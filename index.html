@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hocan Holdings</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: Inter, sans-serif;
+      margin: 0;
+      padding: 0;
+      background:
+        radial-gradient(circle at 10% 20%, #e0f2ff 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, #ffd9cf 0%, transparent 40%),
+        #f4f6f8;
+      min-height: 100vh;
+      color: #333;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Background shimmer – sky blue & rose gold */
+    .bg-shimmer {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .bg-shimmer::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(
+          circle at 30% 30%,
+          rgba(169, 216, 237, 0.48) 0%,
+          transparent 50%
+        ),
+        radial-gradient(
+          circle at 70% 70%,
+          rgba(243, 222, 217, 0.48) 0%,
+          transparent 50%
+        );
+      animation: bg-shimmer 10s infinite ease-in-out;
+    }
+
+    @keyframes bg-shimmer {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      50% { transform: translate(30px, 30px) rotate(160deg); }
+    }
+
+    /* Bubble-like orbs on top of background */
+    .bg-bubbles {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .bg-bubbles .bubble {
+      position: absolute;
+      border-radius: 50%;
+      background: radial-gradient(
+        circle at 30% 30%,
+        rgba(255, 255, 255, 0.5) 0%,
+        rgba(200, 230, 255, 0.25) 40%,
+        rgba(255, 220, 230, 0.15) 70%,
+        transparent 100%
+      );
+      filter: blur(20px);
+      animation: bubble-float 18s infinite ease-in-out;
+    }
+
+    .bg-bubbles .bubble:nth-child(1) { width: 280px; height: 280px; left: -8%; top: 15%; animation-duration: 20s; animation-delay: 0s; }
+    .bg-bubbles .bubble:nth-child(2) { width: 200px; height: 200px; right: 5%; top: 25%; animation-duration: 16s; animation-delay: -4s; }
+    .bg-bubbles .bubble:nth-child(3) { width: 160px; height: 160px; left: 35%; bottom: 20%; animation-duration: 22s; animation-delay: -8s; }
+    .bg-bubbles .bubble:nth-child(4) { width: 120px; height: 120px; right: 25%; top: 50%; animation-duration: 14s; animation-delay: -2s; }
+    .bg-bubbles .bubble:nth-child(5) { width: 220px; height: 220px; left: 50%; top: -5%; animation-duration: 19s; animation-delay: -6s; }
+    .bg-bubbles .bubble:nth-child(6) { width: 100px; height: 100px; left: 15%; bottom: 35%; animation-duration: 15s; animation-delay: -10s; }
+    .bg-bubbles .bubble:nth-child(7) { width: 180px; height: 180px; right: -5%; bottom: 10%; animation-duration: 17s; animation-delay: -3s; }
+
+    @keyframes bubble-float {
+      0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.85; }
+      25% { transform: translate(15px, -20px) scale(1.05); opacity: 0.9; }
+      50% { transform: translate(-10px, 15px) scale(0.98); opacity: 0.8; }
+      75% { transform: translate(20px, 10px) scale(1.02); opacity: 0.9; }
+    }
+
+    .container {
+      width: 90%;
+      max-width: 1200px;
+      margin: auto;
+      padding-bottom: 80px;
+    }
+
+    /* Glassmorphism card */
+    .glass {
+      background: rgba(255, 255, 255, 0.35);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 24px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+      padding: 48px;
+    }
+
+    /* Wrapper reserves space so hero doesn’t jump when nav slides up */
+    .nav-wrapper {
+      min-height: 176px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Floating glass navbar – whole section disappears on scroll, smooth animation */
+    .navbar {
+      position: sticky;
+      top: 20px;
+      margin: 20px auto;
+      width: 90%;
+      max-width: 1200px;
+      z-index: 100;
+      transform: translateZ(0);
+      opacity: 1;
+      visibility: visible;
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+      transition:
+        transform 0.65s cubic-bezier(0.33, 1, 0.68, 1),
+        opacity 0.65s cubic-bezier(0.33, 1, 0.68, 1),
+        visibility 0s 0s;
+    }
+
+    .navbar--hidden {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%) translateY(-100%);
+      margin: 0;
+      width: 90%;
+      max-width: 1200px;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition:
+        transform 0.65s cubic-bezier(0.33, 1, 0.68, 1),
+        opacity 0.65s cubic-bezier(0.33, 1, 0.68, 1),
+        visibility 0s 0.65s;
+    }
+
+    .nav-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .links,
+    .contact {
+      /* no collapse transition needed – whole nav hides */
+    }
+
+    .logo img {
+      height: 60px;
+      display: block;
+    }
+
+    .links a {
+      margin: 0 18px;
+      color: #444;
+      font-weight: 500;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .links a:hover {
+      color: #d18c7c;
+    }
+
+    /* Rose gold button */
+    .btn {
+      background: #d18c7c;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 10px;
+      text-decoration: none;
+      border: none;
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-block;
+    }
+
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Tabs – glassmorphism with sliding glass indicator; clear blue (Home) vs rose gold (Send Package) */
+    .tabs {
+      position: relative;
+      display: flex;
+      border-radius: 30px;
+      overflow: hidden;
+      width: 320px;
+      margin-bottom: 0;
+      background: rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    }
+
+    .tab {
+      flex: 1;
+      padding: 14px 20px;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 600;
+      background: transparent;
+      color: #666;
+      z-index: 1;
+      transition: color 0.3s;
+    }
+
+    .tab.active {
+      color: #1a1a1a;
+      font-weight: 700;
+    }
+
+    .tab-indicator {
+      position: absolute;
+      height: 100%;
+      width: 50%;
+      top: 0;
+      left: 0;
+      border-radius: 30px;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      transition: left 0.35s ease;
+      pointer-events: none;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+    }
+
+    .tab-indicator.is-home {
+      background: rgba(169, 216, 237, 0.55);
+      border: 1px solid rgba(91, 163, 201, 0.25);
+      border-bottom: 2px solid rgba(91, 163, 201, 0.7);
+    }
+
+    .tab-indicator.is-send {
+      background: rgba(243, 222, 217, 0.55);
+      border: 1px solid rgba(209, 140, 124, 0.25);
+      border-bottom: 2px solid rgba(209, 140, 124, 0.6);
+    }
+
+    /* Hero section */
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      gap: 40px;
+    }
+
+    .hero h1 {
+      font-size: 42px;
+      margin-bottom: 16px;
+      font-weight: 700;
+      color: #1a1a1a;
+      line-height: 1.2;
+    }
+
+    .hero p {
+      color: #555;
+      line-height: 1.6;
+      margin-bottom: 20px;
+      font-size: 17px;
+    }
+
+    .hero-image {
+      position: relative;
+      border-radius: 20px;
+      overflow: hidden;
+    }
+
+    .hero-image img {
+      width: 100%;
+      border-radius: 20px;
+      object-fit: cover;
+      display: block;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Panel switching (Home vs Send Package form) */
+    .hero-panel {
+      animation: panelIn 0.35s ease;
+    }
+    @keyframes panelIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .hero-panel-send {
+      margin-top: 0;
+    }
+
+    /* Send package form */
+    .send-package-form {
+      padding: 8px 0 0;
+    }
+    .send-form-title {
+      font-size: 26px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 8px;
+    }
+    .send-form-sub {
+      font-size: 15px;
+      color: #555;
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px 24px;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .form-group-full {
+      grid-column: 1 / -1;
+    }
+    .form-group label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #333;
+    }
+    .form-group .req {
+      color: #d18c7c;
+    }
+    .form-group input {
+      padding: 12px 14px;
+      border: 1px solid rgba(0,0,0,0.12);
+      border-radius: 10px;
+      font-size: 15px;
+      font-family: inherit;
+      background: rgba(255,255,255,0.6);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-group input:focus {
+      outline: none;
+      border-color: #d18c7c;
+      box-shadow: 0 0 0 3px rgba(209, 140, 124, 0.2);
+    }
+    .form-group input::placeholder {
+      color: #999;
+    }
+    .btn-submit {
+      padding: 14px 28px;
+      font-size: 16px;
+      margin-top: 8px;
+    }
+
+    /* Main content card (tabs + hero) – text higher on card */
+    .hero-section {
+      margin-top: 80px;
+      padding-top: 16px;
+      padding-bottom: 48px;
+    }
+
+    .hero-section .hero {
+      padding-top: 0;
+      margin-top: 0;
+      align-items: start;
+    }
+
+    .hero-section .hero-text {
+      padding-top: 8px;
+    }
+
+    .welcome-section {
+      background: rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 20px;
+      padding: 40px;
+      margin-top: 80px;
+      margin-bottom: 30px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+      color: #41463f;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+    }
+
+    .welcome-section::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(
+          circle at 40% 40%,
+          rgba(169, 216, 237, 0.2) 0%,
+          transparent 50%
+        ),
+        radial-gradient(
+          circle at 60% 60%,
+          rgba(243, 222, 217, 0.25) 0%,
+          transparent 50%
+        );
+      animation: shimmer 10s infinite ease-in-out;
+      pointer-events: none;
+    }
+
+    @keyframes shimmer {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      50% { transform: translate(20px, 20px) rotate(180deg); }
+    }
+
+    .welcome-section-inner {
+      position: relative;
+      z-index: 1;
+    }
+
+    .welcome-section h2 {
+      font-size: 32px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #1a1a1a;
+    }
+
+    .welcome-section p {
+      font-size: 16px;
+      opacity: 0.95;
+      line-height: 1.6;
+      margin-bottom: 24px;
+      color: #555;
+    }
+
+    /* Our Partners – image only, no padding, 65% width (35% smaller) centered */
+    .partners-section {
+      margin-top: 80px;
+      padding: 0;
+      text-align: center;
+    }
+
+    .partners-image-wrap {
+      display: inline-block;
+      width: 65%;
+      line-height: 0;
+      max-width: 100%;
+    }
+
+    .partners-section .partners-image-wrap img {
+      width: 100%;
+      height: auto;
+      display: block;
+      vertical-align: middle;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* Footer bar */
+    .footer-bar {
+      margin-top: 80px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-bar .links a {
+      margin: 0 18px;
+    }
+
+    .admin-login-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      background: #d18c7c;
+      color: #fff;
+      border-radius: 12px;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+
+    .admin-login-btn:hover {
+      background: #b85c4a;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(184, 92, 74, 0.35);
+    }
+
+    .admin-login-icon {
+      width: 24px;
+      height: 24px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      /* On phones: fade only (no slide) to avoid scroll/transform glitches */
+      .navbar--hidden {
+        transform: translateX(-50%) translateY(0);
+        transition: opacity 0.35s ease, visibility 0s 0.35s;
+      }
+
+      .hero {
+        grid-template-columns: 1fr;
+      }
+
+      .hero h1 {
+        font-size: 32px;
+      }
+
+      .tabs {
+        width: 100%;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .nav-inner {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .links {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      .links a {
+        margin: 0 8px;
+      }
+
+      .glass {
+        padding: 32px 24px;
+      }
+
+      .footer-bar {
+        flex-direction: column;
+        gap: 16px;
+      }
+
+    }
+
+    /* Sub-pages (Logistics, Supplies, Consult) + home button */
+    .landing-content {
+      display: block;
+    }
+
+    .landing-content.hidden {
+      display: none;
+    }
+
+    .sub-page {
+      display: none;
+      padding-bottom: 80px;
+    }
+
+    .sub-page.active {
+      display: block;
+    }
+
+    .home-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 32px;
+      padding: 0;
+      padding-right: 24px;
+      padding-left: 4px;
+      min-height: 48px;
+      background: linear-gradient(180deg, #e8b4a8 0%, #d18c7c 35%, #c97b63 70%, #b85c4a 100%);
+      border: none;
+      border-radius: 50px;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      font-family: inherit;
+      transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
+      box-shadow:
+        0 2px 0 rgba(184, 92, 74, 0.4),
+        0 4px 12px rgba(184, 92, 74, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.35);
+      position: relative;
+    }
+
+    .home-btn:hover {
+      transform: translateY(-1px);
+      box-shadow:
+        0 3px 0 rgba(184, 92, 74, 0.4),
+        0 8px 20px rgba(184, 92, 74, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    }
+
+    .home-btn:active {
+      transform: translateY(0);
+    }
+
+    .home-btn-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, #c97b63 0%, #b85c4a 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.15);
+    }
+
+    .home-btn-icon svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .sub-page .content-card {
+      background: rgba(255, 255, 255, 0.4);
+      backdrop-filter: blur(20px);
+      border-radius: 20px;
+      padding: 40px 48px;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.06);
+    }
+
+    .sub-page h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 12px;
+    }
+
+    .sub-page .lead {
+      font-size: 17px;
+      color: #555;
+      line-height: 1.6;
+      margin-bottom: 28px;
+    }
+
+    .sub-page .body p {
+      font-size: 16px;
+      color: #444;
+      line-height: 1.7;
+      margin-bottom: 16px;
+    }
+
+    .consult-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      margin-top: 24px;
+    }
+
+    .consult-services {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .consult-service {
+      position: relative;
+      padding: 24px 20px;
+      background: rgba(255, 255, 255, 0.6);
+      border-radius: 16px;
+      border: 1px solid rgba(45, 122, 110, 0.15);
+    }
+
+    .consult-service .num {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      font-size: 48px;
+      font-weight: 800;
+      color: rgba(0, 0, 0, 0.06);
+      line-height: 1;
+    }
+
+    .consult-service h3 {
+      font-size: 15px;
+      font-weight: 700;
+      color: #2d7a6e;
+      margin-bottom: 10px;
+      letter-spacing: 0.02em;
+    }
+
+    .consult-service p {
+      font-size: 14px;
+      color: #333;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .consult-attributes h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #2d7a6e;
+      margin-bottom: 8px;
+    }
+
+    .consult-attributes p {
+      font-size: 14px;
+      color: #333;
+      line-height: 1.6;
+      margin: 0 0 20px 0;
+    }
+
+    .consult-attributes .attr {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      margin-bottom: 24px;
+    }
+
+    .consult-attributes .attr:last-child {
+      margin-bottom: 0;
+    }
+
+    .consult-attributes .check {
+      flex-shrink: 0;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #2d7a6e;
+      font-size: 18px;
+    }
+
+    @media (max-width: 768px) {
+      .consult-grid {
+        grid-template-columns: 1fr;
+      }
+      .consult-services {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-shimmer" aria-hidden="true"></div>
+  <div class="bg-bubbles" aria-hidden="true">
+    <span class="bubble"></span>
+    <span class="bubble"></span>
+    <span class="bubble"></span>
+    <span class="bubble"></span>
+    <span class="bubble"></span>
+    <span class="bubble"></span>
+    <span class="bubble"></span>
+  </div>
+  <div class="container">
+    <div class="nav-wrapper">
+    <nav class="navbar glass">
+      <div class="nav-inner">
+        <div class="logo">
+          <img src="assets/logo.png" alt="Hocan Holdings" height="60" />
+        </div>
+        <div class="links">
+          <a href="#logistics" class="nav-page-link" data-page="logistics">Hocan Logistics</a>
+          <a href="#consult" class="nav-page-link" data-page="consult">Hocan Consult</a>
+          <a href="#supplies" class="nav-page-link" data-page="supplies">Hocan Supplies</a>
+        </div>
+        <div class="contact">
+          <button type="button" class="btn btn-send-package" aria-label="Send Package">Send Package</button>
+        </div>
+      </div>
+    </nav>
+    </div>
+
+    <div class="landing-content" id="landingContent">
+    <section class="hero-section glass" id="heroSection">
+      <div class="tabs">
+        <div class="tab-indicator is-home"></div>
+        <button type="button" class="tab active" data-panel="home">Home</button>
+        <button type="button" class="tab" data-panel="send">Send Package</button>
+      </div>
+
+      <div class="hero-panel hero-panel-home" id="panelHome">
+        <section class="hero">
+          <div class="hero-text">
+            <h1>Welcome to Hocan Holdings</h1>
+            <p>
+              Established since 2015. Comprehensive logistics, consulting,
+              and supplies provider dedicated to your success across Kenya and East Africa.
+            </p>
+            <a href="#learn" class="btn">Learn More</a>
+          </div>
+          <div class="hero-image">
+            <img src="assets/hero.png" alt="Delivery professional" />
+          </div>
+        </section>
+      </div>
+
+      <div class="hero-panel hero-panel-send" id="panelSend" hidden>
+        <form class="send-package-form" id="sendPackageForm" aria-labelledby="sendPackageHeading">
+          <h2 id="sendPackageHeading" class="send-form-title">Send a Package</h2>
+          <p class="send-form-sub">Enter the package details below. We’ll get back to you to confirm pickup and delivery.</p>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="senderName">Sender name <span class="req">*</span></label>
+              <input type="text" id="senderName" name="senderName" required placeholder="Your full name" />
+            </div>
+            <div class="form-group">
+              <label for="senderPhone">Phone <span class="req">*</span></label>
+              <input type="tel" id="senderPhone" name="senderPhone" required placeholder="e.g. 0727111179" />
+            </div>
+            <div class="form-group">
+              <label for="senderEmail">Email <span class="req">*</span></label>
+              <input type="email" id="senderEmail" name="senderEmail" required placeholder="you@example.com" />
+            </div>
+            <div class="form-group form-group-full">
+              <label for="pickupAddress">Pickup address <span class="req">*</span></label>
+              <input type="text" id="pickupAddress" name="pickupAddress" required placeholder="Street, area, town" />
+            </div>
+            <div class="form-group">
+              <label for="recipientName">Recipient name <span class="req">*</span></label>
+              <input type="text" id="recipientName" name="recipientName" required placeholder="Recipient full name" />
+            </div>
+            <div class="form-group">
+              <label for="recipientPhone">Recipient phone <span class="req">*</span></label>
+              <input type="tel" id="recipientPhone" name="recipientPhone" required placeholder="e.g. 0727111179" />
+            </div>
+            <div class="form-group form-group-full">
+              <label for="deliveryAddress">Delivery address <span class="req">*</span></label>
+              <input type="text" id="deliveryAddress" name="deliveryAddress" required placeholder="Street, area, town" />
+            </div>
+            <div class="form-group">
+              <label for="packageDesc">Package description</label>
+              <input type="text" id="packageDesc" name="packageDesc" placeholder="e.g. Documents, small box" />
+            </div>
+            <div class="form-group">
+              <label for="packageWeight">Weight (kg)</label>
+              <input type="number" id="packageWeight" name="packageWeight" min="0" step="0.1" placeholder="e.g. 2.5" />
+            </div>
+            <div class="form-group form-group-full">
+              <button type="submit" class="btn btn-submit">Submit request</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <section class="welcome-section">
+      <div class="welcome-section-inner">
+        <h2>Building the infrastructure behind East Africa's fastest growing businesses.</h2>
+        <p>
+          Since 2015, Hocan Holdings has supported companies across Kenya and the region with logistics, consulting, and supply solutions designed for scale.
+        </p>
+        <a href="#learn" class="btn">Explore Our Work</a>
+      </div>
+    </section>
+
+    <section class="partners-section" aria-label="Our partners">
+      <div class="partners-image-wrap">
+        <img src="assets/partners.png" alt="Our partners: TastyGrubs Limited, Versa Natura, Omega Gardens Karatina, Technoedge limited, Mifun team builders" />
+      </div>
+    </section>
+
+    <footer class="footer-bar glass">
+      <div class="links">
+        <a href="#logistics" class="nav-page-link" data-page="logistics">Hocan Logistics</a>
+        <a href="#consult" class="nav-page-link" data-page="consult">Hocan Consult</a>
+        <a href="#supplies" class="nav-page-link" data-page="supplies">Hocan Supplies</a>
+      </div>
+      <a href="admin.html" class="admin-login-btn" aria-label="Admin login" title="Admin login">
+        <svg class="admin-login-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="8" r="4"/>
+          <path d="M4 20c0-4 4-6 8-6s8 2 8 6"/>
+        </svg>
+      </a>
+    </footer>
+    </div>
+
+    <!-- Sub-page: Hocan Logistics -->
+    <div class="sub-page" id="page-logistics">
+      <button type="button" class="home-btn" aria-label="Back to home"><span class="home-btn-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span><span class="home-btn-text">HOME</span></button>
+      <div class="content-card">
+        <h1>Hocan Logistics</h1>
+        <p class="lead">Optimized for delivery in urban centers across Kenya and East Africa. We started in Nairobi and have built our operations around the unique demands of city logistics.</p>
+        <div class="body">
+          <p>From last-mile delivery in dense neighbourhoods to cross-town freight, Hocan Logistics is built for urban efficiency. Our Nairobi roots mean we know the routes, the traffic patterns, and the local requirements that keep your packages moving on time.</p>
+          <p>We offer same-day and next-day delivery in major urban centers, real-time tracking, and dedicated account management for businesses of every size. Whether you need regular replenishment runs or one-off urgent shipments, our fleet and hubs are positioned to serve you.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sub-page: Hocan Supplies -->
+    <div class="sub-page" id="page-supplies">
+      <button type="button" class="home-btn" aria-label="Back to home"><span class="home-btn-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span><span class="home-btn-text">HOME</span></button>
+      <div class="content-card">
+        <h1>Hocan Supplies</h1>
+        <p class="lead">We deliver at scale through major contracts, tenders, and long-term supply agreements. Our capability and capacity are built for large-volume and institutional clients.</p>
+        <div class="body">
+          <p>Hocan Supplies is equipped to handle big contracts and competitive tenders. We combine robust procurement, reliable distribution, and compliance-ready processes so you can meet your obligations on time and to spec.</p>
+          <p>From office and facility supplies to industrial and project-based procurement, we bring the capability to support government, corporate, and NGO tenders. Our team manages end-to-end logistics so you can focus on your core work.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sub-page: Hocan Consult -->
+    <div class="sub-page" id="page-consult">
+      <button type="button" class="home-btn" aria-label="Back to home"><span class="home-btn-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span><span class="home-btn-text">HOME</span></button>
+      <div class="content-card">
+        <h1>Hocan Consult</h1>
+        <p class="lead">Consultancy services and strategic support for your business. We combine innovation, quality, and a customer-centric focus across HR, legal, F&amp;B, and tax.</p>
+        <div class="consult-grid">
+          <div class="consult-services">
+            <div class="consult-service">
+              <span class="num" aria-hidden="true">1</span>
+              <h3>HR CONSULTANCY</h3>
+              <p>Develop strategies to assess and address complex HR challenges for existing companies and start-ups.</p>
+            </div>
+            <div class="consult-service">
+              <span class="num" aria-hidden="true">2</span>
+              <h3>LEGAL CONSULTANCY</h3>
+              <p>Offer relevant and up-to-date advice with sound and cost-effective solutions.</p>
+            </div>
+            <div class="consult-service">
+              <span class="num" aria-hidden="true">3</span>
+              <h3>F &amp; B CONSULTANCY</h3>
+              <p>Experienced in dealing with cloud food outlets and standalone kitchens as well as traditional establishments.</p>
+            </div>
+            <div class="consult-service">
+              <span class="num" aria-hidden="true">4</span>
+              <h3>TAX MANAGEMENT</h3>
+              <p>All matters tax planning, compliance, deductions/credits and tax risk management.</p>
+            </div>
+          </div>
+          <div class="consult-attributes">
+            <div class="attr">
+              <span class="check" aria-hidden="true">&#10003;</span>
+              <div>
+                <h3>Innovation and Expertise</h3>
+                <p>Our team pioneers cutting-edge solutions, backed by years of industry-leading expertise.</p>
+              </div>
+            </div>
+            <div class="attr">
+              <span class="check" aria-hidden="true">&#10003;</span>
+              <div>
+                <h3>Quality Solutions</h3>
+                <p>We uphold the highest standards of quality, ensuring reliability and customer satisfaction.</p>
+              </div>
+            </div>
+            <div class="attr">
+              <span class="check" aria-hidden="true">&#10003;</span>
+              <div>
+                <h3>Customer-Centric Focus</h3>
+                <p>Our dedication prioritizes customers with personalized support, tailored solutions—no off-the-shelf stuff.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const landingContent = document.getElementById("landingContent");
+    const subPages = document.querySelectorAll(".sub-page");
+    const navPageLinks = document.querySelectorAll(".nav-page-link");
+    const homeButtons = document.querySelectorAll(".home-btn");
+
+    function showPage(pageId) {
+      if (!landingContent) return;
+      window.location.hash = pageId;
+      landingContent.classList.add("hidden");
+      subPages.forEach(function (el) {
+        el.classList.toggle("active", el.id === "page-" + pageId);
+      });
+    }
+
+    function showLanding() {
+      history.replaceState(null, "", window.location.pathname + window.location.search);
+      if (landingContent) landingContent.classList.remove("hidden");
+      subPages.forEach(function (el) {
+        el.classList.remove("active");
+      });
+    }
+
+    navPageLinks.forEach(function (link) {
+      link.addEventListener("click", function (e) {
+        e.preventDefault();
+        var page = link.getAttribute("data-page");
+        if (page) showPage(page);
+      });
+    });
+
+    homeButtons.forEach(function (btn) {
+      btn.addEventListener("click", showLanding);
+    });
+
+    window.addEventListener("hashchange", function () {
+      var hash = (window.location.hash || "").replace("#", "");
+      if (hash === "logistics" || hash === "supplies" || hash === "consult") showPage(hash);
+      else if (!hash || hash === "home") showLanding();
+    });
+    if (window.location.hash && window.location.hash !== "#") {
+      var h = window.location.hash.replace("#", "");
+      if (h === "logistics" || h === "supplies" || h === "consult") showPage(h);
+    }
+
+    const tabEls = document.querySelectorAll(".tab");
+    const indicator = document.querySelector(".tab-indicator");
+    const panelHome = document.getElementById("panelHome");
+    const panelSend = document.getElementById("panelSend");
+
+    function setPanel(panel) {
+      const isSend = panel === "send";
+      document.querySelector(".tab.active").classList.remove("active");
+      tabEls[isSend ? 1 : 0].classList.add("active");
+      indicator.style.left = (isSend ? 1 : 0) * 50 + "%";
+      indicator.classList.toggle("is-home", !isSend);
+      indicator.classList.toggle("is-send", isSend);
+      if (panelHome) panelHome.hidden = isSend;
+      if (panelSend) panelSend.hidden = !isSend;
+      if (isSend) document.getElementById("heroSection")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    tabEls.forEach((tab, index) => {
+      tab.addEventListener("click", () => setPanel(index === 0 ? "home" : "send"));
+    });
+
+    document.querySelectorAll(".btn-send-package").forEach(function (btn) {
+      btn.addEventListener("click", function () { setPanel("send"); });
+    });
+
+    document.getElementById("sendPackageForm")?.addEventListener("submit", function (e) {
+      e.preventDefault();
+      alert("Thank you. Your package request has been submitted. We’ll contact you shortly to confirm pickup and delivery.");
+      this.reset();
+    });
+
+    (function () {
+      const nav = document.querySelector(".navbar");
+      const thresholdHide = 80;
+      const thresholdShow = 50;
+      var isHidden = false;
+      var ticking = false;
+      function updateNav() {
+        var y = window.scrollY;
+        if (!isHidden && y > thresholdHide) {
+          nav.classList.add("navbar--hidden");
+          isHidden = true;
+        } else if (isHidden && y < thresholdShow) {
+          nav.classList.remove("navbar--hidden");
+          isHidden = false;
+        }
+        ticking = false;
+      }
+      window.addEventListener("scroll", function () {
+        if (!ticking) {
+          requestAnimationFrame(updateNav);
+          ticking = true;
+        }
+      }, { passive: true });
+      isHidden = window.scrollY > thresholdHide;
+      if (isHidden) nav.classList.add("navbar--hidden");
+      else nav.classList.remove("navbar--hidden");
+    })();
+  </script>
+</body>
+</html>
