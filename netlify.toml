@@ -1,0 +1,5 @@
+# Netlify build: inject SUPABASE_URL and SUPABASE_ANON_KEY into config.js (set in Netlify env vars).
+# Do not add SUPABASE_SERVICE_ROLE_KEY to frontend; use it only in Supabase Edge Function secrets.
+[build]
+  command = "npm run build"
+  publish = "."

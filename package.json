@@ -1,0 +1,8 @@
+{
+  "name": "hocan-holdings-website",
+  "private": true,
+  "scripts": {
+    "build": "node scripts/generate-config.js",
+    "postbuild": "echo Build complete. config.js is generated from Netlify env vars."
+  }
+}

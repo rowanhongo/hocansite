@@ -983,6 +983,8 @@
     </div>
   </div>
 
+  <script src="config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script>
     const landingContent = document.getElementById("landingContent");
     const subPages = document.querySelectorAll(".sub-page");
@@ -1053,10 +1055,40 @@
       btn.addEventListener("click", function () { setPanel("send"); });
     });
 
-    document.getElementById("sendPackageForm")?.addEventListener("submit", function (e) {
+    document.getElementById("sendPackageForm")?.addEventListener("submit", async function (e) {
       e.preventDefault();
-      alert("Thank you. Your package request has been submitted. We’ll contact you shortly to confirm pickup and delivery.");
-      this.reset();
+      const url = window.SUPABASE_URL;
+      const key = window.SUPABASE_ANON_KEY;
+      if (!url || !key) {
+        alert("Supabase is not configured. Add your project URL and anon key in config.js");
+        return;
+      }
+      const btn = this.querySelector('button[type="submit"]');
+      const origText = btn?.textContent;
+      if (btn) btn.disabled = true;
+      try {
+        const supabase = window.supabase.createClient(url, key);
+        const payload = {
+          sender_name: document.getElementById("senderName").value.trim(),
+          sender_phone: document.getElementById("senderPhone").value.trim(),
+          sender_email: document.getElementById("senderEmail").value.trim(),
+          pickup_address: document.getElementById("pickupAddress").value.trim(),
+          recipient_name: document.getElementById("recipientName").value.trim(),
+          recipient_phone: document.getElementById("recipientPhone").value.trim(),
+          delivery_address: document.getElementById("deliveryAddress").value.trim(),
+          package_description: document.getElementById("packageDesc").value.trim() || null,
+          package_weight_kg: document.getElementById("packageWeight").value ? parseFloat(document.getElementById("packageWeight").value) : null,
+          status: "pending",
+          payment_status: "pending"
+        };
+        const { data, error } = await supabase.from("orders").insert(payload).select("id, order_number").single();
+        if (error) throw error;
+        this.reset();
+        alert("Thank you. Your package request has been submitted (Order " + (data?.order_number || data?.id) + "). We will contact you shortly to confirm pickup and delivery.");
+      } catch (err) {
+        alert("Something went wrong. Please try again or contact support.\n\n" + (err?.message || String(err)));
+      }
+      if (btn) { btn.disabled = false; btn.textContent = origText; }
     });
 
     (function () {

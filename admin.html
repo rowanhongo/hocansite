@@ -255,26 +255,96 @@ tr:hover td{background:#fafbfd}
   </div>
 </div>
 
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
 let allOrders=[];
 let filtered=allOrders.filter(o=>o.status==='pending');
 let currentOrderId=null;
 let currentFilter='pending';
+let supabaseClient=null;
 
-function doLogin(){
-  const email=document.getElementById('emailInput').value;
+function getSupabase(){
+  const url=window.SUPABASE_URL;
+  const key=window.SUPABASE_ANON_KEY;
+  if(!url||!key)return null;
+  if(!supabaseClient)supabaseClient=window.supabase.createClient(url,key);
+  return supabaseClient;
+}
+
+function formatOrderDate(createdAt){
+  if(!createdAt)return '—';
+  const d=new Date(createdAt);
+  return isNaN(d.getTime())?'—':d.toISOString().slice(0,10);
+}
+
+function rowToOrder(row){
+  return {
+    id:row.id,
+    order_number:row.order_number||row.id,
+    name:row.sender_name,
+    whatsapp:row.sender_phone,
+    email:row.sender_email,
+    pickup:row.pickup_address,
+    delivery:row.delivery_address,
+    type:row.package_description||'—',
+    date:formatOrderDate(row.created_at),
+    status:row.status,
+    description:row.package_description||'—'
+  };
+}
+
+async function loadOrdersFromSupabase(){
+  const supabase=getSupabase();
+  if(!supabase){allOrders=[];filtered=[];renderOrders();updateStats();updateDashboard();return;}
+  const {data,error}=await supabase.from('orders').select('*').order('created_at',{ascending:false});
+  if(error){console.error(error);allOrders=[];}
+  else allOrders=(data||[]).map(rowToOrder);
+  filtered=allOrders.filter(o=>o.status===currentFilter);
+  renderOrders();
+  updateStats();
+  updateDashboard();
+}
+
+async function doLogin(){
+  const email=document.getElementById('emailInput').value.trim();
   const pass=document.getElementById('passwordInput').value;
-  if(!email||!email.includes('@')){alert('Please enter a valid email address.');return}
-  if(!pass){alert('Please enter your password.');return}
-  // TODO: Replace with Supabase auth
+  if(!email||!email.includes('@')){alert('Please enter a valid email address.');return;}
+  if(!pass){alert('Please enter your password.');return;}
+  const supabase=getSupabase();
+  if(!supabase){alert('Supabase is not configured. Add your project URL and anon key in config.js');return;}
+  try {
+    const {data:authData,error:authErr}=await supabase.auth.signInWithPassword({email,password:pass});
+    if(authErr)throw authErr;
+    const {data:adminRow}=await supabase.from('admins').select('user_id').eq('user_id',authData.user.id).maybeSingle();
+    if(!adminRow){await supabase.auth.signOut();alert('You are not authorized as an admin.');return;}
+    document.getElementById('loginScreen').classList.add('hidden');
+    document.getElementById('mainApp').classList.add('show');
+    document.getElementById('dateLabel').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+    await loadOrdersFromSupabase();
+    setView('home',document.querySelector('.nav-item'));
+  } catch(err){
+    alert(err?.message||'Login failed. Please try again.');
+  }
+}
+
+async function initAdminSession(){
+  const supabase=getSupabase();
+  if(!supabase)return;
+  const {data:{session}}=await supabase.auth.getSession();
+  if(!session)return;
+  const {data:adminRow}=await supabase.from('admins').select('user_id').eq('user_id',session.user.id).maybeSingle();
+  if(!adminRow)return;
   document.getElementById('loginScreen').classList.add('hidden');
   document.getElementById('mainApp').classList.add('show');
   document.getElementById('dateLabel').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-  renderOrders();updateStats();updateDashboard();
+  await loadOrdersFromSupabase();
   setView('home',document.querySelector('.nav-item'));
 }
 
 function logout(){
+  const supabase=getSupabase();
+  if(supabase)supabase.auth.signOut();
   document.getElementById('loginScreen').classList.remove('hidden');
   document.getElementById('mainApp').classList.remove('show');
   document.getElementById('emailInput').value='';
@@ -362,7 +432,7 @@ function renderOrders(){
   const labelMap={pending:'Pending',confirmed:'Confirmed',transit:'In Transit',delivered:'Delivered',cancelled:'Cancelled'};
   tbody.innerHTML=filtered.map(o=>`
     <tr>
-      <td><strong>${o.id}</strong></td>
+      <td><strong>${o.order_number||o.id}</strong></td>
       <td><div style="font-weight:600">${o.name}</div><div style="font-size:12px;color:var(--muted)">${o.whatsapp}</div></td>
       <td>${o.pickup}</td>
       <td>${o.delivery}</td>
@@ -394,21 +464,25 @@ function openDetail(id){
   currentOrderId=id;
   const statusLabel={pending:'Pending',confirmed:'Confirmed',transit:'In Transit',delivered:'Delivered',cancelled:'Cancelled'};
   document.getElementById('detailContent').innerHTML=`
-    ${[['Order ID',o.id],['Customer',o.name],['WhatsApp',o.whatsapp],['Email',o.email],['Package Type',o.type],['Pickup',o.pickup],['Delivery',o.delivery],['Date',o.date],['Status',statusLabel[o.status]||o.status],['Description',o.description||'—']].map(([k,v])=>`<div class="detail-row"><span class="key">${k}</span><span class="val">${v}</span></div>`).join('')}`;
+    ${[['Order ID',o.order_number||o.id],['Customer',o.name],['WhatsApp',o.whatsapp],['Email',o.email],['Package Type',o.type],['Pickup',o.pickup],['Delivery',o.delivery],['Date',o.date],['Status',statusLabel[o.status]||o.status],['Description',o.description||'—']].map(([k,v])=>`<div class="detail-row"><span class="key">${k}</span><span class="val">${v}</span></div>`).join('')}`;
   document.getElementById('detailOverlay').classList.add('show');
 }
 
 function closeDetail(){document.getElementById('detailOverlay').classList.remove('show');currentOrderId=null}
 
-function updateStatus(status){
+async function updateStatus(status){
   if(!currentOrderId)return;
-  const o=allOrders.find(x=>x.id===currentOrderId);
-  if(o){o.status=status;}
-  filtered=allOrders.filter(o=>o.status===currentFilter);
-  renderOrders();updateStats();closeDetail();
+  const supabase=getSupabase();
+  if(!supabase){closeDetail();return;}
+  try {
+    const {error}=await supabase.from('orders').update({status}).eq('id',currentOrderId);
+    if(error)throw error;
+    await loadOrdersFromSupabase();
+    closeDetail();
+  } catch(err){ alert(err?.message||'Update failed.'); }
 }
 
-function refreshOrders(){renderOrders();updateStats();alert('Orders refreshed!\n\nSupabase real-time sync will be integrated here.');}
+function refreshOrders(){loadOrdersFromSupabase();}
 
 var currentView='home';
 
@@ -470,6 +544,8 @@ function setView(v,el){
   var searchEl=document.getElementById('customerSearch');
   if(searchEl&&searchEl.value)searchOrders(searchEl.value);
 }
+
+initAdminSession();
 </script>
 </body>
 </html>
