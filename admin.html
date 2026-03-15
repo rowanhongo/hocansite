@@ -256,14 +256,7 @@ tr:hover td{background:#fafbfd}
 </div>
 
 <script>
-// Sample orders data (replace with Supabase later)
-let allOrders=[
-  {id:'HCN-001',name:'Jane Mwangi',whatsapp:'0712345678',email:'jane@example.com',pickup:'Nairobi CBD',delivery:'Mombasa',type:'Small Parcel',date:'2026-03-14',status:'pending',description:'Electronics accessories'},
-  {id:'HCN-002',name:'Peter Otieno',whatsapp:'0723456789',email:'peter@ex.com',pickup:'Kisumu',delivery:'Nairobi CBD',type:'Documents',date:'2026-03-13',status:'confirmed',description:'Legal documents'},
-  {id:'HCN-003',name:'Mary Wanjiru',whatsapp:'0734567890',email:'mary@ex.com',pickup:'Nakuru',delivery:'Eldoret',type:'Medium Parcel',date:'2026-03-12',status:'transit',description:'Clothing items'},
-  {id:'HCN-004',name:'David Kamau',whatsapp:'0745678901',email:'david@ex.com',pickup:'Thika',delivery:'Nyeri',type:'Large Cargo',date:'2026-03-11',status:'delivered',description:'Household goods'},
-  {id:'HCN-005',name:'Sarah Njeri',whatsapp:'0756789012',email:'sarah@ex.com',pickup:'Meru',delivery:'Nairobi CBD',type:'Small Parcel',date:'2026-03-14',status:'pending',description:'Food items'},
-];
+let allOrders=[];
 let filtered=allOrders.filter(o=>o.status==='pending');
 let currentOrderId=null;
 let currentFilter='pending';
