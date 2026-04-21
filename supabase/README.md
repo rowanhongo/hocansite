@@ -44,9 +44,24 @@ https://YOUR_PROJECT_REF.supabase.co/functions/v1/paystack-webhook
 
 ### 5. Admin and rider users
 
-- **Admins**: After a user signs up with Supabase Auth, add them to `public.admins`:  
-  `INSERT INTO public.admins (user_id) VALUES ('auth.users.id');`
+- **Admins**: After a user exists in Supabase Auth, add them to `public.admins`:  
+  `INSERT INTO public.admins (user_id) SELECT id FROM auth.users WHERE email = 'their@email.com';`
 - **Riders**: Create a row in `public.riders` and set `user_id` to their `auth.users.id` so they can log in to the rider app and see assigned orders.
+
+#### Create admin ntonkwac@gmail.com
+
+1. In **Supabase Dashboard → Authentication → Users → Add user**, create a user:
+   - **Email:** `ntonkwac@gmail.com`
+   - **Password:** set the password you want for this admin (you can change it later in Auth → Users).
+2. In **SQL Editor**, run:
+
+```sql
+INSERT INTO public.admins (user_id)
+SELECT id FROM auth.users WHERE email = 'ntonkwac@gmail.com'
+ON CONFLICT (user_id) DO NOTHING;
+```
+
+Then log in at your admin dashboard with that email and password.
 
 ## What’s included
 

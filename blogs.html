@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blogs - Hocan Holdings</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Inter, sans-serif; background: radial-gradient(circle at 10% 20%, #e0f2ff 0%, transparent 40%), radial-gradient(circle at 90% 80%, #ffd9cf 0%, transparent 40%), #f4f6f8; color: #333; }
+    .container { width: 90%; max-width: 1200px; margin: 0 auto; padding-bottom: 80px; }
+    .glass { background: rgba(255,255,255,0.35); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.3); border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.08); }
+    .topbar { margin-top: 20px; padding: 8px 20px; min-height: 36px; display: flex; justify-content: space-between; align-items: center; }
+    .topbar-left { font-size: 13px; color: #666; font-weight: 500; } .topbar-socials { display: flex; gap: 12px; } .topbar-socials a { color: #666; display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; text-decoration: none; } .topbar-socials svg { width: 16px; height: 16px; }
+    .navbar { margin-top: 10px; padding: 18px 24px; } .nav-inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+    .logo img { height: 60px; display: block; } .links a { margin: 0 10px; color: #444; font-weight: 500; text-decoration: none; } .links a:hover { color: #C47A5A; }
+    .hero { margin-top: 36px; padding: 42px; } .hero h1 { font-size: 40px; color: #1a1a1a; margin-bottom: 10px; } .hero p { color: #555; }
+    .cards { margin-top: 24px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .card { background: #fff; border-radius: 16px; box-shadow: 0 8px 22px rgba(0,0,0,0.06); overflow: hidden; }
+    .placeholder { background: #d9dde3; height: 160px; }
+    .card-body { padding: 18px; } .card h3 { margin-bottom: 8px; color: #1a1a1a; } .date { color: #777; font-size: 13px; margin-bottom: 10px; }
+    .card a { color: #C47A5A; text-decoration: none; font-weight: 600; }
+    .site-footer { margin-top: 40px; background: #1C1C2E; color: #fff; border-radius: 20px; overflow: hidden; }
+    .footer-grid { display: grid; grid-template-columns: 1.2fr 1fr 1.2fr 1fr 1fr; gap: 24px; padding: 32px; }
+    .footer-col h4 { margin-bottom: 10px; font-size: 16px; }
+    .footer-col p, .footer-col a, .footer-col li { color: rgba(255,255,255,0.85); font-size: 14px; line-height: 1.6; text-decoration: none; list-style: none; }
+    .footer-col ul { padding: 0; } .footer-socials { display: flex; gap: 10px; } .footer-socials a { color: #fff; display: inline-flex; width: 24px; height: 24px; align-items: center; justify-content: center; } .footer-socials svg { width: 16px; height: 16px; }
+    .footer-bottom { border-top: 1px solid rgba(255,255,255,0.15); padding: 14px 32px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: 13px; } .footer-bottom a { color: rgba(255,255,255,0.85); text-decoration: none; }
+    @media (max-width: 900px) { .nav-inner { flex-direction: column; } .cards { grid-template-columns: 1fr; } .footer-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="topbar glass"><div class="topbar-left">Hotline: +254 791 235 830</div><div class="topbar-socials"><a href="#" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg></a><a href="#" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="16" rx="3"/></svg></a><a href="#" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 3h10a4 4 0 0 1 4 4v10a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V7a4 4 0 0 1 4-4z"/></svg></a><a href="#" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 7h18v10H3z"/></svg></a><a href="#" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h16v16H4z"/></svg></a></div></div>
+    <nav class="navbar glass"><div class="nav-inner"><a class="logo" href="index.html"><img src="assets/logo.png" alt="Hocan Holdings"></a><div class="links"><a href="index.html">Home</a><a href="hocan-hr-consulting.html">Hocan HR Consulting</a><a href="hocan-logistics.html">Hocan Logistics</a><a href="blogs.html">Blogs</a><a href="contact.html">Contact Us</a></div></div></nav>
+    <section class="hero glass"><h1>Insights &amp; Updates</h1><p>Articles from the Hocan Holdings team</p></section>
+    <section class="cards">
+      <article class="card"><div class="placeholder"></div><div class="card-body"><h3>Improving Last-Mile Delivery in Kenya</h3><p class="date">April 12, 2026</p><p>How operational visibility and local route intelligence drive logistics performance.</p><a href="#">Read More &rarr;</a></div></article>
+      <article class="card"><div class="placeholder"></div><div class="card-body"><h3>Building Stronger Teams Through HR Strategy</h3><p class="date">March 27, 2026</p><p>Key workforce practices that support business growth and long-term resilience.</p><a href="#">Read More &rarr;</a></div></article>
+      <article class="card"><div class="placeholder"></div><div class="card-body"><h3>Procurement and Supply Trends for 2026</h3><p class="date">March 8, 2026</p><p>What organizations should prioritize to secure quality and control costs.</p><a href="#">Read More &rarr;</a></div></article>
+    </section>
+    <footer class="site-footer"><div class="footer-grid"><div class="footer-col"><h4>Hocan Holdings</h4><p>Building the infrastructure behind East Africa's fastest growing businesses.</p></div><div class="footer-col"><h4>Quick Links</h4><ul><li><a href="index.html">Home</a></li><li><a href="hocan-hr-consulting.html">Hocan HR Consulting</a></li><li><a href="hocan-logistics.html">Hocan Logistics</a></li><li><a href="blogs.html">Blogs</a></li><li><a href="contact.html">Contact Us</a></li></ul></div><div class="footer-col"><h4>HR Services</h4><ul><li>Talent Acquisition & Recruitment</li><li>Corporate Training & Professional Development</li><li>Labour Outsourcing & Workforce Solutions</li><li>HR360 - Complete HR Management Solution</li><li>Startup HR Advisory</li></ul></div><div class="footer-col"><h4>Contact</h4><p>+254 791 235 830<br>info@hocanholdings.co.ke<br>iHiT Building, Nairobi, Kenya</p></div><div class="footer-col"><h4>Follow Us</h4><div class="footer-socials"><a href="#" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg></a><a href="#" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="16" rx="3"/></svg></a><a href="#" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 3h10a4 4 0 0 1 4 4v10a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V7a4 4 0 0 1 4-4z"/></svg></a><a href="#" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 7h18v10H3z"/></svg></a><a href="#" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h16v16H4z"/></svg></a></div></div></div><div class="footer-bottom"><span>© 2026 Hocan Holdings. All rights reserved.</span><span><a href="#">Privacy Policy</a> | <a href="#">Terms & Conditions</a></span></div></footer>
+  </div>
+</body>
+</html>

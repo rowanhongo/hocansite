@@ -15,7 +15,7 @@ Set these in **Netlify → Site settings → Environment variables** (or in `net
 **Build command:** `npm run build`  
 **Publish directory:** `.` (or your static output folder)
 
-The build runs `scripts/generate-config.js`, which writes `config.js` from `SUPABASE_URL` and `SUPABASE_ANON_KEY`, so the send-package page and admin dashboard get the correct Supabase client config without hardcoding keys.
+The build runs `scripts/generate-config.js`, which writes `config.js` from `SUPABASE_URL` and `SUPABASE_ANON_KEY`. **After adding or changing these env vars in Netlify, you must trigger a new deploy** (e.g. push a commit or "Trigger deploy" in Netlify) so the build runs and the live site gets the correct config. Otherwise the Send Package form will not save orders and the admin dashboard will stay empty.
 
 ## Local development
 

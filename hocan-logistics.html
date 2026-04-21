@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hocan Logistics</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Inter, sans-serif; background: radial-gradient(circle at 10% 20%, #e0f2ff 0%, transparent 40%), radial-gradient(circle at 90% 80%, #ffd9cf 0%, transparent 40%), #f4f6f8; color: #333; }
+    .container { width: 90%; max-width: 1200px; margin: 0 auto; padding-bottom: 80px; }
+    .glass { background: rgba(255,255,255,0.35); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.3); border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.08); }
+    .topbar { margin-top: 20px; padding: 8px 20px; min-height: 36px; display: flex; justify-content: space-between; align-items: center; }
+    .topbar-left { font-size: 13px; color: #666; font-weight: 500; } .topbar-socials { display: flex; gap: 12px; } .topbar-socials a { color: #666; display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; text-decoration: none; } .topbar-socials svg { width: 16px; height: 16px; }
+    .navbar { margin-top: 10px; padding: 18px 24px; } .nav-inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+    .logo img { height: 60px; display: block; } .links a { margin: 0 10px; color: #444; font-weight: 500; text-decoration: none; } .links a:hover { color: #C47A5A; }
+    .hero { margin-top: 36px; padding: 40px; }
+    .hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; align-items: start; }
+    .hero h1 { font-size: 42px; margin-bottom: 12px; color: #1a1a1a; }
+    .hero p { color: #555; margin-bottom: 18px; line-height: 1.6; }
+    .hero-image img { width: 100%; border-radius: 20px; box-shadow: 0 16px 40px rgba(0,0,0,0.1); }
+    .btn { background: #C47A5A; color: #fff; padding: 12px 24px; border-radius: 10px; border: none; font-weight: 600; cursor: pointer; font-family: inherit; }
+    .send-package-form { margin-top: 20px; } .send-form-title { font-size: 26px; margin-bottom: 8px; color: #1a1a1a; } .send-form-sub { margin-bottom: 18px; color: #555; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 16px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; } .form-group-full { grid-column: 1 / -1; }
+    .form-group input { padding: 12px 14px; border: 1px solid rgba(0,0,0,0.12); border-radius: 10px; font-size: 15px; font-family: inherit; background: rgba(255,255,255,0.6); }
+    .form-group label { font-size: 14px; font-weight: 600; } .req { color: #C47A5A; }
+    .site-footer { margin-top: 40px; background: #1C1C2E; color: #fff; border-radius: 20px; overflow: hidden; }
+    .footer-grid { display: grid; grid-template-columns: 1.2fr 1fr 1.2fr 1fr 1fr; gap: 24px; padding: 32px; }
+    .footer-col h4 { margin-bottom: 10px; font-size: 16px; }
+    .footer-col p, .footer-col a, .footer-col li { color: rgba(255,255,255,0.85); font-size: 14px; line-height: 1.6; text-decoration: none; list-style: none; }
+    .footer-col ul { padding: 0; } .footer-socials { display: flex; gap: 10px; } .footer-socials a { color: #fff; display: inline-flex; width: 24px; height: 24px; align-items: center; justify-content: center; } .footer-socials svg { width: 16px; height: 16px; }
+    .footer-bottom { border-top: 1px solid rgba(255,255,255,0.15); padding: 14px 32px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: 13px; } .footer-bottom a { color: rgba(255,255,255,0.85); text-decoration: none; }
+    @media (max-width: 900px) { .nav-inner { flex-direction: column; } .hero-grid, .form-grid { grid-template-columns: 1fr; } .footer-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="topbar glass"><div class="topbar-left">Hotline: +254 791 235 830</div><div class="topbar-socials"><a href="#" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg></a><a href="#" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="16" rx="3"/></svg></a><a href="#" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 3h10a4 4 0 0 1 4 4v10a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V7a4 4 0 0 1 4-4z"/></svg></a><a href="#" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 7h18v10H3z"/></svg></a><a href="#" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h16v16H4z"/></svg></a></div></div>
+    <nav class="navbar glass"><div class="nav-inner"><a class="logo" href="index.html"><img src="assets/logo.png" alt="Hocan Holdings"></a><div class="links"><a href="index.html">Home</a><a href="hocan-hr-consulting.html">Hocan HR Consulting</a><a href="hocan-logistics.html">Hocan Logistics</a><a href="blogs.html">Blogs</a><a href="contact.html">Contact Us</a></div></div></nav>
+    <section class="hero glass">
+      <h1>Hocan Logistics</h1>
+      <p>Reliable delivery across Kenya and East Africa.</p>
+      <div class="hero-grid">
+        <div>
+          <button type="button" class="btn">Send Package</button>
+          <form class="send-package-form" id="sendPackageForm" aria-labelledby="sendPackageHeading">
+            <h2 id="sendPackageHeading" class="send-form-title">Send a Package</h2>
+            <p class="send-form-sub">Enter package details below. We will contact you to confirm pickup and delivery.</p>
+            <div class="form-grid">
+              <div class="form-group"><label for="senderName">Sender name <span class="req">*</span></label><input type="text" id="senderName" name="senderName" required></div>
+              <div class="form-group"><label for="senderPhone">Phone <span class="req">*</span></label><input type="tel" id="senderPhone" name="senderPhone" required></div>
+              <div class="form-group"><label for="senderEmail">Email <span class="req">*</span></label><input type="email" id="senderEmail" name="senderEmail" required></div>
+              <div class="form-group form-group-full"><label for="pickupAddress">Pickup address <span class="req">*</span></label><input type="text" id="pickupAddress" name="pickupAddress" required></div>
+              <div class="form-group"><label for="recipientName">Recipient name <span class="req">*</span></label><input type="text" id="recipientName" name="recipientName" required></div>
+              <div class="form-group"><label for="recipientPhone">Recipient phone <span class="req">*</span></label><input type="tel" id="recipientPhone" name="recipientPhone" required></div>
+              <div class="form-group form-group-full"><label for="deliveryAddress">Delivery address <span class="req">*</span></label><input type="text" id="deliveryAddress" name="deliveryAddress" required></div>
+              <div class="form-group"><label for="packageDesc">Package description</label><input type="text" id="packageDesc" name="packageDesc"></div>
+              <div class="form-group"><label for="packageWeight">Weight (kg)</label><input type="number" id="packageWeight" name="packageWeight" min="0" step="0.1"></div>
+              <div class="form-group form-group-full"><button type="submit" class="btn">Submit request</button></div>
+            </div>
+          </form>
+        </div>
+        <div class="hero-image"><img src="assets/hero.png" alt="Delivery professional holding carton"></div>
+      </div>
+    </section>
+    <footer class="site-footer"><div class="footer-grid"><div class="footer-col"><h4>Hocan Holdings</h4><p>Building the infrastructure behind East Africa's fastest growing businesses.</p></div><div class="footer-col"><h4>Quick Links</h4><ul><li><a href="index.html">Home</a></li><li><a href="hocan-hr-consulting.html">Hocan HR Consulting</a></li><li><a href="hocan-logistics.html">Hocan Logistics</a></li><li><a href="blogs.html">Blogs</a></li><li><a href="contact.html">Contact Us</a></li></ul></div><div class="footer-col"><h4>HR Services</h4><ul><li>Talent Acquisition & Recruitment</li><li>Corporate Training & Professional Development</li><li>Labour Outsourcing & Workforce Solutions</li><li>HR360 - Complete HR Management Solution</li><li>Startup HR Advisory</li></ul></div><div class="footer-col"><h4>Contact</h4><p>+254 791 235 830<br>info@hocanholdings.co.ke<br>iHiT Building, Nairobi, Kenya</p></div><div class="footer-col"><h4>Follow Us</h4><div class="footer-socials"><a href="#" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg></a><a href="#" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="16" rx="3"/></svg></a><a href="#" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 3h10a4 4 0 0 1 4 4v10a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V7a4 4 0 0 1 4-4z"/></svg></a><a href="#" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 7h18v10H3z"/></svg></a><a href="#" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h16v16H4z"/></svg></a></div></div></div><div class="footer-bottom"><span>© 2026 Hocan Holdings. All rights reserved.</span><span><a href="#">Privacy Policy</a> | <a href="#">Terms & Conditions</a></span></div></footer>
+  </div>
+  <script src="config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script>
+    document.getElementById("sendPackageForm")?.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const url = window.SUPABASE_URL;
+      const key = window.SUPABASE_ANON_KEY;
+      if (!url || !key) return alert("Supabase is not configured.");
+      const btn = this.querySelector('button[type="submit"]');
+      const origText = btn?.textContent;
+      if (btn) btn.disabled = true;
+      try {
+        const supabase = window.supabase.createClient(url, key);
+        const payload = {
+          sender_name: document.getElementById("senderName").value.trim(),
+          sender_phone: document.getElementById("senderPhone").value.trim(),
+          sender_email: document.getElementById("senderEmail").value.trim(),
+          pickup_address: document.getElementById("pickupAddress").value.trim(),
+          recipient_name: document.getElementById("recipientName").value.trim(),
+          recipient_phone: document.getElementById("recipientPhone").value.trim(),
+          delivery_address: document.getElementById("deliveryAddress").value.trim(),
+          package_description: document.getElementById("packageDesc").value.trim() || null,
+          package_weight_kg: document.getElementById("packageWeight").value ? parseFloat(document.getElementById("packageWeight").value) : null,
+          status: "pending",
+          payment_status: "pending"
+        };
+        const { error } = await supabase.from("orders").insert(payload);
+        if (error) throw error;
+        this.reset();
+        alert("Your package request has been submitted.");
+      } catch (err) {
+        alert(err?.message || "Something went wrong.");
+      }
+      if (btn) { btn.disabled = false; btn.textContent = origText; }
+    });
+  </script>
+</body>
+</html>

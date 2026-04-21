@@ -114,7 +114,7 @@
 
     /* Wrapper reserves space so hero doesn’t jump when nav slides up */
     .nav-wrapper {
-      min-height: 176px;
+      min-height: 220px;
       overflow: hidden;
       position: relative;
     }
@@ -122,8 +122,8 @@
     /* Floating glass navbar – whole section disappears on scroll, smooth animation */
     .navbar {
       position: sticky;
-      top: 20px;
-      margin: 20px auto;
+      top: 66px;
+      margin: 10px auto 20px;
       width: 90%;
       max-width: 1200px;
       z-index: 100;
@@ -136,6 +136,52 @@
         transform 0.65s cubic-bezier(0.33, 1, 0.68, 1),
         opacity 0.65s cubic-bezier(0.33, 1, 0.68, 1),
         visibility 0s 0s;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 20px;
+      margin: 20px auto 0;
+      width: 90%;
+      max-width: 1200px;
+      z-index: 110;
+      padding: 8px 20px;
+      min-height: 36px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .topbar-left {
+      font-size: 13px;
+      color: #666;
+      font-weight: 500;
+    }
+
+    .topbar-socials {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .topbar-socials a {
+      color: #666;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      transition: color 0.2s ease, transform 0.2s ease;
+    }
+
+    .topbar-socials a:hover {
+      color: #C47A5A;
+      transform: translateY(-1px);
+    }
+
+    .topbar-socials svg {
+      width: 16px;
+      height: 16px;
     }
 
     .navbar--hidden {
@@ -180,12 +226,12 @@
     }
 
     .links a:hover {
-      color: #d18c7c;
+      color: #C47A5A;
     }
 
     /* Rose gold button */
     .btn {
-      background: #d18c7c;
+      background: #C47A5A;
       color: white;
       padding: 12px 24px;
       border-radius: 10px;
@@ -201,66 +247,6 @@
     .btn:hover {
       transform: translateY(-3px);
       box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-    }
-
-    /* Tabs – glassmorphism with sliding glass indicator; clear blue (Home) vs rose gold (Send Package) */
-    .tabs {
-      position: relative;
-      display: flex;
-      border-radius: 30px;
-      overflow: hidden;
-      width: 320px;
-      margin-bottom: 0;
-      background: rgba(255, 255, 255, 0.25);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.35);
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-    }
-
-    .tab {
-      flex: 1;
-      padding: 14px 20px;
-      border: none;
-      cursor: pointer;
-      font-family: inherit;
-      font-size: 15px;
-      font-weight: 600;
-      background: transparent;
-      color: #666;
-      z-index: 1;
-      transition: color 0.3s;
-    }
-
-    .tab.active {
-      color: #1a1a1a;
-      font-weight: 700;
-    }
-
-    .tab-indicator {
-      position: absolute;
-      height: 100%;
-      width: 50%;
-      top: 0;
-      left: 0;
-      border-radius: 30px;
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      transition: left 0.35s ease;
-      pointer-events: none;
-      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
-    }
-
-    .tab-indicator.is-home {
-      background: rgba(169, 216, 237, 0.55);
-      border: 1px solid rgba(91, 163, 201, 0.25);
-      border-bottom: 2px solid rgba(91, 163, 201, 0.7);
-    }
-
-    .tab-indicator.is-send {
-      background: rgba(243, 222, 217, 0.55);
-      border: 1px solid rgba(209, 140, 124, 0.25);
-      border-bottom: 2px solid rgba(209, 140, 124, 0.6);
     }
 
     /* Hero section */
@@ -300,79 +286,7 @@
       box-shadow: 0 16px 40px rgba(0, 0, 0, 0.1);
     }
 
-    /* Panel switching (Home vs Send Package form) */
-    .hero-panel {
-      animation: panelIn 0.35s ease;
-    }
-    @keyframes panelIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-    .hero-panel-send {
-      margin-top: 0;
-    }
-
-    /* Send package form */
-    .send-package-form {
-      padding: 8px 0 0;
-    }
-    .send-form-title {
-      font-size: 26px;
-      font-weight: 700;
-      color: #1a1a1a;
-      margin-bottom: 8px;
-    }
-    .send-form-sub {
-      font-size: 15px;
-      color: #555;
-      margin-bottom: 24px;
-      line-height: 1.5;
-    }
-    .form-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px 24px;
-    }
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .form-group-full {
-      grid-column: 1 / -1;
-    }
-    .form-group label {
-      font-size: 14px;
-      font-weight: 600;
-      color: #333;
-    }
-    .form-group .req {
-      color: #d18c7c;
-    }
-    .form-group input {
-      padding: 12px 14px;
-      border: 1px solid rgba(0,0,0,0.12);
-      border-radius: 10px;
-      font-size: 15px;
-      font-family: inherit;
-      background: rgba(255,255,255,0.6);
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .form-group input:focus {
-      outline: none;
-      border-color: #d18c7c;
-      box-shadow: 0 0 0 3px rgba(209, 140, 124, 0.2);
-    }
-    .form-group input::placeholder {
-      color: #999;
-    }
-    .btn-submit {
-      padding: 14px 28px;
-      font-size: 16px;
-      margin-top: 8px;
-    }
-
-    /* Main content card (tabs + hero) – text higher on card */
+    /* Main content card */
     .hero-section {
       margin-top: 80px;
       padding-top: 16px;
@@ -450,6 +364,146 @@
       color: #555;
     }
 
+    .about-us-section {
+      margin-top: 40px;
+      padding: 40px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.4);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+    }
+
+    .about-us-section h2 {
+      font-size: 30px;
+      margin-bottom: 20px;
+      color: #1a1a1a;
+    }
+
+    .about-tabs {
+      display: inline-flex;
+      gap: 8px;
+      padding: 6px;
+      border-radius: 30px;
+      background: rgba(245, 245, 245, 0.7);
+      margin-bottom: 24px;
+    }
+
+    .about-tab {
+      border: none;
+      padding: 10px 22px;
+      border-radius: 24px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      color: #555;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .about-tab.active {
+      background: #C47A5A;
+      color: #fff;
+    }
+
+    .about-panel[hidden] {
+      display: none;
+    }
+
+    .quote {
+      border-left: 4px solid #C47A5A;
+      padding: 10px 0 10px 16px;
+      font-style: italic;
+      color: #444;
+      margin: 12px 0 20px;
+    }
+
+    .core-values {
+      margin-top: 30px;
+    }
+
+    .section-subtitle {
+      font-size: 24px;
+      color: #1a1a1a;
+      margin-bottom: 16px;
+    }
+
+    .values-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .value-card {
+      background: rgba(255, 255, 255, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      border-radius: 16px;
+      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.06);
+      padding: 22px;
+    }
+
+    .value-card h4 {
+      color: #1a1a1a;
+      margin-bottom: 10px;
+      font-size: 18px;
+    }
+
+    .focus-row {
+      margin-top: 30px;
+    }
+
+    .focus-items {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .focus-item {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      padding: 16px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.45);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+    }
+
+    .focus-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: rgba(196, 122, 90, 0.15);
+      color: #C47A5A;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 18px;
+    }
+
+    .features-strip {
+      margin-top: 30px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .feature-card {
+      background: rgba(255, 255, 255, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.45);
+      border-radius: 16px;
+      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.06);
+      padding: 24px;
+    }
+
+    .feature-card h3 {
+      margin-bottom: 10px;
+      color: #1a1a1a;
+      font-size: 20px;
+    }
+
     /* Our Partners – image only, no padding, 65% width (35% smaller) centered */
     .partners-section {
       margin-top: 80px;
@@ -483,17 +537,22 @@
       border: 0;
     }
 
-    /* Footer bar */
-    .footer-bar {
-      margin-top: 80px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    .site-footer {
+      margin-top: 60px;
+      background: #1C1C2E;
+      color: #fff;
+      border-radius: 20px;
+      overflow: hidden;
     }
-
-    .footer-bar .links a {
-      margin: 0 18px;
-    }
+    .footer-grid { display: grid; grid-template-columns: 1.2fr 1fr 1.2fr 1fr 1fr; gap: 24px; padding: 32px; }
+    .footer-col h4 { margin-bottom: 10px; font-size: 16px; }
+    .footer-col p, .footer-col a, .footer-col li { color: rgba(255,255,255,0.85); font-size: 14px; line-height: 1.6; text-decoration: none; list-style: none; }
+    .footer-col ul { padding: 0; }
+    .footer-socials { display: flex; gap: 10px; }
+    .footer-socials a { color: #fff; display: inline-flex; width: 24px; height: 24px; align-items: center; justify-content: center; }
+    .footer-socials svg { width: 16px; height: 16px; }
+    .footer-bottom { border-top: 1px solid rgba(255,255,255,0.15); padding: 14px 32px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: 13px; }
+    .footer-bottom a { color: rgba(255,255,255,0.85); text-decoration: none; }
 
     .admin-login-btn {
       display: inline-flex;
@@ -535,17 +594,14 @@
         font-size: 32px;
       }
 
-      .tabs {
-        width: 100%;
-      }
-
-      .form-grid {
-        grid-template-columns: 1fr;
-      }
-
       .nav-inner {
         flex-direction: column;
         gap: 10px;
+      .topbar {
+        flex-direction: column;
+        gap: 10px;
+      }
+
       }
 
       .links {
@@ -562,11 +618,24 @@
       .glass {
         padding: 32px 24px;
       }
-
-      .footer-bar {
-        flex-direction: column;
-        gap: 16px;
+      .about-us-section {
+        padding: 30px 22px;
       }
+
+      .values-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .focus-items {
+        grid-template-columns: 1fr;
+      }
+
+      .features-strip {
+        grid-template-columns: 1fr;
+      }
+
+
+      .footer-grid { grid-template-columns: 1fr; }
 
     }
 
@@ -779,18 +848,37 @@
   </div>
   <div class="container">
     <div class="nav-wrapper">
+    <div class="topbar glass">
+      <div class="topbar-left">Hotline: +254 791 235 830</div>
+      <div class="topbar-socials" aria-label="Social links">
+        <a href="#" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.52 3.48A11.8 11.8 0 0 0 12.06 0C5.52 0 .24 5.28.24 11.82c0 2.1.54 4.14 1.56 5.94L0 24l6.42-1.68a11.8 11.8 0 0 0 5.64 1.44h.06c6.54 0 11.82-5.28 11.82-11.82 0-3.12-1.2-6.06-3.42-8.46zM12.12 21.6h-.06a9.7 9.7 0 0 1-4.92-1.32l-.36-.18-3.78 1.02 1.02-3.66-.24-.36a9.72 9.72 0 0 1-1.5-5.22c0-5.4 4.38-9.78 9.84-9.78 2.64 0 5.1 1.02 6.96 2.88a9.73 9.73 0 0 1 2.88 6.96c0 5.4-4.38 9.78-9.84 9.78zm5.34-7.32c-.3-.18-1.74-.84-2.04-.96-.24-.06-.42-.12-.6.12-.18.24-.66.78-.84.96-.18.18-.3.18-.6.06-.3-.18-1.2-.42-2.22-1.38-.84-.72-1.38-1.62-1.56-1.92-.18-.24 0-.42.12-.54.12-.12.3-.3.42-.48.18-.18.24-.3.36-.48.12-.18.06-.36 0-.54-.06-.12-.6-1.5-.84-2.04-.24-.54-.48-.48-.66-.48h-.54c-.18 0-.48.06-.72.3-.24.24-.96.9-.96 2.22 0 1.32.96 2.58 1.14 2.76.18.18 1.92 2.94 4.68 4.08.66.3 1.2.48 1.62.6.72.24 1.32.24 1.8.18.54-.06 1.74-.72 1.98-1.38.24-.72.24-1.32.18-1.44-.06-.12-.24-.18-.54-.36z"/></svg>
+        </a>
+        <a href="#" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M22 12a10 10 0 1 0-11.56 9.84v-6.96H7.9V12h2.54V9.8c0-2.52 1.5-3.9 3.78-3.9 1.08 0 2.22.18 2.22.18v2.46h-1.26c-1.26 0-1.62.78-1.62 1.56V12h2.76l-.42 2.88h-2.34v6.96A10 10 0 0 0 22 12z"/></svg>
+        </a>
+        <a href="#" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.16c3.18 0 3.54 0 4.8.06 1.2.06 1.86.24 2.28.42.54.24.96.48 1.38.9.42.42.66.84.9 1.38.18.42.36 1.08.42 2.28.06 1.26.06 1.62.06 4.8s0 3.54-.06 4.8c-.06 1.2-.24 1.86-.42 2.28-.24.54-.48.96-.9 1.38-.42.42-.84.66-1.38.9-.42.18-1.08.36-2.28.42-1.26.06-1.62.06-4.8.06s-3.54 0-4.8-.06c-1.2-.06-1.86-.24-2.28-.42-.54-.24-.96-.48-1.38-.9-.42-.42-.66-.84-.9-1.38-.18-.42-.36-1.08-.42-2.28C2.16 15.54 2.16 15.18 2.16 12s0-3.54.06-4.8c.06-1.2.24-1.86.42-2.28.24-.54.48-.96.9-1.38.42-.42.84-.66 1.38-.9.42-.18 1.08-.36 2.28-.42 1.26-.06 1.62-.06 4.8-.06zm0 1.98c-3.12 0-3.48 0-4.74.06-1.14.06-1.74.24-2.16.36-.42.18-.66.36-.96.6-.3.3-.42.54-.6.96-.12.42-.3 1.02-.36 2.16-.06 1.26-.06 1.62-.06 4.74s0 3.48.06 4.74c.06 1.14.24 1.74.36 2.16.18.42.36.66.6.96.3.3.54.42.96.6.42.12 1.02.3 2.16.36 1.26.06 1.62.06 4.74.06s3.48 0 4.74-.06c1.14-.06 1.74-.24 2.16-.36.42-.18.66-.36.96-.6.3-.3.42-.54.6-.96.12-.42.3-1.02.36-2.16.06-1.26.06-1.62.06-4.74s0-3.48-.06-4.74c-.06-1.14-.24-1.74-.36-2.16-.18-.42-.36-.66-.6-.96-.3-.3-.54-.42-.96-.6-.42-.12-1.02-.3-2.16-.36-1.26-.06-1.62-.06-4.74-.06zm0 3.36a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9zm0 1.98A2.52 2.52 0 1 0 12 14.52a2.52 2.52 0 0 0 0-5.04zm5.76-2.16a1.08 1.08 0 1 1 0 2.16 1.08 1.08 0 0 1 0-2.16z"/></svg>
+        </a>
+        <a href="#" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.52 7.2a3 3 0 0 0-2.1-2.1C19.56 4.5 12 4.5 12 4.5s-7.56 0-9.42.6A3 3 0 0 0 .48 7.2C0 9.12 0 12 0 12s0 2.88.48 4.8a3 3 0 0 0 2.1 2.1c1.86.6 9.42.6 9.42.6s7.56 0 9.42-.6a3 3 0 0 0 2.1-2.1c.48-1.92.48-4.8.48-4.8s0-2.88-.48-4.8zM9.6 15.12V8.88L15.84 12 9.6 15.12z"/></svg>
+        </a>
+        <a href="#" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4.98 3.5A2.5 2.5 0 1 0 5 8.5a2.5 2.5 0 0 0-.02-5zM3 9h4v12H3zM9 9h3.84v1.68h.06c.54-1.02 1.86-2.1 3.84-2.1C20.82 8.58 21 11.34 21 14.58V21h-4v-5.7c0-1.38-.06-3.12-1.92-3.12-1.92 0-2.22 1.5-2.22 3.06V21H9z"/></svg>
+        </a>
+      </div>
+    </div>
     <nav class="navbar glass">
       <div class="nav-inner">
         <div class="logo">
           <img src="assets/logo.png" alt="Hocan Holdings" height="60" />
         </div>
         <div class="links">
-          <a href="#logistics" class="nav-page-link" data-page="logistics">Hocan Logistics</a>
-          <a href="#consult" class="nav-page-link" data-page="consult">Hocan Consult</a>
-          <a href="#supplies" class="nav-page-link" data-page="supplies">Hocan Supplies</a>
-        </div>
-        <div class="contact">
-          <button type="button" class="btn btn-send-package" aria-label="Send Package">Send Package</button>
+          <a href="index.html">Home</a>
+          <a href="hocan-hr-consulting.html">Hocan HR Consulting</a>
+          <a href="hocan-logistics.html">Hocan Logistics</a>
+          <a href="blogs.html">Blogs</a>
+          <a href="contact.html">Contact Us</a>
         </div>
       </div>
     </nav>
@@ -798,85 +886,101 @@
 
     <div class="landing-content" id="landingContent">
     <section class="hero-section glass" id="heroSection">
-      <div class="tabs">
-        <div class="tab-indicator is-home"></div>
-        <button type="button" class="tab active" data-panel="home">Home</button>
-        <button type="button" class="tab" data-panel="send">Send Package</button>
-      </div>
+      <section class="hero">
+        <div class="hero-text">
+          <h1>Welcome to Hocan Holdings</h1>
+          <p>
+            Established since 2015. Comprehensive logistics, consulting, and supplies provider dedicated to your success across Kenya and East Africa.
+          </p>
+          <p>
+            Building the infrastructure behind East Africa’s fastest growing businesses. Since 2015, Hocan Holdings has supported companies across Kenya and the region with logistics, consulting, and supply solutions designed for scale.
+          </p>
+          <a href="#learn" class="btn">Explore our work</a>
+        </div>
+        <div class="hero-image">
+          <img src="assets/hero.png" alt="Delivery professional" />
+        </div>
+      </section>
+    </section>
 
-      <div class="hero-panel hero-panel-home" id="panelHome">
-        <section class="hero">
-          <div class="hero-text">
-            <h1>Welcome to Hocan Holdings</h1>
-            <p>
-              Established since 2015. Comprehensive logistics, consulting,
-              and supplies provider dedicated to your success across Kenya and East Africa.
-            </p>
-            <a href="#learn" class="btn">Learn More</a>
-          </div>
-          <div class="hero-image">
-            <img src="assets/hero.png" alt="Delivery professional" />
-          </div>
-        </section>
+    <section class="about-us-section">
+      <h2>About Us</h2>
+      <div class="about-tabs" role="tablist" aria-label="Mission and Vision tabs">
+        <button type="button" class="about-tab active" role="tab" aria-selected="true" aria-controls="missionPanel" id="missionTab">Mission</button>
+        <button type="button" class="about-tab" role="tab" aria-selected="false" aria-controls="visionPanel" id="visionTab">Vision</button>
       </div>
-
-      <div class="hero-panel hero-panel-send" id="panelSend" hidden>
-        <form class="send-package-form" id="sendPackageForm" aria-labelledby="sendPackageHeading">
-          <h2 id="sendPackageHeading" class="send-form-title">Send a Package</h2>
-          <p class="send-form-sub">Enter the package details below. We’ll get back to you to confirm pickup and delivery.</p>
-          <div class="form-grid">
-            <div class="form-group">
-              <label for="senderName">Sender name <span class="req">*</span></label>
-              <input type="text" id="senderName" name="senderName" required placeholder="Your full name" />
+      <div class="about-panel" id="missionPanel" role="tabpanel" aria-labelledby="missionTab">
+        <h3>Our Mission</h3>
+        <p class="quote">"Providing service excellence at competitive pricing for best value."</p>
+        <p>A one stop service provider to both local and international markets, with a niche in Hospitality and Gaming industries. We understand it is a daunting task to source efficient services - we see it as an opportunity to successfully fill the gaps in the service infrastructure across local and global markets.</p>
+      </div>
+      <div class="about-panel" id="visionPanel" role="tabpanel" aria-labelledby="visionTab" hidden>
+        <h3>Our Vision</h3>
+        <p class="quote">"To be the regional premier provider of choice."</p>
+        <p>A one stop service provider to both local and international markets, with a niche in Hospitality and Gaming industries. We understand it is a daunting task to source efficient services - we see it as an opportunity to successfully fill the gaps in the service infrastructure across local and global markets.</p>
+      </div>
+      <div class="core-values">
+        <h3 class="section-subtitle">Core Values</h3>
+        <div class="values-grid">
+          <article class="value-card">
+            <h4>Integrity</h4>
+            <p>We will always do what is right. Our business is based on trust - we adhere to the highest ethical standards and pledge to be transparent, just and consistent.</p>
+          </article>
+          <article class="value-card">
+            <h4>Gratitude</h4>
+            <p>We are truly thankful for the opportunities given to us. Our positive-minded team embraces gratitude as the key to true greatness and concern for others.</p>
+          </article>
+          <article class="value-card">
+            <h4>Excellence</h4>
+            <p>We strive to always improve. We teach and encourage our team to improve performance and efficiency to add value beyond what is expected.</p>
+          </article>
+          <article class="value-card">
+            <h4>Passion</h4>
+            <p>We show pride, enthusiasm and dedication in everything we do, committed to delivering superior value to our clients.</p>
+          </article>
+        </div>
+      </div>
+      <div class="focus-row">
+        <h3 class="section-subtitle">Our Focus</h3>
+        <div class="focus-items">
+          <article class="focus-item">
+            <span class="focus-icon" aria-hidden="true">&#9200;</span>
+            <div>
+              <h4>Timely Response</h4>
+              <p>Committed to responding to your enquiry within 1 working day.</p>
             </div>
-            <div class="form-group">
-              <label for="senderPhone">Phone <span class="req">*</span></label>
-              <input type="tel" id="senderPhone" name="senderPhone" required placeholder="e.g. 0727111179" />
+          </article>
+          <article class="focus-item">
+            <span class="focus-icon" aria-hidden="true">&#10004;</span>
+            <div>
+              <h4>Quality Assurance</h4>
+              <p>All services undergo stringent quality control before execution.</p>
             </div>
-            <div class="form-group">
-              <label for="senderEmail">Email <span class="req">*</span></label>
-              <input type="email" id="senderEmail" name="senderEmail" required placeholder="you@example.com" />
+          </article>
+          <article class="focus-item">
+            <span class="focus-icon" aria-hidden="true">&#128176;</span>
+            <div>
+              <h4>Competitive Pricing</h4>
+              <p>Our cost leadership strategy ensures quality service that is value for money.</p>
             </div>
-            <div class="form-group form-group-full">
-              <label for="pickupAddress">Pickup address <span class="req">*</span></label>
-              <input type="text" id="pickupAddress" name="pickupAddress" required placeholder="Street, area, town" />
-            </div>
-            <div class="form-group">
-              <label for="recipientName">Recipient name <span class="req">*</span></label>
-              <input type="text" id="recipientName" name="recipientName" required placeholder="Recipient full name" />
-            </div>
-            <div class="form-group">
-              <label for="recipientPhone">Recipient phone <span class="req">*</span></label>
-              <input type="tel" id="recipientPhone" name="recipientPhone" required placeholder="e.g. 0727111179" />
-            </div>
-            <div class="form-group form-group-full">
-              <label for="deliveryAddress">Delivery address <span class="req">*</span></label>
-              <input type="text" id="deliveryAddress" name="deliveryAddress" required placeholder="Street, area, town" />
-            </div>
-            <div class="form-group">
-              <label for="packageDesc">Package description</label>
-              <input type="text" id="packageDesc" name="packageDesc" placeholder="e.g. Documents, small box" />
-            </div>
-            <div class="form-group">
-              <label for="packageWeight">Weight (kg)</label>
-              <input type="number" id="packageWeight" name="packageWeight" min="0" step="0.1" placeholder="e.g. 2.5" />
-            </div>
-            <div class="form-group form-group-full">
-              <button type="submit" class="btn btn-submit">Submit request</button>
-            </div>
-          </div>
-        </form>
+          </article>
+        </div>
       </div>
     </section>
 
-    <section class="welcome-section">
-      <div class="welcome-section-inner">
-        <h2>Building the infrastructure behind East Africa's fastest growing businesses.</h2>
-        <p>
-          Since 2015, Hocan Holdings has supported companies across Kenya and the region with logistics, consulting, and supply solutions designed for scale.
-        </p>
-        <a href="#learn" class="btn">Explore Our Work</a>
-      </div>
+    <section class="features-strip">
+      <article class="feature-card">
+        <h3>Innovation &amp; Expertise</h3>
+        <p>Our team pioneers cutting-edge solutions backed by years of industry-leading expertise.</p>
+      </article>
+      <article class="feature-card">
+        <h3>Quality Solutions</h3>
+        <p>We uphold the highest standards of quality, ensuring reliability and customer satisfaction.</p>
+      </article>
+      <article class="feature-card">
+        <h3>Customer-Centric Focus</h3>
+        <p>Personalized support and tailored solutions - no off-the-shelf stuff.</p>
+      </article>
     </section>
 
     <section class="partners-section" aria-label="Our partners">
@@ -885,19 +989,7 @@
       </div>
     </section>
 
-    <footer class="footer-bar glass">
-      <div class="links">
-        <a href="#logistics" class="nav-page-link" data-page="logistics">Hocan Logistics</a>
-        <a href="#consult" class="nav-page-link" data-page="consult">Hocan Consult</a>
-        <a href="#supplies" class="nav-page-link" data-page="supplies">Hocan Supplies</a>
-      </div>
-      <a href="admin.html" class="admin-login-btn" aria-label="Admin login" title="Admin login">
-        <svg class="admin-login-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="12" cy="8" r="4"/>
-          <path d="M4 20c0-4 4-6 8-6s8 2 8 6"/>
-        </svg>
-      </a>
-    </footer>
+    <footer class="site-footer"><div class="footer-grid"><div class="footer-col"><h4>Hocan Holdings</h4><p>Building the infrastructure behind East Africa's fastest growing businesses.</p></div><div class="footer-col"><h4>Quick Links</h4><ul><li><a href="index.html">Home</a></li><li><a href="hocan-hr-consulting.html">Hocan HR Consulting</a></li><li><a href="hocan-logistics.html">Hocan Logistics</a></li><li><a href="blogs.html">Blogs</a></li><li><a href="contact.html">Contact Us</a></li></ul></div><div class="footer-col"><h4>HR Services</h4><ul><li>Talent Acquisition & Recruitment</li><li>Corporate Training & Professional Development</li><li>Labour Outsourcing & Workforce Solutions</li><li>HR360 - Complete HR Management Solution</li><li>Startup HR Advisory</li></ul></div><div class="footer-col"><h4>Contact</h4><p>+254 791 235 830<br>info@hocanholdings.co.ke<br>iHiT Building, Nairobi, Kenya</p></div><div class="footer-col"><h4>Follow Us</h4><div class="footer-socials"><a href="#" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg></a><a href="#" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="16" rx="3"/></svg></a><a href="#" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 3h10a4 4 0 0 1 4 4v10a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V7a4 4 0 0 1 4-4z"/></svg></a><a href="#" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 7h18v10H3z"/></svg></a><a href="#" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h16v16H4z"/></svg></a></div></div></div><div class="footer-bottom"><span>© 2026 Hocan Holdings. All rights reserved.</span><span><a href="#">Privacy Policy</a> | <a href="#">Terms & Conditions</a></span></div></footer>
     </div>
 
     <!-- Sub-page: Hocan Logistics -->
@@ -986,110 +1078,24 @@
   <script src="config.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script>
-    const landingContent = document.getElementById("landingContent");
-    const subPages = document.querySelectorAll(".sub-page");
-    const navPageLinks = document.querySelectorAll(".nav-page-link");
-    const homeButtons = document.querySelectorAll(".home-btn");
-
-    function showPage(pageId) {
-      if (!landingContent) return;
-      window.location.hash = pageId;
-      landingContent.classList.add("hidden");
-      subPages.forEach(function (el) {
-        el.classList.toggle("active", el.id === "page-" + pageId);
-      });
-    }
-
-    function showLanding() {
-      history.replaceState(null, "", window.location.pathname + window.location.search);
-      if (landingContent) landingContent.classList.remove("hidden");
-      subPages.forEach(function (el) {
-        el.classList.remove("active");
-      });
-    }
-
-    navPageLinks.forEach(function (link) {
-      link.addEventListener("click", function (e) {
-        e.preventDefault();
-        var page = link.getAttribute("data-page");
-        if (page) showPage(page);
-      });
-    });
-
-    homeButtons.forEach(function (btn) {
-      btn.addEventListener("click", showLanding);
-    });
-
-    window.addEventListener("hashchange", function () {
-      var hash = (window.location.hash || "").replace("#", "");
-      if (hash === "logistics" || hash === "supplies" || hash === "consult") showPage(hash);
-      else if (!hash || hash === "home") showLanding();
-    });
-    if (window.location.hash && window.location.hash !== "#") {
-      var h = window.location.hash.replace("#", "");
-      if (h === "logistics" || h === "supplies" || h === "consult") showPage(h);
-    }
-
-    const tabEls = document.querySelectorAll(".tab");
-    const indicator = document.querySelector(".tab-indicator");
-    const panelHome = document.getElementById("panelHome");
-    const panelSend = document.getElementById("panelSend");
-
-    function setPanel(panel) {
-      const isSend = panel === "send";
-      document.querySelector(".tab.active").classList.remove("active");
-      tabEls[isSend ? 1 : 0].classList.add("active");
-      indicator.style.left = (isSend ? 1 : 0) * 50 + "%";
-      indicator.classList.toggle("is-home", !isSend);
-      indicator.classList.toggle("is-send", isSend);
-      if (panelHome) panelHome.hidden = isSend;
-      if (panelSend) panelSend.hidden = !isSend;
-      if (isSend) document.getElementById("heroSection")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-
-    tabEls.forEach((tab, index) => {
-      tab.addEventListener("click", () => setPanel(index === 0 ? "home" : "send"));
-    });
-
-    document.querySelectorAll(".btn-send-package").forEach(function (btn) {
-      btn.addEventListener("click", function () { setPanel("send"); });
-    });
-
-    document.getElementById("sendPackageForm")?.addEventListener("submit", async function (e) {
-      e.preventDefault();
-      const url = window.SUPABASE_URL;
-      const key = window.SUPABASE_ANON_KEY;
-      if (!url || !key) {
-        alert("Supabase is not configured. Add your project URL and anon key in config.js");
-        return;
+    (function () {
+      const missionTab = document.getElementById("missionTab");
+      const visionTab = document.getElementById("visionTab");
+      const missionPanel = document.getElementById("missionPanel");
+      const visionPanel = document.getElementById("visionPanel");
+      if (!missionTab || !visionTab || !missionPanel || !visionPanel) return;
+      function activateTab(tab) {
+        const isMission = tab === "mission";
+        missionTab.classList.toggle("active", isMission);
+        visionTab.classList.toggle("active", !isMission);
+        missionTab.setAttribute("aria-selected", isMission ? "true" : "false");
+        visionTab.setAttribute("aria-selected", isMission ? "false" : "true");
+        missionPanel.hidden = !isMission;
+        visionPanel.hidden = isMission;
       }
-      const btn = this.querySelector('button[type="submit"]');
-      const origText = btn?.textContent;
-      if (btn) btn.disabled = true;
-      try {
-        const supabase = window.supabase.createClient(url, key);
-        const payload = {
-          sender_name: document.getElementById("senderName").value.trim(),
-          sender_phone: document.getElementById("senderPhone").value.trim(),
-          sender_email: document.getElementById("senderEmail").value.trim(),
-          pickup_address: document.getElementById("pickupAddress").value.trim(),
-          recipient_name: document.getElementById("recipientName").value.trim(),
-          recipient_phone: document.getElementById("recipientPhone").value.trim(),
-          delivery_address: document.getElementById("deliveryAddress").value.trim(),
-          package_description: document.getElementById("packageDesc").value.trim() || null,
-          package_weight_kg: document.getElementById("packageWeight").value ? parseFloat(document.getElementById("packageWeight").value) : null,
-          status: "pending",
-          payment_status: "pending"
-        };
-        const { data, error } = await supabase.from("orders").insert(payload).select("id, order_number").single();
-        if (error) throw error;
-        this.reset();
-        alert("Thank you. Your package request has been submitted (Order " + (data?.order_number || data?.id) + "). We will contact you shortly to confirm pickup and delivery.");
-      } catch (err) {
-        alert("Something went wrong. Please try again or contact support.\n\n" + (err?.message || String(err)));
-      }
-      if (btn) { btn.disabled = false; btn.textContent = origText; }
-    });
+      missionTab.addEventListener("click", function () { activateTab("mission"); });
+      visionTab.addEventListener("click", function () { activateTab("vision"); });
+    })();
 
     (function () {
       const nav = document.querySelector(".navbar");

@@ -199,6 +199,7 @@ tr:hover td{background:#fafbfd}
           <div class="stat-val" id="homeTrashedCount">0</div>
         </div>
       </div>
+      <p id="homeNoOrdersHint" style="display:none;font-size:13px;color:var(--muted);margin-bottom:16px;">Orders appear here after they are submitted from the <strong>Send Package</strong> page. If you added Netlify env vars recently, trigger a new deploy so <code>npm run build</code> runs and config is generated. Then submit a test order and click Refresh.</p>
       <div class="dashboard-charts">
         <div class="dashboard-card">
           <h3>Orders This Week</h3>
@@ -233,7 +234,7 @@ tr:hover td{background:#fafbfd}
         <thead><tr><th>Order ID</th><th>Customer</th><th>Pickup</th><th>Delivery</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
         <tbody id="ordersBody"></tbody>
       </table>
-      <div id="emptyMsg" style="display:none;text-align:center;padding:40px;color:var(--muted);font-size:14px">No orders found.</div>
+      <div id="emptyMsg" style="display:none;text-align:center;padding:40px;color:var(--muted);font-size:14px">No orders found. Orders appear here after they are submitted from the Send Package page. Ensure Netlify env vars (SUPABASE_URL, SUPABASE_ANON_KEY) are set and you have redeployed.</div>
     </div>
   </div>
 </div>
@@ -298,7 +299,7 @@ async function loadOrdersFromSupabase(){
   const supabase=getSupabase();
   if(!supabase){allOrders=[];filtered=[];renderOrders();updateStats();updateDashboard();return;}
   const {data,error}=await supabase.from('orders').select('*').order('created_at',{ascending:false});
-  if(error){console.error(error);allOrders=[];}
+  if(error){console.error('Orders fetch error:',error);allOrders=[];}
   else allOrders=(data||[]).map(rowToOrder);
   filtered=allOrders.filter(o=>o.status===currentFilter);
   renderOrders();
@@ -366,6 +367,8 @@ function updateDashboard(){
   if(homeTransit)homeTransit.textContent=allOrders.filter(o=>o.status==='transit').length;
   if(homeCompleted)homeCompleted.textContent=allOrders.filter(o=>o.status==='delivered').length;
   if(homeTrashed)homeTrashed.textContent=allOrders.filter(o=>o.status==='cancelled').length;
+  var noOrdersHint=document.getElementById('homeNoOrdersHint');
+  if(noOrdersHint)noOrdersHint.style.display=allOrders.length===0?'block':'none';
 
   var days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   var weekCounts=[0,0,0,0,0,0,0];
