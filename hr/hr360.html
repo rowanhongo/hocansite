@@ -7,13 +7,49 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: Inter, sans-serif; background: radial-gradient(circle at 10% 20%, #e0f2ff 0%, transparent 40%), radial-gradient(circle at 90% 80%, #ffd9cf 0%, transparent 40%), #f4f6f8; color: #333; }
-    .wrap { max-width: 860px; margin: 70px auto; padding: 48px; background: #fff; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.08); }
-    h1 { color: #1a1a1a; margin-bottom: 12px; } p { color: #555; line-height: 1.7; margin-bottom: 22px; }
-    .btn { display: inline-block; background: #C47A5A; color: #fff; text-decoration: none; padding: 12px 20px; border-radius: 10px; font-weight: 600; }
-    .site-footer { max-width: 860px; margin: 0 auto 40px; background: #1C1C2E; color: #fff; border-radius: 20px; padding: 16px 24px; font-size: 13px; display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
-    .site-footer a { color: rgba(255,255,255,0.85); text-decoration: none; }
+    body { font-family: Inter, sans-serif; background: #f3f0f8; color: #1f1f2c; }
+    .wrap { max-width: 920px; margin: 24px auto 50px; padding: 0 14px; }
+    .hero { background: linear-gradient(135deg, #6f36c7, #5a2ba8); color: #fff; border-radius: 16px; padding: 26px; box-shadow: 0 16px 36px rgba(93, 48, 171, 0.28); }
+    .hero h1 { font-size: 38px; line-height: 1.15; margin-bottom: 10px; }
+    .hero p { font-size: 18px; line-height: 1.5; opacity: 0.95; }
+    .actions { margin-top: 16px; display: flex; gap: 10px; flex-wrap: wrap; }
+    .btn { display: inline-block; border-radius: 10px; text-decoration: none; font-weight: 700; padding: 11px 18px; }
+    .btn-back { background: #fff; color: #5f2eb2; }
+    .btn-email { background: #C47A5A; color: #fff; }
+    .stats { margin-top: 16px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    .stat { background: #ede7f7; border-radius: 12px; padding: 14px; text-align: center; }
+    .stat strong { display: block; color: #6f36c7; font-size: 28px; margin-bottom: 4px; }
+    .card { margin-top: 16px; background: #fff; border-radius: 14px; padding: 20px; box-shadow: 0 8px 20px rgba(24, 21, 34, 0.07); }
+    .card h2 { margin-bottom: 12px; font-size: 30px; }
+    .card ul { padding-left: 18px; line-height: 1.8; color: #404a60; }
+    @media (max-width: 768px) { .hero h1 { font-size: 28px; } .stats { grid-template-columns: 1fr 1fr; } .card h2 { font-size: 24px; } }
   </style>
 </head>
-<body><main class="wrap"><h1>HR360 - Complete HR Management Solution</h1><p>HR360 centralizes critical HR workflows into one coordinated system to improve efficiency, visibility, and workforce governance. It supports modern organizations that need scalable people operations.</p><p>From records and performance to process automation, HR360 helps your business run HR with consistency and clarity.</p><a class="btn" href="mailto:info@hocanholdings.co.ke?subject=Inquiry:HR360 - Complete HR Management Solution">Send Email</a></main><footer class="site-footer"><span>© 2026 Hocan Holdings. All rights reserved.</span><span><a href="../contact.html">Contact Us</a></span></footer></body>
+<body>
+  <main class="wrap">
+    <section class="hero">
+      <h1>HR360 - Complete HR Management Solution</h1>
+      <p>An all-in-one HR operating model built for modern organizations that need consistency, speed, and visibility.</p>
+      <div class="actions">
+        <a class="btn btn-back" href="../hocan-hr-consulting.html">Back to HR Consulting</a>
+        <a class="btn btn-email" href="mailto:info@hocanholdings.co.ke?subject=Inquiry%3A%20HR360%20-%20Complete%20HR%20Management%20Solution">Send Email</a>
+      </div>
+    </section>
+    <section class="stats">
+      <article class="stat"><strong>360°</strong><span>HR Coverage</span></article>
+      <article class="stat"><strong>95%</strong><span>Client Satisfaction</span></article>
+      <article class="stat"><strong>24/7</strong><span>Support Available</span></article>
+      <article class="stat"><strong>21+</strong><span>Years Experience</span></article>
+    </section>
+    <section class="card">
+      <h2>Integrated HR Operations</h2>
+      <ul>
+        <li>Centralized HR process design and execution governance</li>
+        <li>Policy, compliance, and documentation lifecycle management</li>
+        <li>Performance, onboarding, and workforce administration support</li>
+        <li>Scalable HR frameworks for growing teams and multi-site operations</li>
+      </ul>
+    </section>
+  </main>
+</body>
 </html>
