@@ -4,12 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Corporate Training & Professional Development</title>
+  <link rel="icon" type="image/png" href="../Hocan%20Logo.png">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: Inter, sans-serif; background: #f3f0f8; color: #1f1f2c; }
+    body { font-family: Inter, sans-serif; background: #f3f0f8; color: #1f1f2c; overflow-x: hidden; position: relative; }
+    body::before { content: ""; position: fixed; inset: -40% -40%; pointer-events: none; z-index: -1; background: radial-gradient(circle at 25% 30%, rgba(169,216,237,0.45), transparent 45%), radial-gradient(circle at 75% 70%, rgba(243,222,217,0.4), transparent 45%); animation: pageGlow 12s ease-in-out infinite; }
+    @keyframes pageGlow { 0%,100% { transform: translate(0,0) rotate(0deg); } 50% { transform: translate(18px,18px) rotate(170deg);} }
     .wrap { max-width: 920px; margin: 24px auto 50px; padding: 0 14px; }
-    .hero { background: linear-gradient(135deg, #6f36c7, #5a2ba8); color: #fff; border-radius: 16px; padding: 26px; box-shadow: 0 16px 36px rgba(93, 48, 171, 0.28); }
+    .hero { background: linear-gradient(135deg, #2f6ea6, #275b89); color: #fff; border-radius: 16px; padding: 26px; box-shadow: 0 16px 36px rgba(39, 91, 137, 0.28); }
     .hero h1 { font-size: 38px; line-height: 1.15; margin-bottom: 10px; }
     .hero p { font-size: 18px; line-height: 1.5; opacity: 0.95; }
     .actions { margin-top: 16px; display: flex; gap: 10px; flex-wrap: wrap; }
@@ -32,14 +35,8 @@
       <p>Upskill your teams through practical programs that improve productivity, leadership quality, and execution standards.</p>
       <div class="actions">
         <a class="btn btn-back" href="../hocan-hr-consulting.html">Back to HR Consulting</a>
-        <a class="btn btn-email" href="mailto:info@hocanholdings.co.ke?subject=Inquiry%3A%20Corporate%20Training%20%26%20Professional%20Development">Send Email</a>
+        <a class="btn btn-email" href="mailto:info@hocanholdings.co.ke?subject=Inquiry%3A%20Corporate%20Training%20%26%20Professional%20Development" onclick="window.location.href=this.href;return false;">Send Email</a>
       </div>
-    </section>
-    <section class="stats">
-      <article class="stat"><strong>300+</strong><span>Programs Delivered</span></article>
-      <article class="stat"><strong>95%</strong><span>Client Satisfaction</span></article>
-      <article class="stat"><strong>24/7</strong><span>Support Available</span></article>
-      <article class="stat"><strong>21+</strong><span>Years Experience</span></article>
     </section>
     <section class="card">
       <h2>Workforce Capability Development</h2>
@@ -48,6 +45,24 @@
         <li>Technical and soft-skills programs tailored by role</li>
         <li>Performance coaching tied to business outcomes</li>
         <li>Training impact tracking and continuous improvement planning</li>
+      </ul>
+    </section>
+    <section class="card">
+      <h2>Why Us</h2>
+      <ul>
+        <li>Programs designed around your real operational challenges</li>
+        <li>Measurable learning outcomes tied to business priorities</li>
+        <li>Flexible delivery formats for teams across locations</li>
+        <li>Continuous support beyond training sessions</li>
+      </ul>
+    </section>
+    <section class="card">
+      <h2>Our Process & Customer Collaboration</h2>
+      <ul>
+        <li>Needs assessment workshops with your leadership and HR teams</li>
+        <li>Co-created training objectives and success indicators</li>
+        <li>Delivery with regular check-ins and progress visibility</li>
+        <li>Post-training reviews to refine future learning cycles together</li>
       </ul>
     </section>
   </main>

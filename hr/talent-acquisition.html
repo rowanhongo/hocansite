@@ -4,12 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Talent Acquisition & Recruitment</title>
+  <link rel="icon" type="image/png" href="../Hocan%20Logo.png">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: Inter, sans-serif; background: #f3f0f8; color: #1f1f2c; }
+    body { font-family: Inter, sans-serif; background: #f3f0f8; color: #1f1f2c; overflow-x: hidden; position: relative; }
+    body::before { content: ""; position: fixed; inset: -40% -40%; pointer-events: none; z-index: -1; background: radial-gradient(circle at 25% 30%, rgba(169,216,237,0.45), transparent 45%), radial-gradient(circle at 75% 70%, rgba(243,222,217,0.4), transparent 45%); animation: pageGlow 12s ease-in-out infinite; }
+    @keyframes pageGlow { 0%,100% { transform: translate(0,0) rotate(0deg); } 50% { transform: translate(18px,18px) rotate(170deg);} }
     .wrap { max-width: 920px; margin: 24px auto 50px; padding: 0 14px; }
-    .hero { background: linear-gradient(135deg, #6f36c7, #5a2ba8); color: #fff; border-radius: 16px; padding: 26px; box-shadow: 0 16px 36px rgba(93, 48, 171, 0.28); }
+    .hero { background: linear-gradient(135deg, #2f6ea6, #275b89); color: #fff; border-radius: 16px; padding: 26px; box-shadow: 0 16px 36px rgba(39, 91, 137, 0.28); }
     .hero h1 { font-size: 38px; line-height: 1.15; margin-bottom: 10px; }
     .hero p { font-size: 18px; line-height: 1.5; opacity: 0.95; }
     .actions { margin-top: 16px; display: flex; gap: 10px; flex-wrap: wrap; }
@@ -32,14 +35,8 @@
       <p>Strategic talent acquisition for leadership, specialist, and high-volume hiring needs across Kenya and East Africa.</p>
       <div class="actions">
         <a class="btn btn-back" href="../hocan-hr-consulting.html">Back to HR Consulting</a>
-        <a class="btn btn-email" href="mailto:info@hocanholdings.co.ke?subject=Inquiry%3A%20Talent%20Acquisition%20%26%20Recruitment">Send Email</a>
+        <a class="btn btn-email" href="mailto:info@hocanholdings.co.ke?subject=Inquiry%3A%20Talent%20Acquisition%20%26%20Recruitment" onclick="window.location.href=this.href;return false;">Send Email</a>
       </div>
-    </section>
-    <section class="stats">
-      <article class="stat"><strong>150K+</strong><span>Candidates Placed</span></article>
-      <article class="stat"><strong>95%</strong><span>Client Satisfaction</span></article>
-      <article class="stat"><strong>24/7</strong><span>Support Available</span></article>
-      <article class="stat"><strong>21+</strong><span>Years Experience</span></article>
     </section>
     <section class="card">
       <h2>Executive Search & Professional Recruitment</h2>
@@ -48,6 +45,24 @@
         <li>Mid-to-senior professional recruitment across industries</li>
         <li>Confidential search delivery with role-specific assessment</li>
         <li>Talent pipeline mapping for future workforce planning</li>
+      </ul>
+    </section>
+    <section class="card">
+      <h2>Why Clients Choose Us</h2>
+      <ul>
+        <li>Deep understanding of local and regional talent markets</li>
+        <li>Role-specific candidate evaluation for better quality hires</li>
+        <li>Transparent communication from brief to final offer stage</li>
+        <li>Retention-minded hiring that supports long-term growth</li>
+      </ul>
+    </section>
+    <section class="card">
+      <h2>Our Process & Customer Involvement</h2>
+      <ul>
+        <li>Discovery session with your team to define business and role priorities</li>
+        <li>Joint shortlist reviews so you stay in control of hiring decisions</li>
+        <li>Structured interview support and decision calibration with stakeholders</li>
+        <li>Post-placement check-ins and adjustments based on your feedback</li>
       </ul>
     </section>
   </main>

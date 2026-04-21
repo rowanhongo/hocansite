@@ -4,12 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Labour Outsourcing & Workforce Solutions</title>
+  <link rel="icon" type="image/png" href="../Hocan%20Logo.png">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: Inter, sans-serif; background: #f3f0f8; color: #1f1f2c; }
+    body { font-family: Inter, sans-serif; background: #f3f0f8; color: #1f1f2c; overflow-x: hidden; position: relative; }
+    body::before { content: ""; position: fixed; inset: -40% -40%; pointer-events: none; z-index: -1; background: radial-gradient(circle at 25% 30%, rgba(169,216,237,0.45), transparent 45%), radial-gradient(circle at 75% 70%, rgba(243,222,217,0.4), transparent 45%); animation: pageGlow 12s ease-in-out infinite; }
+    @keyframes pageGlow { 0%,100% { transform: translate(0,0) rotate(0deg); } 50% { transform: translate(18px,18px) rotate(170deg);} }
     .wrap { max-width: 920px; margin: 24px auto 50px; padding: 0 14px; }
-    .hero { background: linear-gradient(135deg, #6f36c7, #5a2ba8); color: #fff; border-radius: 16px; padding: 26px; box-shadow: 0 16px 36px rgba(93, 48, 171, 0.28); }
+    .hero { background: linear-gradient(135deg, #2f6ea6, #275b89); color: #fff; border-radius: 16px; padding: 26px; box-shadow: 0 16px 36px rgba(39, 91, 137, 0.28); }
     .hero h1 { font-size: 38px; line-height: 1.15; margin-bottom: 10px; }
     .hero p { font-size: 18px; line-height: 1.5; opacity: 0.95; }
     .actions { margin-top: 16px; display: flex; gap: 10px; flex-wrap: wrap; }
@@ -32,14 +35,8 @@
       <p>Flexible workforce deployment and managed staffing solutions that help you scale while staying compliant.</p>
       <div class="actions">
         <a class="btn btn-back" href="../hocan-hr-consulting.html">Back to HR Consulting</a>
-        <a class="btn btn-email" href="mailto:info@hocanholdings.co.ke?subject=Inquiry%3A%20Labour%20Outsourcing%20%26%20Workforce%20Solutions">Send Email</a>
+        <a class="btn btn-email" href="mailto:info@hocanholdings.co.ke?subject=Inquiry%3A%20Labour%20Outsourcing%20%26%20Workforce%20Solutions" onclick="window.location.href=this.href;return false;">Send Email</a>
       </div>
-    </section>
-    <section class="stats">
-      <article class="stat"><strong>1K+</strong><span>Workers Deployed</span></article>
-      <article class="stat"><strong>99%</strong><span>Compliance Focus</span></article>
-      <article class="stat"><strong>24/7</strong><span>Support Available</span></article>
-      <article class="stat"><strong>21+</strong><span>Years Experience</span></article>
     </section>
     <section class="card">
       <h2>Managed Workforce Delivery</h2>
@@ -48,6 +45,24 @@
         <li>Payroll coordination and workforce administration support</li>
         <li>Performance monitoring with quality assurance controls</li>
         <li>Rapid staffing for seasonal and project-based demand</li>
+      </ul>
+    </section>
+    <section class="card">
+      <h2>Why Us</h2>
+      <ul>
+        <li>Balanced cost-efficiency with strong service quality controls</li>
+        <li>Compliance-oriented workforce management and documentation</li>
+        <li>Rapid response capabilities for urgent staffing requirements</li>
+        <li>Clear communication and account ownership throughout delivery</li>
+      </ul>
+    </section>
+    <section class="card">
+      <h2>Our Process & Customer Collaboration</h2>
+      <ul>
+        <li>Service scoping and workforce planning with your operations team</li>
+        <li>Joint onboarding plans and role readiness alignment</li>
+        <li>Regular performance reviews and escalation channels</li>
+        <li>Continuous optimization based on your feedback and KPIs</li>
       </ul>
     </section>
   </main>
