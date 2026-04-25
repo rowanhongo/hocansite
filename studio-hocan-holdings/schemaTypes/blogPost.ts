@@ -1,22 +1,44 @@
 export default {
   name: 'blogPost',
-  title: 'Blog Post',
+  title: '✍️ Blog Post',
   type: 'document',
+
+  initialValue: {
+    title: 'New Blog Title',
+    excerpt: 'Short summary of this article...',
+  },
+
   fields: [
-    { name: 'title', title: 'Title', type: 'string' },
+    {
+      name: 'title',
+      title: 'Title',
+      type: 'string'
+    },
+
     {
       name: 'slug',
       title: 'Slug',
       type: 'slug',
-      options: { source: 'title' }
+      options: {source: 'title'}
     },
-    { name: 'coverImage', title: 'Cover Image', type: 'image' },
-    { name: 'excerpt', title: 'Excerpt', type: 'text' },
+
+    {
+      name: 'coverImage',
+      title: 'Cover Image',
+      type: 'image'
+    },
+
+    {
+      name: 'excerpt',
+      title: 'Excerpt',
+      type: 'text'
+    },
+
     {
       name: 'content',
       title: 'Content',
       type: 'array',
-      of: [{ type: 'block' }]
+      of: [{type: 'block'}]
     }
   ]
 }

@@ -4,5 +4,8 @@
   "scripts": {
     "build": "node scripts/generate-config.js",
     "postbuild": "echo Build complete. config.js is generated from Netlify env vars."
+  },
+  "dependencies": {
+    "@sanity/image-url": "^2.1.1"
   }
 }

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog - Hocan Holdings</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Inter, sans-serif; background: #f4f6f8; color: #111; }
+    .container { width: 92%; max-width: 1100px; margin: 0 auto; padding: 34px 0 80px; }
+    .hero { margin-bottom: 18px; }
+    .hero h1 { font-size: 44px; letter-spacing: -0.02em; }
+    .hero p { margin-top: 8px; color: #555; }
+
+    .blog-grid { margin-top: 18px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .blog-card { display: block; text-decoration: none; color: inherit; background: #fff; border: 1px solid rgba(0,0,0,0.06); border-radius: 18px; overflow: hidden; box-shadow: 0 10px 26px rgba(0,0,0,0.06); transition: transform 0.18s ease, box-shadow 0.18s ease; }
+    .blog-card:hover { transform: translateY(-3px); box-shadow: 0 16px 36px rgba(0,0,0,0.09); }
+    .blog-card-img { width: 100%; height: 190px; object-fit: cover; background: #e7eaf0; display: block; }
+    .blog-card-body { padding: 16px 16px 18px; }
+    .blog-card-meta { font-size: 13px; color: #6b7280; margin-bottom: 8px; }
+    .blog-card-title { font-size: 16px; font-weight: 700; line-height: 1.35; margin-bottom: 8px; }
+    .blog-card-excerpt { color: #4b5563; line-height: 1.6; }
+    .blog-loading, .blog-empty { padding: 16px; color: #555; }
+
+    @media (max-width: 900px) {
+      .hero h1 { font-size: 34px; }
+      .blog-grid { grid-template-columns: 1fr; }
+      .blog-card-img { height: 220px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <header class="hero">
+      <h1>Blog</h1>
+      <p>Insights, updates, and stories from Hocan Holdings.</p>
+    </header>
+
+    <section id="blog-container" class="blog-grid"></section>
+  </main>
+
+  <script type="module" src="js/blog.js"></script>
+</body>
+</html>
+

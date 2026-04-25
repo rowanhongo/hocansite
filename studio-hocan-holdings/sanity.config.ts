@@ -1,18 +1,23 @@
 import {defineConfig} from 'sanity'
-import {structureTool} from 'sanity/structure'
-import {visionTool} from '@sanity/vision'
-import {schemaTypes} from './schemaTypes'
+import {deskTool} from 'sanity/desk'
+import {deskStructure} from './structure/deskStructure'
+import blogPost from './schemaTypes/blogPost'
+import jobPost from './schemaTypes/jobPost'
 
 export default defineConfig({
-  name: 'default',
-  title: 'Hocan Holdings',
+  name: 'hocan-holdings',
+  title: 'Hocan Holdings CMS',
 
   projectId: 'ktbj8t65',
   dataset: 'production',
 
-  plugins: [structureTool(), visionTool()],
+  plugins: [
+    deskTool({
+      structure: deskStructure
+    })
+  ],
 
   schema: {
-    types: schemaTypes,
-  },
+    types: [blogPost, jobPost]
+  }
 })

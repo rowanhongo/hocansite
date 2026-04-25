@@ -278,10 +278,24 @@
       align-items: baseline;
       gap: 0;
       white-space: nowrap;
+      flex-shrink: 0;
     }
 
     .typewriter-prefix {
       min-width: 1ch;
+    }
+
+    /* Reserve the full width of the longest prefix + suffix so layout never shifts */
+    .typewriter::after {
+      content: "Добро пожаловать в Hocan Holdings";
+      visibility: hidden;
+      position: absolute;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .typewriter {
+      position: relative;
     }
 
     .typewriter-cursor {

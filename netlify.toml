@@ -1,5 +1,18 @@
-# Netlify build: inject SUPABASE_URL and SUPABASE_ANON_KEY into config.js (set in Netlify env vars).
-# Do not add SUPABASE_SERVICE_ROLE_KEY to frontend; use it only in Supabase Edge Function secrets.
-[build]
-  command = "npm run build"
-  publish = "."
+[[redirects]]
+from = "/admin"
+to = "https://hocan-admin.sanity.studio/"
+status = 301
+force = true
+
+# Pretty blog URLs: /blog/my-slug -> serves blog-post.html (client fetches by slug)
+[[redirects]]
+from = "/blog/*"
+to = "/blog-post.html"
+status = 200
+
+[[redirects]]
+from = "/blog"
+to = "/blog.html"
+status = 301
+force = true
+

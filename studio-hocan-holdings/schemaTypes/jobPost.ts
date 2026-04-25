@@ -1,22 +1,43 @@
 export default {
   name: 'jobPost',
-  title: 'Job Post',
+  title: '💼 Job Post',
   type: 'document',
+
+  initialValue: {
+    title: 'Job Title Here',
+    location: 'Kigali, Rwanda',
+    jobType: 'Full-time'
+  },
+
   fields: [
-    { name: 'title', title: 'Job Title', type: 'string' },
-    { name: 'location', title: 'Location', type: 'string' },
-    { name: 'jobType', title: 'Job Type', type: 'string' },
+    {
+      name: 'title',
+      title: 'Job Title',
+      type: 'string'
+    },
+
+    {
+      name: 'location',
+      title: 'Location',
+      type: 'string'
+    },
+
+    {
+      name: 'jobType',
+      title: 'Job Type',
+      type: 'string'
+    },
     {
       name: 'description',
       title: 'Description',
       type: 'array',
-      of: [{ type: 'block' }]
+      of: [{type: 'block'}]
     },
     {
       name: 'requirements',
       title: 'Requirements',
       type: 'array',
-      of: [{ type: 'string' }]
+      of: [{type: 'string'}]
     }
   ]
 }
