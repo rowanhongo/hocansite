@@ -19,6 +19,14 @@
     .btn { display: inline-block; border-radius: 10px; text-decoration: none; font-weight: 700; padding: 11px 18px; }
     .btn-back { background: #2563eb; color: #fff; }
     .btn-email { background: #C47A5A; color: #fff; }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.55); display: none; align-items: center; justify-content: center; z-index: 2000; padding: 16px; }
+    .modal-overlay.open { display: flex; }
+    .modal { width: min(430px, 100%); border-radius: 16px; background: #fff; padding: 20px; box-shadow: 0 20px 44px rgba(0, 0, 0, 0.25); }
+    .modal h3 { margin-bottom: 8px; }
+    .modal p { margin-bottom: 12px; color: #555; }
+    .field { margin-bottom: 10px; }
+    .field label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 14px; }
+    .field input { width: 100%; border: 1px solid #d1d5db; border-radius: 10px; padding: 10px 12px; font-family: inherit; }
     .stats { margin-top: 16px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
     .stat { background: #ede7f7; border-radius: 12px; padding: 14px; text-align: center; }
     .stat strong { display: block; color: #6f36c7; font-size: 28px; margin-bottom: 4px; }
@@ -35,7 +43,7 @@
       <p>An all-in-one HR operating model built for modern organizations that need consistency, speed, and visibility.</p>
       <div class="actions">
         <a class="btn btn-back" href="../hocan-hr-consulting.html">Back</a>
-        <a class="btn btn-email" href="https://wa.me/254791235830?text=Hi%20I%20am%20%22Your%20Name%22%20my%20email%20is%20%22your@email.com%22%20and%20I%20need%20HR360%20support.">Send Message</a>
+        <button class="btn btn-email" type="button" id="sendMessageBtn">Send Message</button>
       </div>
     </section>
     <section class="card">
@@ -66,5 +74,35 @@
       </ul>
     </section>
   </main>
+  <div class="modal-overlay" id="waModal">
+    <div class="modal">
+      <h3>Send Message</h3>
+      <p>Please enter your details to continue on WhatsApp.</p>
+      <form id="waForm">
+        <div class="field"><label for="waName">Name</label><input id="waName" type="text" required></div>
+        <div class="field"><label for="waEmail">Email</label><input id="waEmail" type="email" required></div>
+        <div class="actions"><button type="button" class="btn btn-back" id="waCancel">Cancel</button><button class="btn btn-email" type="submit">Send</button></div>
+      </form>
+    </div>
+  </div>
+  <script>
+    document.querySelectorAll("img").forEach(function (img, idx) {
+      if (!img.hasAttribute("loading")) img.loading = idx < 2 ? "eager" : "lazy";
+      if (!img.hasAttribute("decoding")) img.decoding = "async";
+    });
+    const modal = document.getElementById("waModal");
+    document.getElementById("sendMessageBtn").addEventListener("click", function () { modal.classList.add("open"); });
+    document.getElementById("waCancel").addEventListener("click", function () { modal.classList.remove("open"); });
+    modal.addEventListener("click", function (e) { if (e.target === modal) modal.classList.remove("open"); });
+    document.getElementById("waForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const name = document.getElementById("waName").value.trim();
+      const email = document.getElementById("waEmail").value.trim();
+      const text = `Hi I am ${name} my email is ${email} and I need HR360 support.`;
+      window.open("https://wa.me/254791235830?text=" + encodeURIComponent(text), "_blank");
+      modal.classList.remove("open");
+      this.reset();
+    });
+  </script>
 </body>
 </html>

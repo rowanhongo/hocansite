@@ -64,6 +64,10 @@
     </section>
   </main>
   <script>
+    document.querySelectorAll("img").forEach(function (img, idx) {
+      if (!img.hasAttribute("loading")) img.loading = idx < 2 ? "eager" : "lazy";
+      if (!img.hasAttribute("decoding")) img.decoding = "async";
+    });
     const missionTab = document.getElementById("missionTab");
     const visionTab = document.getElementById("visionTab");
     const missionPanel = document.getElementById("missionPanel");

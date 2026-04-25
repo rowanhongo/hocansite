@@ -52,6 +52,10 @@
     <section class="empty" id="jobEmpty" hidden>No active vacancies right now. Please check back soon.</section>
   </main>
   <script>
+    document.querySelectorAll("img").forEach(function (img, idx) {
+      if (!img.hasAttribute("loading")) img.loading = idx < 2 ? "eager" : "lazy";
+      if (!img.hasAttribute("decoding")) img.decoding = "async";
+    });
     const SANITY_PROJECT_ID = "ktbj8t65";
     const SANITY_DATASET = "production";
     const SANITY_API_VERSION = "2023-10-01";

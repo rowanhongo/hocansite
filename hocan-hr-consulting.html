@@ -18,7 +18,11 @@
     .topbar-socials { display: flex; gap: 12px; }
     .topbar-socials a { color: #666; display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; text-decoration: none; }
     .topbar-socials svg { width: 16px; height: 16px; }
-    .navbar { margin-top: 10px; padding: 18px 24px; }
+    .navbar {
+      margin-top: 10px;
+      padding: 18px 24px;
+      background: linear-gradient(rgba(230, 241, 249, 0.88), rgba(230, 241, 249, 0.88)), url("image10.png") center/cover no-repeat;
+    }
     .nav-inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
     .logo img { height: 102px; display: block; }
     .links a { margin: 0 10px; color: #444; font-weight: 500; text-decoration: none; }
@@ -31,7 +35,7 @@
     .cta-row { display: flex; gap: 14px; flex-wrap: wrap; }
     .btn { display: inline-block; background: #C47A5A; color: #fff; text-decoration: none; padding: 12px 22px; border-radius: 10px; font-weight: 600; border: none; cursor: pointer; }
     .about { margin-top: 24px; padding: 30px; }
-    .about-grid { display: grid; grid-template-columns: 1fr; gap: 24px; align-items: center; }
+    .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: center; }
     .about h2 { font-size: 32px; color: #111827; margin-bottom: 10px; }
     .about p { line-height: 1.8; color: #4b5563; }
     .about img { width: 100%; border-radius: 16px; display: block; max-height: 340px; object-fit: cover; }
@@ -51,6 +55,31 @@
     .footer-socials svg { width: 16px; height: 16px; }
     .footer-bottom { border-top: 1px solid rgba(255,255,255,0.15); padding: 14px 32px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: 13px; }
     .footer-bottom a { color: rgba(255,255,255,0.85); text-decoration: none; }
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.55);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      padding: 16px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      width: min(460px, 100%);
+      border-radius: 16px;
+      background: #fff;
+      box-shadow: 0 20px 44px rgba(0, 0, 0, 0.25);
+      padding: 22px;
+    }
+    .modal h3 { font-size: 24px; margin-bottom: 8px; color: #111827; }
+    .modal p { color: #4b5563; margin-bottom: 14px; }
+    .modal .field { margin-bottom: 12px; }
+    .modal .field label { display: block; margin-bottom: 6px; font-size: 14px; font-weight: 600; }
+    .modal .field input { width: 100%; border: 1px solid #d1d5db; border-radius: 10px; padding: 11px 12px; font-family: inherit; }
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 8px; }
+    .btn-secondary { background: #e5e7eb; color: #111827; }
     @media (max-width: 900px) {
       .services, .hero-grid, .about-grid { grid-template-columns: 1fr; }
       .nav-inner { flex-direction: column; }
@@ -71,7 +100,7 @@
       <div class="nav-inner">
         <a class="logo" href="index.html"><img src="assets/logo.png" alt="Hocan Holdings"></a>
         <div class="links">
-          <a href="index.html">Home</a><a href="hocan-hr-consulting.html">Hocan HR Consulting</a><a href="hocan-logistics.html">Hocan Logistics</a><a href="blogs.html">Blogs</a><a href="contact.html">Contact Us</a>
+          <a href="index.html">Home</a><a href="about-us.html">About Us</a><a href="hocan-hr-consulting.html">Hocan HR Consulting</a><a href="hocan-logistics.html">Hocan Logistics</a><a href="blogs.html">Blogs</a><a href="contact.html">Contact Us</a>
         </div>
       </div>
     </nav>
@@ -82,9 +111,8 @@
           <h1>Hocan HR Consulting</h1>
           <p>Your trusted partner for workforce solutions, talent growth, and practical HR support.</p>
           <div class="cta-row">
-            <a class="btn" href="https://wa.me/254791235830?text=Hi%20I%20am%20%22Your%20Name%22%20my%20email%20is%20%22your@email.com%22%20and%20I%20would%20like%20to%20schedule%20a%20call.">Schedule a Call</a>
+            <button class="btn" type="button" data-contact-type="schedule">Schedule a Call</button>
             <a class="btn" href="jobs.html">Find a Job</a>
-            <a class="btn" href="about-us.html">About Us</a>
           </div>
         </div>
         <div class="hero-image">
@@ -99,6 +127,9 @@
           <h2>Why Us</h2>
           <p>Hocan HR Consulting supports organizations with practical people strategies, from recruitment to long-term talent development. We help employers build strong teams and help professionals access better career opportunities across East Africa.</p>
         </div>
+        <div>
+          <img src="image9.png" alt="Why Hocan HR Consulting">
+        </div>
       </div>
     </section>
 
@@ -106,29 +137,77 @@
       <article class="service-card">
         <h3>Talent Acquisition &amp; Recruitment</h3>
         <p>End-to-end hiring solutions tailored to your business.</p>
-        <div class="service-links"><a href="hr/talent-acquisition.html">View service</a><a href="https://wa.me/254791235830?text=Hi%20I%20am%20%22Your%20Name%22%20my%20email%20is%20%22your@email.com%22%20and%20I%20need%20Talent%20Acquisition%20support.">Send Message</a></div>
+        <div class="service-links"><a href="hr/talent-acquisition.html">View service</a><button class="btn btn-secondary" type="button" data-contact-type="talent acquisition support">Send Message</button></div>
       </article>
       <article class="service-card">
         <h3>Corporate Training &amp; Professional Development</h3>
         <p>Upskill your workforce with expert-led programs.</p>
-        <div class="service-links"><a href="hr/corporate-training.html">View service</a><a href="https://wa.me/254791235830?text=Hi%20I%20am%20%22Your%20Name%22%20my%20email%20is%20%22your@email.com%22%20and%20I%20need%20Corporate%20Training%20support.">Send Message</a></div>
+        <div class="service-links"><a href="hr/corporate-training.html">View service</a><button class="btn btn-secondary" type="button" data-contact-type="corporate training support">Send Message</button></div>
       </article>
       <article class="service-card">
         <h3>Labour Outsourcing &amp; Workforce Solutions</h3>
         <p>Flexible staffing and managed workforce services.</p>
-        <div class="service-links"><a href="hr/labour-outsourcing.html">View service</a><a href="https://wa.me/254791235830?text=Hi%20I%20am%20%22Your%20Name%22%20my%20email%20is%20%22your@email.com%22%20and%20I%20need%20Labour%20Outsourcing%20support.">Send Message</a></div>
+        <div class="service-links"><a href="hr/labour-outsourcing.html">View service</a><button class="btn btn-secondary" type="button" data-contact-type="labour outsourcing support">Send Message</button></div>
       </article>
       <article class="service-card">
         <h3>HR360 - Complete HR Management Solution</h3>
         <p>An all-in-one HR platform for modern businesses.</p>
-        <div class="service-links"><a href="hr/hr360.html">View service</a><a href="https://wa.me/254791235830?text=Hi%20I%20am%20%22Your%20Name%22%20my%20email%20is%20%22your@email.com%22%20and%20I%20need%20HR360%20support.">Send Message</a></div>
+        <div class="service-links"><a href="hr/hr360.html">View service</a><button class="btn btn-secondary" type="button" data-contact-type="HR360 support">Send Message</button></div>
       </article>
       <article class="service-card">
         <h3>Startup HR Advisory</h3>
         <p>Strategic HR guidance for early-stage and growing startups.</p>
-        <div class="service-links"><a href="hr/startup-hr-advisory.html">View service</a><a href="https://wa.me/254791235830?text=Hi%20I%20am%20%22Your%20Name%22%20my%20email%20is%20%22your@email.com%22%20and%20I%20need%20Startup%20HR%20Advisory%20support.">Send Message</a></div>
+        <div class="service-links"><a href="hr/startup-hr-advisory.html">View service</a><button class="btn btn-secondary" type="button" data-contact-type="startup HR advisory support">Send Message</button></div>
       </article>
     </section>
   </div>
+  <div class="modal-overlay" id="waModal" aria-hidden="true">
+    <div class="modal">
+      <h3>Send Message</h3>
+      <p>Please share your details and continue to WhatsApp.</p>
+      <form id="waForm">
+        <div class="field">
+          <label for="waName">Name</label>
+          <input id="waName" type="text" required>
+        </div>
+        <div class="field">
+          <label for="waEmail">Email</label>
+          <input id="waEmail" type="email" required>
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-secondary" type="button" id="waCancel">Cancel</button>
+          <button class="btn" type="submit">Send</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <script>
+    document.querySelectorAll("img").forEach(function (img, idx) {
+      if (!img.hasAttribute("loading")) img.loading = idx < 2 ? "eager" : "lazy";
+      if (!img.hasAttribute("decoding")) img.decoding = "async";
+    });
+    const waBase = "https://wa.me/254791235830?text=";
+    const waModal = document.getElementById("waModal");
+    const waForm = document.getElementById("waForm");
+    const waCancel = document.getElementById("waCancel");
+    let activeTopic = "HR support";
+    document.querySelectorAll("[data-contact-type]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        activeTopic = btn.getAttribute("data-contact-type") || "HR support";
+        waModal.classList.add("open");
+      });
+    });
+    waCancel.addEventListener("click", function () { waModal.classList.remove("open"); });
+    waModal.addEventListener("click", function (e) { if (e.target === waModal) waModal.classList.remove("open"); });
+    waForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      const name = document.getElementById("waName").value.trim();
+      const email = document.getElementById("waEmail").value.trim();
+      const text = `Hi I am ${name} my email is ${email} and I need ${activeTopic}.`;
+      window.open(waBase + encodeURIComponent(text), "_blank");
+      waModal.classList.remove("open");
+      waForm.reset();
+    });
+  </script>
 </body>
 </html>

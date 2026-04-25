@@ -131,6 +131,7 @@
       margin: 10px auto 20px;
       width: 90%;
       max-width: 1200px;
+      background: linear-gradient(rgba(230, 241, 249, 0.9), rgba(230, 241, 249, 0.9)), url("image10.png") center/cover no-repeat;
       z-index: 100;
       transform: translateZ(0);
       opacity: 1;
@@ -210,11 +211,6 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-    }
-
-    .links,
-    .contact {
-      /* no collapse transition needed – whole nav hides */
     }
 
     .logo img {
@@ -983,6 +979,7 @@
         </div>
         <div class="links">
           <a href="index.html">Home</a>
+          <a href="about-us.html">About Us</a>
           <a href="hocan-hr-consulting.html">Hocan HR Consulting</a>
           <a href="hocan-logistics.html">Hocan Logistics</a>
           <a href="blogs.html">Blogs</a>
@@ -1024,6 +1021,23 @@
         <h3>Customer-Centric Focus</h3>
         <p>Personalized support and tailored solutions - no off-the-shelf stuff.</p>
       </article>
+    </section>
+    <section class="about-us-section" id="learn">
+      <h2>Success Stories</h2>
+      <div class="values-grid">
+        <article class="value-card">
+          <h4>Technoedge Limited</h4>
+          <p>We helped streamline employment workflows and onboarding, reducing hiring delays and improving retention through structured workforce support.</p>
+        </article>
+        <article class="value-card">
+          <h4>Mifun Team Builders</h4>
+          <p>We supported seasonal workforce planning and role-matching to help Mifun scale delivery capacity while maintaining quality and consistency.</p>
+        </article>
+        <article class="value-card">
+          <h4>TastyGrubs Limited</h4>
+          <p>We partnered on talent sourcing and staffing process design, helping speed up recruitment and improve day-to-day HR operations.</p>
+        </article>
+      </div>
     </section>
 
     <section class="employers-section" aria-label="For employers">
@@ -1129,6 +1143,10 @@
   <script src="config.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script>
+    document.querySelectorAll("img").forEach(function (img, idx) {
+      if (!img.hasAttribute("loading")) img.loading = idx < 2 ? "eager" : "lazy";
+      if (!img.hasAttribute("decoding")) img.decoding = "async";
+    });
     const IMG_PREFIX = "./scroll";
     const IMG_EXT = ".png";
     const MAX_LOGOS = 50;
