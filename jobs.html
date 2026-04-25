@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Find a Job - Hocan Holdings</title>
+  <link rel="icon" type="image/png" href="Hocan%20Logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Inter, sans-serif; background: #f4f6f8; color: #333; }
+    .container { width: min(1100px, 92%); margin: 30px auto 80px; }
+    .hero { background: #fff; border-radius: 22px; padding: 28px; box-shadow: 0 14px 30px rgba(0,0,0,0.08); margin-bottom: 22px; }
+    .hero h1 { font-size: 36px; margin-bottom: 8px; color: #111827; }
+    .hero p { color: #4b5563; line-height: 1.7; }
+    .job-list { display: grid; gap: 14px; }
+    .job-card { background: #fff; border-radius: 16px; border: 1px solid #e5e7eb; box-shadow: 0 6px 18px rgba(0,0,0,0.06); padding: 20px; text-decoration: none; color: inherit; display: block; }
+    .job-card:hover { border-color: #d0d7e2; }
+    .job-card h3 { font-size: 22px; margin-bottom: 10px; color: #111827; }
+    .meta { display: flex; gap: 10px; flex-wrap: wrap; color: #4b5563; font-size: 14px; }
+    .pill { background: #eef4ff; color: #2e5a89; border-radius: 999px; padding: 4px 10px; font-size: 12px; }
+    .empty { background: #fff; border-radius: 16px; padding: 20px; color: #4b5563; }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <section class="hero">
+      <h1>Find a Job</h1>
+      <p>Explore open opportunities across Hocan Holdings and subsidiaries.</p>
+    </section>
+    <section class="job-list" id="jobList"></section>
+    <section class="empty" id="jobEmpty" hidden>No active vacancies right now. Please check back soon.</section>
+  </main>
+  <script>
+    const SANITY_PROJECT_ID = "ktbj8t65";
+    const SANITY_DATASET = "production";
+    const SANITY_API_VERSION = "2023-10-01";
+    const SANITY_API = `https://${SANITY_PROJECT_ID}.api.sanity.io/v${SANITY_API_VERSION}/data/query/${SANITY_DATASET}`;
+
+    async function fetchJobs() {
+      const query = `*[_type == "jobPost"] | order(_createdAt desc){
+        _id,
+        title,
+        location,
+        jobType,
+        "slug": coalesce(slug.current, _id),
+        "company": coalesce(company, "Hocan Holdings")
+      }`;
+      const res = await fetch(`${SANITY_API}?query=${encodeURIComponent(query)}`);
+      if (!res.ok) throw new Error("Unable to load jobs");
+      const data = await res.json();
+      return data.result || [];
+    }
+
+    function renderJobs(jobs) {
+      const list = document.getElementById("jobList");
+      const empty = document.getElementById("jobEmpty");
+      list.innerHTML = "";
+      if (!jobs.length) {
+        empty.hidden = false;
+        return;
+      }
+      empty.hidden = true;
+      jobs.forEach(job => {
+        const card = document.createElement("a");
+        card.className = "job-card";
+        card.href = `job-detail.html?slug=${encodeURIComponent(job.slug)}`;
+        card.innerHTML = `
+          <h3>${job.title || "Untitled role"}</h3>
+          <div class="meta">
+            <span>${job.company || "Hocan Holdings"}</span>
+            <span>&bull;</span>
+            <span>${job.location || "Kenya"}</span>
+            <span class="pill">${job.jobType || "Full-time"}</span>
+          </div>
+        `;
+        list.appendChild(card);
+      });
+    }
+
+    (async function init() {
+      try {
+        const jobs = await fetchJobs();
+        renderJobs(jobs);
+      } catch (e) {
+        document.getElementById("jobEmpty").hidden = false;
+        document.getElementById("jobEmpty").textContent = "Unable to load jobs right now. Please try again shortly.";
+      }
+    })();
+  </script>
+</body>
+</html>

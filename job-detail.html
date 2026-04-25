@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Job Detail - Hocan Holdings</title>
+  <link rel="icon" type="image/png" href="Hocan%20Logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Inter, sans-serif; background: #f4f6f8; color: #333; }
+    .container { width: min(980px, 92%); margin: 28px auto 80px; }
+    .back { display: inline-block; margin-bottom: 14px; color: #C47A5A; text-decoration: none; font-weight: 600; }
+    .card { background: #fff; border-radius: 20px; padding: 26px; box-shadow: 0 12px 30px rgba(0,0,0,0.08); }
+    h1 { font-size: 34px; margin-bottom: 10px; color: #111827; }
+    .meta { color: #4b5563; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px; }
+    h2 { margin-top: 22px; margin-bottom: 10px; color: #111827; font-size: 22px; }
+    .body { line-height: 1.8; color: #1f2937; white-space: pre-wrap; }
+    ul { padding-left: 22px; line-height: 1.8; color: #1f2937; }
+    .apply { display: inline-block; margin-top: 24px; background: #C47A5A; color: #fff; text-decoration: none; font-weight: 600; padding: 12px 20px; border-radius: 10px; }
+    .note { margin-top: 10px; color: #4b5563; }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <a class="back" href="jobs.html">&larr; Back to jobs</a>
+    <article class="card" id="jobCard"></article>
+  </main>
+  <script>
+    const SANITY_PROJECT_ID = "ktbj8t65";
+    const SANITY_DATASET = "production";
+    const SANITY_API_VERSION = "2023-10-01";
+    const SANITY_API = `https://${SANITY_PROJECT_ID}.api.sanity.io/v${SANITY_API_VERSION}/data/query/${SANITY_DATASET}`;
+    const slug = new URLSearchParams(window.location.search).get("slug");
+
+    function portableTextToPlain(blocks) {
+      if (!Array.isArray(blocks)) return "";
+      return blocks
+        .map(block => Array.isArray(block.children) ? block.children.map(child => child.text || "").join("") : "")
+        .filter(Boolean)
+        .join("\n\n");
+    }
+
+    async function fetchJobBySlug(value) {
+      const safeSlug = value.replace(/"/g, '\\"');
+      const query = `*[_type == "jobPost" && (slug.current == "${safeSlug}" || _id == "${safeSlug}")][0]{
+        title,
+        location,
+        jobType,
+        "company": coalesce(company, "Hocan Holdings"),
+        description,
+        requirements
+      }`;
+      const res = await fetch(`${SANITY_API}?query=${encodeURIComponent(query)}`);
+      if (!res.ok) throw new Error("Unable to load job");
+      const data = await res.json();
+      return data.result;
+    }
+
+    function render(job) {
+      const card = document.getElementById("jobCard");
+      if (!job) {
+        card.innerHTML = "<h1>Job not found</h1><p>This role may have been removed.</p>";
+        return;
+      }
+      const requirements = Array.isArray(job.requirements) && job.requirements.length
+        ? job.requirements.map(item => `<li>${item}</li>`).join("")
+        : "<li>Submit a complete CV and cover letter (both are required).</li>";
+      const subject = encodeURIComponent(`Application: ${job.title || "Open Role"}`);
+      card.innerHTML = `
+        <h1>${job.title || "Open Role"}</h1>
+        <p class="meta">
+          <span>${job.company || "Hocan Holdings"}</span>
+          <span>&bull;</span>
+          <span>${job.location || "Kenya"}</span>
+          <span>&bull;</span>
+          <span>${job.jobType || "Full-time"}</span>
+        </p>
+        <h2>Description</h2>
+        <div class="body">${portableTextToPlain(job.description) || "No description provided yet."}</div>
+        <h2>Requirements</h2>
+        <ul>${requirements}</ul>
+        <p class="note"><strong>CV and cover letter are always required.</strong></p>
+        <a class="apply" href="mailto:info@hocanholdings.co.ke?subject=${subject}">Apply via Email</a>
+      `;
+    }
+
+    (async function init() {
+      if (!slug) return render(null);
+      try {
+        const job = await fetchJobBySlug(slug);
+        render(job);
+      } catch (e) {
+        render(null);
+      }
+    })();
+  </script>
+</body>
+</html>

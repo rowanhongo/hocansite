@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog Post - Hocan Holdings</title>
+  <link rel="icon" type="image/png" href="Hocan%20Logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Inter, sans-serif; background: #f4f6f8; color: #333; }
+    .container { width: 90%; max-width: 960px; margin: 24px auto 80px; }
+    .card { background: #fff; border-radius: 20px; box-shadow: 0 12px 30px rgba(0,0,0,0.08); overflow: hidden; }
+    .cover { width: 100%; max-height: 420px; object-fit: cover; display: block; }
+    .content { padding: 28px; }
+    .meta { color: #6b7280; margin-bottom: 12px; font-size: 14px; }
+    h1 { font-size: 36px; margin-bottom: 14px; color: #111827; }
+    .excerpt { color: #374151; font-size: 18px; margin-bottom: 20px; line-height: 1.7; }
+    .body { line-height: 1.8; color: #1f2937; white-space: pre-wrap; }
+    .back { display: inline-block; margin-bottom: 14px; color: #C47A5A; text-decoration: none; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a class="back" href="blogs.html">&larr; Back to blogs</a>
+    <article class="card" id="postCard"></article>
+  </div>
+  <script>
+    const SANITY_PROJECT_ID = "ktbj8t65";
+    const SANITY_DATASET = "production";
+    const SANITY_API_VERSION = "2023-10-01";
+    const SANITY_API = `https://${SANITY_PROJECT_ID}.api.sanity.io/v${SANITY_API_VERSION}/data/query/${SANITY_DATASET}`;
+    const slug = new URLSearchParams(window.location.search).get("slug");
+
+    function portableTextToPlain(blocks) {
+      if (!Array.isArray(blocks)) return "";
+      return blocks
+        .map(block => Array.isArray(block.children) ? block.children.map(child => child.text || "").join("") : "")
+        .filter(Boolean)
+        .join("\n\n");
+    }
+
+    async function fetchPostBySlug(value) {
+      const safeSlug = value.replace(/"/g, '\\"');
+      const query = `*[_type == "blogPost" && (slug.current == "${safeSlug}" || _id == "${safeSlug}")][0]{
+        title,
+        excerpt,
+        "coverImage": coverImage.asset->url,
+        "publishedDate": coalesce(publishedAt, _createdAt),
+        content
+      }`;
+      const res = await fetch(`${SANITY_API}?query=${encodeURIComponent(query)}`);
+      if (!res.ok) throw new Error("Unable to load post");
+      const data = await res.json();
+      return data.result;
+    }
+
+    function render(post) {
+      const el = document.getElementById("postCard");
+      if (!post) {
+        el.innerHTML = `<div class="content"><h1>Post not found</h1><p>This blog post may have been moved or deleted.</p></div>`;
+        return;
+      }
+      const date = new Date(post.publishedDate);
+      const dateLabel = Number.isNaN(date.getTime()) ? "" : date.toLocaleDateString("en-KE", { year: "numeric", month: "long", day: "numeric" });
+      el.innerHTML = `
+        <img class="cover" src="${post.coverImage || "image%202.jpeg"}" alt="${post.title || "Blog cover"}">
+        <div class="content">
+          <p class="meta">${dateLabel}</p>
+          <h1>${post.title || "Untitled Post"}</h1>
+          <p class="excerpt">${post.excerpt || ""}</p>
+          <div class="body">${portableTextToPlain(post.content) || "No content yet."}</div>
+        </div>
+      `;
+    }
+
+    (async function init() {
+      if (!slug) return render(null);
+      try {
+        const post = await fetchPostBySlug(slug);
+        render(post);
+      } catch (e) {
+        render(null);
+      }
+    })();
+  </script>
+</body>
+</html>
