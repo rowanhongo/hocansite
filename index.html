@@ -273,6 +273,31 @@
       line-height: 1.2;
     }
 
+    .typewriter {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 0;
+      white-space: nowrap;
+    }
+
+    .typewriter-prefix {
+      min-width: 1ch;
+    }
+
+    .typewriter-cursor {
+      display: inline-block;
+      width: 1ch;
+      margin-left: 2px;
+      color: rgba(26, 26, 26, 0.85);
+      animation: tw-blink 1s steps(1, end) infinite;
+      transform: translateY(1px);
+    }
+
+    @keyframes tw-blink {
+      0%, 49% { opacity: 1; }
+      50%, 100% { opacity: 0; }
+    }
+
     .hero p {
       color: #555;
       line-height: 1.6;
@@ -960,7 +985,7 @@
   <div class="container">
     <div class="nav-wrapper">
     <div class="topbar glass">
-      <div class="topbar-left">Hotline: +254 791 235 830</div>
+      <div class="topbar-left">Hotline: <a href="tel:+254791235830" style="color: inherit; text-decoration: none;">+254 791 235 830</a></div>
       <div class="topbar-socials" aria-label="Social links">
         <a href="https://wa.me/254791235830" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
           <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.52 3.48A11.8 11.8 0 0 0 12.06 0C5.52 0 .24 5.28.24 11.82c0 2.1.54 4.14 1.56 5.94L0 24l6.42-1.68a11.8 11.8 0 0 0 5.64 1.44h.06c6.54 0 11.82-5.28 11.82-11.82 0-3.12-1.2-6.06-3.42-8.46zM12.12 21.6h-.06a9.7 9.7 0 0 1-4.92-1.32l-.36-.18-3.78 1.02 1.02-3.66-.24-.36a9.72 9.72 0 0 1-1.5-5.22c0-5.4 4.38-9.78 9.84-9.78 2.64 0 5.1 1.02 6.96 2.88a9.73 9.73 0 0 1 2.88 6.96c0 5.4-4.38 9.78-9.84 9.78zm5.34-7.32c-.3-.18-1.74-.84-2.04-.96-.24-.06-.42-.12-.6.12-.18.24-.66.78-.84.96-.18.18-.3.18-.6.06-.3-.18-1.2-.42-2.22-1.38-.84-.72-1.38-1.62-1.56-1.92-.18-.24 0-.42.12-.54.12-.12.3-.3.42-.48.18-.18.24-.3.36-.48.12-.18.06-.36 0-.54-.06-.12-.6-1.5-.84-2.04-.24-.54-.48-.48-.66-.48h-.54c-.18 0-.48.06-.72.3-.24.24-.96.9-.96 2.22 0 1.32.96 2.58 1.14 2.76.18.18 1.92 2.94 4.68 4.08.66.3 1.2.48 1.62.6.72.24 1.32.24 1.8.18.54-.06 1.74-.72 1.98-1.38.24-.72.24-1.32.18-1.44-.06-.12-.24-.18-.54-.36z"/></svg>
@@ -1000,7 +1025,13 @@
     <section class="hero-section glass" id="heroSection">
       <section class="hero">
         <div class="hero-text">
-          <h1>Welcome to Hocan Holdings</h1>
+          <h1>
+            <span class="typewriter" aria-label="Welcome message">
+              <span class="typewriter-prefix" id="twPrefix"></span>
+              <span id="twStatic"> Hocan Holdings</span>
+              <span class="typewriter-cursor" aria-hidden="true">|</span>
+            </span>
+          </h1>
           <p>
             Established since 2015. Comprehensive logistics and consulting provider dedicated to your success across Kenya and East Africa.
           </p>
@@ -1136,6 +1167,64 @@
       if (!img.hasAttribute("loading")) img.loading = idx < 2 ? "eager" : "lazy";
       if (!img.hasAttribute("decoding")) img.decoding = "async";
     });
+
+    (function () {
+      const prefixes = [
+        "Welcome to",
+        "Bienvenue chez",
+        "Karibu kwa",
+        "Bienvenidos a",
+        "Willkommen bei",
+        "Добро пожаловать в",
+        "欢迎来到",
+        "مرحبا بكم في",
+        "へようこそ"
+      ];
+
+      const prefixEl = document.getElementById("twPrefix");
+      if (!prefixEl) return;
+
+      const typingSpeed = 90;      // ms per char
+      const deletingSpeed = 55;    // faster than typing
+      const pauseAfterType = 2000; // ms
+      const pauseAfterDelete = 250;
+
+      let wordIndex = 0;
+      let charIndex = 0;
+      let isDeleting = false;
+
+      function tick() {
+        const current = prefixes[wordIndex] || "";
+
+        if (!isDeleting) {
+          charIndex = Math.min(charIndex + 1, current.length);
+          prefixEl.textContent = current.slice(0, charIndex);
+
+          if (charIndex === current.length) {
+            isDeleting = true;
+            return setTimeout(tick, pauseAfterType);
+          }
+
+          return setTimeout(tick, typingSpeed);
+        }
+
+        // deleting (ONLY prefix)
+        charIndex = Math.max(charIndex - 1, 0);
+        prefixEl.textContent = current.slice(0, charIndex);
+
+        if (charIndex === 0) {
+          isDeleting = false;
+          wordIndex = (wordIndex + 1) % prefixes.length;
+          return setTimeout(tick, pauseAfterDelete);
+        }
+
+        return setTimeout(tick, deletingSpeed);
+      }
+
+      // Start clean
+      prefixEl.textContent = "";
+      tick();
+    })();
     const IMG_PREFIX = "./scroll";
     const IMG_EXT = ".png";
     const MAX_LOGOS = 50;
