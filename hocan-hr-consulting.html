@@ -80,10 +80,42 @@
     @media (max-width: 900px) {
       .services, .hero-grid, .about-grid { grid-template-columns: 1fr; }
       .nav-inner { flex-direction: column; }
+      .links {
+        width: 100%;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px 16px;
+      }
+      .links a {
+        text-align: center;
+      }
       .footer-grid { grid-template-columns: 1fr; }
       .hero { padding: 28px 22px; }
       .hero h1 { font-size: 32px; }
       .about { padding: 24px 20px; }
+    }
+    @media (max-width: 560px) {
+      .container { width: 94%; }
+      .topbar {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+      }
+      .navbar {
+        padding: 16px 14px;
+      }
+      .logo img {
+        height: 82px;
+      }
+      .links {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px 12px;
+      }
+      .links a {
+        white-space: normal;
+        line-height: 1.3;
+      }
     }
   </style>
 </head>

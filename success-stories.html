@@ -19,7 +19,38 @@
     .story { padding: 20px; }
     .story h2 { margin-bottom: 10px; color: #111827; }
     .story p { margin-bottom: 12px; color: #4b5563; line-height: 1.7; }
-    .video { width: 100%; aspect-ratio: 16/9; border: 0; border-radius: 12px; }
+    .video-card {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid rgba(0,0,0,0.08);
+      background: #fff;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.08);
+    }
+    .video-thumb {
+      aspect-ratio: 16/9;
+      background:
+        linear-gradient(rgba(15, 23, 42, 0.28), rgba(15, 23, 42, 0.28)),
+        linear-gradient(135deg, #dbeafe, #fde2e4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+    .video-meta {
+      padding: 14px 16px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      color: #4b5563;
+      font-size: 14px;
+    }
   </style>
 </head>
 <body>
@@ -33,17 +64,26 @@
       <article class="story glass">
         <h2>Technoedge Limited</h2>
         <p>We helped streamline employment workflows and onboarding, reducing delays and improving quality of hire.</p>
-        <iframe class="video" src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Technoedge story video" allowfullscreen loading="lazy"></iframe>
+        <a class="video-card" href="https://example.com/videos/technoedge-success-story" target="_blank" rel="noopener noreferrer">
+          <div class="video-thumb">Technoedge Story</div>
+          <div class="video-meta"><span>Placeholder video thumbnail</span><span>Watch story</span></div>
+        </a>
       </article>
       <article class="story glass">
         <h2>Mifun Team Builders</h2>
         <p>We supported staffing design and role mapping to help Mifun scale operations while maintaining service quality.</p>
-        <iframe class="video" src="https://www.youtube.com/embed/9bZkp7q19f0" title="Mifun story video" allowfullscreen loading="lazy"></iframe>
+        <a class="video-card" href="https://example.com/videos/mifun-success-story" target="_blank" rel="noopener noreferrer">
+          <div class="video-thumb">Mifun Story</div>
+          <div class="video-meta"><span>Placeholder video thumbnail</span><span>Watch story</span></div>
+        </a>
       </article>
       <article class="story glass">
         <h2>TastyGrubs Limited</h2>
         <p>We partnered on recruiting processes and workforce planning to accelerate hiring and improve team readiness.</p>
-        <iframe class="video" src="https://www.youtube.com/embed/3JZ_D3ELwOQ" title="Tastygrubs story video" allowfullscreen loading="lazy"></iframe>
+        <a class="video-card" href="https://example.com/videos/tastygrubs-success-story" target="_blank" rel="noopener noreferrer">
+          <div class="video-thumb">TastyGrubs Story</div>
+          <div class="video-meta"><span>Placeholder video thumbnail</span><span>Watch story</span></div>
+        </a>
       </article>
     </section>
   </main>
