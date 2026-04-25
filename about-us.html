@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Us - Hocan Holdings</title>
+  <link rel="icon" type="image/png" href="Hocan%20Logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Inter, sans-serif; background: radial-gradient(circle at 10% 20%, #e0f2ff 0%, transparent 40%), radial-gradient(circle at 90% 80%, #ffd9cf 0%, transparent 40%), #f4f6f8; color: #333; }
+    .container { width: min(1200px, 92%); margin: 22px auto 80px; }
+    .glass { background: rgba(255,255,255,0.4); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.4); border-radius: 20px; box-shadow: 0 16px 32px rgba(0,0,0,0.08); }
+    .hero { padding: 30px; margin-bottom: 20px; display: grid; grid-template-columns: 1.1fr 1fr; gap: 24px; align-items: center; }
+    .hero h1 { font-size: 38px; margin-bottom: 10px; color: #111827; }
+    .hero p { color: #4b5563; line-height: 1.7; }
+    .hero img { width: 100%; border-radius: 16px; max-height: 360px; object-fit: cover; display: block; }
+    .btn { display: inline-block; margin-top: 14px; background: #2563eb; color: #fff; text-decoration: none; font-weight: 600; padding: 11px 18px; border-radius: 10px; }
+    .about { padding: 30px; }
+    .about h2 { font-size: 32px; margin-bottom: 16px; }
+    .about-tabs { display: inline-flex; gap: 8px; padding: 6px; border-radius: 30px; background: rgba(245,245,245,0.7); margin-bottom: 24px; }
+    .about-tab { border: none; padding: 10px 22px; border-radius: 24px; font-family: inherit; font-size: 14px; font-weight: 600; color: #555; background: transparent; cursor: pointer; }
+    .about-tab.active { background: #C47A5A; color: #fff; }
+    .about-panel[hidden] { display: none; }
+    .quote { border-left: 4px solid #C47A5A; padding: 10px 0 10px 16px; font-style: italic; color: #444; margin: 12px 0 20px; }
+    .values-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 20px; }
+    .value-card { background: rgba(255,255,255,0.7); border-radius: 16px; padding: 20px; border: 1px solid rgba(255,255,255,0.45); }
+    .value-card h4 { margin-bottom: 8px; color: #111827; }
+    @media (max-width: 900px) { .hero, .values-grid { grid-template-columns: 1fr; } .hero h1 { font-size: 32px; } }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <section class="hero glass">
+      <div>
+        <h1>About Us</h1>
+        <p>Learn more about Hocan Holdings, our mission, our vision, and the values that drive our work across East Africa.</p>
+        <a class="btn" href="hocan-hr-consulting.html">Back to HR Consulting</a>
+      </div>
+      <img src="image%203.jpeg" alt="Hocan team at work">
+    </section>
+    <section class="about glass">
+      <h2>About Us</h2>
+      <div class="about-tabs" role="tablist" aria-label="Mission and Vision tabs">
+        <button type="button" class="about-tab active" role="tab" aria-selected="true" aria-controls="missionPanel" id="missionTab">Mission</button>
+        <button type="button" class="about-tab" role="tab" aria-selected="false" aria-controls="visionPanel" id="visionTab">Vision</button>
+      </div>
+      <div class="about-panel" id="missionPanel" role="tabpanel" aria-labelledby="missionTab">
+        <h3>Our Mission</h3>
+        <p class="quote">"Providing service excellence at competitive pricing for best value."</p>
+        <p>A one stop service provider to both local and international markets, with a niche in Hospitality and Gaming industries. We understand it is a daunting task to source efficient services - we see it as an opportunity to successfully fill the gaps in the service infrastructure across local and global markets.</p>
+      </div>
+      <div class="about-panel" id="visionPanel" role="tabpanel" aria-labelledby="visionTab" hidden>
+        <h3>Our Vision</h3>
+        <p class="quote">"To be the regional premier provider of choice."</p>
+        <p>A one stop service provider to both local and international markets, with a niche in Hospitality and Gaming industries. We understand it is a daunting task to source efficient services - we see it as an opportunity to successfully fill the gaps in the service infrastructure across local and global markets.</p>
+      </div>
+      <div class="values-grid">
+        <article class="value-card"><h4>Integrity</h4><p>We will always do what is right. Our business is based on trust - we adhere to the highest ethical standards and pledge to be transparent, just and consistent.</p></article>
+        <article class="value-card"><h4>Gratitude</h4><p>We are truly thankful for the opportunities given to us. Our positive-minded team embraces gratitude as the key to true greatness and concern for others.</p></article>
+        <article class="value-card"><h4>Excellence</h4><p>We strive to always improve. We teach and encourage our team to improve performance and efficiency to add value beyond what is expected.</p></article>
+        <article class="value-card"><h4>Passion</h4><p>We show pride, enthusiasm and dedication in everything we do, committed to delivering superior value to our clients.</p></article>
+      </div>
+    </section>
+  </main>
+  <script>
+    const missionTab = document.getElementById("missionTab");
+    const visionTab = document.getElementById("visionTab");
+    const missionPanel = document.getElementById("missionPanel");
+    const visionPanel = document.getElementById("visionPanel");
+    missionTab.addEventListener("click", function () {
+      missionTab.classList.add("active"); visionTab.classList.remove("active");
+      missionTab.setAttribute("aria-selected", "true"); visionTab.setAttribute("aria-selected", "false");
+      missionPanel.hidden = false; visionPanel.hidden = true;
+    });
+    visionTab.addEventListener("click", function () {
+      visionTab.classList.add("active"); missionTab.classList.remove("active");
+      visionTab.setAttribute("aria-selected", "true"); missionTab.setAttribute("aria-selected", "false");
+      visionPanel.hidden = false; missionPanel.hidden = true;
+    });
+  </script>
+</body>
+</html>
