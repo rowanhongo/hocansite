@@ -11,10 +11,13 @@
     body { font-family: Inter, sans-serif; background: #f4f6f8; color: #333; }
     .container { width: min(1100px, 92%); margin: 18px auto 80px; }
     .back { display: inline-block; margin-bottom: 14px; color: #1a1a2e; text-decoration: none; font-weight: 600; }
+    .crumbs { color: #6b7280; margin-bottom: 14px; font-size: 14px; }
     .hero { border-radius: 18px; padding: 34px 26px; color: #fff; background: linear-gradient(120deg, rgba(15,23,42,.88), rgba(74,179,212,.78)), url("/image%203.jpeg") center/cover no-repeat; margin-bottom: 18px; }
     .hero h1 { font-size: clamp(30px, 5vw, 52px); margin-bottom: 8px; }
     .meta { display: flex; flex-wrap: wrap; gap: 12px; font-size: 14px; }
     .meta span { opacity: .95; }
+    .hero-actions { margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap; }
+    .hero-actions a, .hero-actions button { border: 1px solid rgba(255,255,255,.4); background: rgba(26,26,46,.45); color: #fff; border-radius: 999px; padding: 8px 12px; font-size: 13px; text-decoration: none; cursor: pointer; font-family: inherit; }
     .content { background: #fff; border-radius: 18px; box-shadow: 0 10px 24px rgba(0,0,0,.08); padding: 24px; display: grid; grid-template-columns: 2fr 1fr; gap: 24px; }
     h2 { margin-bottom: 10px; color: #111827; font-size: 24px; }
     .body { line-height: 1.8; color: #1f2937; white-space: pre-wrap; margin-bottom: 20px; }
@@ -30,6 +33,7 @@
 <body>
   <main class="container">
     <a class="back" href="/jobs.html">&larr; Back to jobs</a>
+    <div class="crumbs">Job listing &nbsp;›&nbsp; Job details</div>
     <section class="hero" id="jobHero"></section>
     <section class="content" id="jobCard"></section>
   </main>
@@ -57,6 +61,17 @@
       document.getElementById("jobCard").innerHTML = "<div><p class='muted'>Please return to the listings and select another vacancy.</p></div>";
     }
 
+    function shareLinks(title) {
+      const url = encodeURIComponent(window.location.href);
+      const text = encodeURIComponent(title || "Hocan Job Opening");
+      return {
+        facebook: `https://www.facebook.com/sharer/sharer.php?u=${url}`,
+        x: `https://twitter.com/intent/tweet?url=${url}&text=${text}`,
+        linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${url}`,
+        whatsapp: `https://wa.me/?text=${text}%20${url}`
+      };
+    }
+
     (async () => {
       const slug = getSlugFromPath();
       if (!slug) return renderMissing();
@@ -64,6 +79,7 @@
         const job = await getPublicJobBySlug(slug);
         if (!job) return renderMissing();
 
+        const links = shareLinks(job.title);
         document.getElementById("jobHero").innerHTML = `
           <h1>${esc(job.title || "Open Role")}</h1>
           <div class="meta">
@@ -72,6 +88,13 @@
             <span>${esc(job.job_type || "Full time")}</span>
             <span>|</span>
             <span>Posted on ${esc(formatDate(job.posted_at || job.created_at))}</span>
+          </div>
+          <div class="hero-actions">
+            <a href="${links.facebook}" target="_blank" rel="noopener noreferrer">Facebook</a>
+            <a href="${links.x}" target="_blank" rel="noopener noreferrer">X</a>
+            <a href="${links.linkedin}" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+            <a href="${links.whatsapp}" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+            <button type="button" id="copyJobLinkBtn">Copy Link</button>
           </div>
         `;
 
@@ -95,9 +118,28 @@
             <p><strong>Industry:</strong><br>${esc(job.industry || "Not specified")}</p>
             <p><strong>Experience:</strong><br>${esc(job.experience || "Not specified")}</p>
             ${job.salary ? `<p><strong>Salary:</strong><br>${esc(job.salary)}</p>` : ""}
+            ${job.company ? `<p><strong>Company:</strong><br>${esc(job.company)}</p>` : ""}
+            ${job.department ? `<p><strong>Department:</strong><br>${esc(job.department)}</p>` : ""}
+            ${job.city ? `<p><strong>City:</strong><br>${esc(job.city)}</p>` : ""}
+            ${job.state_province ? `<p><strong>State/Province:</strong><br>${esc(job.state_province)}</p>` : ""}
+            ${job.country ? `<p><strong>Country:</strong><br>${esc(job.country)}</p>` : ""}
+            ${job.zip_postal_code ? `<p><strong>Zip/Postal Code:</strong><br>${esc(job.zip_postal_code)}</p>` : ""}
             <a class="apply" href="mailto:info@hocanholdings.co.ke?subject=${subject}">I'm interested</a>
           </aside>
         `;
+
+        const copyBtn = document.getElementById("copyJobLinkBtn");
+        copyBtn?.addEventListener("click", async () => {
+          try {
+            await navigator.clipboard.writeText(window.location.href);
+            copyBtn.textContent = "Copied";
+            setTimeout(() => {
+              copyBtn.textContent = "Copy Link";
+            }, 1400);
+          } catch (_e) {
+            copyBtn.textContent = "Copy failed";
+          }
+        });
       } catch (_err) {
         renderMissing();
       }

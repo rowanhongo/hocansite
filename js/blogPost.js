@@ -58,6 +58,42 @@ function renderContentBlocks(blocks) {
     .join("\n");
 }
 
+function getShareLinks(title) {
+  const url = encodeURIComponent(window.location.href);
+  const text = encodeURIComponent(title || "Hocan Holdings Blog");
+  return {
+    facebook: `https://www.facebook.com/sharer/sharer.php?u=${url}`,
+    x: `https://twitter.com/intent/tweet?url=${url}&text=${text}`,
+    linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${url}`,
+    whatsapp: `https://wa.me/?text=${text}%20${url}`
+  };
+}
+
+function initials(name) {
+  return String(name || "HH")
+    .split(" ")
+    .map((part) => part[0] || "")
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+}
+
+function setupShareActions() {
+  const copyBtn = document.querySelector("[data-share-copy]");
+  if (!copyBtn) return;
+  copyBtn.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      copyBtn.textContent = "Copied";
+      setTimeout(() => {
+        copyBtn.textContent = "Copy Link";
+      }, 1400);
+    } catch (_e) {
+      copyBtn.textContent = "Copy failed";
+    }
+  });
+}
+
 async function init() {
   const root = document.getElementById("blog-post");
   if (!root) return;
@@ -78,6 +114,8 @@ async function init() {
     }
 
     const cover = post?.cover_image_url || "";
+    const author = post?.author || "Hocan Holdings";
+    const share = getShareLinks(post?.title || "");
 
     root.innerHTML = `
       <a class="article-back" href="/blogs.html">&larr; Back</a>
@@ -86,6 +124,17 @@ async function init() {
           <div class="article-meta">${escapeHtml(formatDate(post?.published_at || post?.created_at))}</div>
           <h1 class="article-title">${escapeHtml(post?.title || "")}</h1>
           ${post?.excerpt ? `<p class="article-excerpt">${escapeHtml(post.excerpt)}</p>` : ""}
+          <div class="article-byline">
+            <span class="author-avatar">${escapeHtml(initials(author))}</span>
+            <span class="author-info"><strong>${escapeHtml(author)}</strong><small>Author</small></span>
+          </div>
+          <div class="article-share">
+            <a href="${share.facebook}" target="_blank" rel="noopener noreferrer">Facebook</a>
+            <a href="${share.x}" target="_blank" rel="noopener noreferrer">X</a>
+            <a href="${share.linkedin}" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+            <a href="${share.whatsapp}" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+            <button type="button" data-share-copy>Copy Link</button>
+          </div>
         </header>
         ${cover ? `<img class="article-cover" src="${escapeHtml(cover)}" alt="${escapeHtml(post?.title || "Article")}" decoding="async">` : ""}
         <div class="article-body">
@@ -93,6 +142,7 @@ async function init() {
         </div>
       </article>
     `;
+    setupShareActions();
   } catch (e) {
     root.innerHTML = `<div class="article-empty">Unable to load this article right now.</div>`;
   }

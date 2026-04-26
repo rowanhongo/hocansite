@@ -608,6 +608,7 @@ async function loadNewsletter(){
     newsletterSubscribers=Array.isArray(body.subscribers)?body.subscribers:[];
     newsletterDailyUsed=Number(body.dailyUsed||0);
     renderNewsletter(body.total||newsletterSubscribers.length,newsletterDailyUsed,Number(body.dailyLimit||300));
+    if(body.setupRequired&&body.message){showToast(body.message,'error');}
   }catch(err){
     showToast(err.message,'error');
   }

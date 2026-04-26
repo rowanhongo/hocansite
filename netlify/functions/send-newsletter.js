@@ -31,6 +31,11 @@ function supabase(pathAndQuery) {
   return `${required("SUPABASE_URL")}/rest/v1/${pathAndQuery}`;
 }
 
+function tableMissing(text) {
+  const msg = String(text || "").toLowerCase();
+  return msg.includes("could not find the table") || msg.includes("relation") || msg.includes("does not exist");
+}
+
 async function getDailyUsed() {
   const start = new Date();
   start.setUTCHours(0, 0, 0, 0);
@@ -38,7 +43,11 @@ async function getDailyUsed() {
     supabase(`newsletter_send_logs?select=sent_count&created_at=gte.${encodeURIComponent(start.toISOString())}`),
     { headers: supabaseHeaders() }
   );
-  if (!res.ok) throw new Error("Could not load daily newsletter usage.");
+  if (!res.ok) {
+    const err = await res.text();
+    if (tableMissing(err)) return 0;
+    throw new Error("Could not load daily newsletter usage.");
+  }
   const rows = await res.json();
   return rows.reduce((sum, row) => sum + Number(row.sent_count || 0), 0);
 }
@@ -73,7 +82,13 @@ exports.handler = async function handler(event) {
       supabase(`newsletter_subscribers?select=email,first_name,last_name&order=created_at.desc&limit=${remaining}`),
       { headers: supabaseHeaders() }
     );
-    if (!listRes.ok) throw new Error("Could not load newsletter subscribers.");
+    if (!listRes.ok) {
+      const err = await listRes.text();
+      if (tableMissing(err)) {
+        return json(400, { ok: false, error: "Newsletter tables are missing. Run the latest Supabase migration first." });
+      }
+      throw new Error("Could not load newsletter subscribers.");
+    }
     const subscribers = await listRes.json();
 
     if (!Array.isArray(subscribers) || !subscribers.length) {
@@ -113,11 +128,17 @@ exports.handler = async function handler(event) {
     }
 
     const sentCount = subscribers.length;
-    await fetch(supabase("newsletter_send_logs"), {
+    const logRes = await fetch(supabase("newsletter_send_logs"), {
       method: "POST",
       headers: { ...supabaseHeaders(), Prefer: "return=minimal" },
       body: JSON.stringify([{ subject, sent_count: sentCount }])
     });
+    if (!logRes.ok) {
+      const err = await logRes.text();
+      if (!tableMissing(err)) {
+        throw new Error("Newsletter was sent but failed to log daily usage.");
+      }
+    }
 
     const newUsed = used + sentCount;
     return json(200, {

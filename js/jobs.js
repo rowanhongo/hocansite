@@ -59,8 +59,10 @@ function applyFilters() {
           <span class="pill">${escapeHtml(job?.job_type || "Full time")}</span>
           ${job?.industry ? `<span class="pill">${escapeHtml(job.industry)}</span>` : ""}
           ${job?.location ? `<span class="pill">${escapeHtml(job.location)}</span>` : ""}
+          ${job?.experience ? `<span class="pill">${escapeHtml(job.experience)}</span>` : ""}
         </div>
         <p class="desc">${escapeHtml((job?.description || "").slice(0, 170))}${(job?.description || "").length > 170 ? "..." : ""}</p>
+        ${(job?.salary || job?.city || job?.country) ? `<p class="desc" style="margin-top:8px;min-height:auto;"><strong>Details:</strong> ${escapeHtml([job.salary, job.city, job.country].filter(Boolean).join(" | "))}</p>` : ""}
         <div class="job-footer"><span>${escapeHtml(formatDate(job?.posted_at || job?.created_at))}</span><span>View Details</span></div>
       </div>
     `;

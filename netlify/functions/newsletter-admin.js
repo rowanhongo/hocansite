@@ -28,6 +28,11 @@ function getSupabaseRestUrl(pathAndQuery) {
   return `${base}/rest/v1/${pathAndQuery}`;
 }
 
+function tableMissing(text) {
+  const msg = String(text || "").toLowerCase();
+  return msg.includes("could not find the table") || msg.includes("relation") || msg.includes("does not exist");
+}
+
 async function getDailyUsed() {
   const headers = getSupabaseHeaders();
   const start = new Date();
@@ -37,7 +42,11 @@ async function getDailyUsed() {
     getSupabaseRestUrl(`newsletter_send_logs?select=sent_count&created_at=gte.${encodeURIComponent(start.toISOString())}`),
     { headers }
   );
-  if (!res.ok) throw new Error("Failed to fetch daily usage");
+  if (!res.ok) {
+    const err = await res.text();
+    if (tableMissing(err)) return 0;
+    throw new Error("Failed to fetch daily usage");
+  }
   const rows = await res.json();
   return rows.reduce((sum, row) => sum + Number(row.sent_count || 0), 0);
 }
@@ -56,7 +65,13 @@ async function addSubscriber(body) {
     getSupabaseRestUrl(`newsletter_subscribers?select=id&email=eq.${encodeURIComponent(email)}&limit=1`),
     { headers }
   );
-  if (!existsRes.ok) throw new Error("Could not validate subscriber");
+  if (!existsRes.ok) {
+    const err = await existsRes.text();
+    if (tableMissing(err)) {
+      return json(400, { ok: false, error: "Newsletter tables are missing. Run the latest Supabase migration first." });
+    }
+    throw new Error("Could not validate subscriber");
+  }
   const existsRows = await existsRes.json();
   if (Array.isArray(existsRows) && existsRows.length) {
     return json(200, { ok: true, alreadySubscribed: true, message: "Email already subscribed." });
@@ -73,6 +88,9 @@ async function addSubscriber(body) {
 
   if (!insertRes.ok) {
     const errBody = await insertRes.text();
+    if (tableMissing(errBody)) {
+      return json(400, { ok: false, error: "Newsletter tables are missing. Run the latest Supabase migration first." });
+    }
     return json(400, { ok: false, error: `Subscribe failed: ${errBody}` });
   }
 
@@ -91,6 +109,19 @@ async function getDashboardData() {
   ]);
 
   if (!listRes.ok || !countRes.ok) {
+    const listErr = await listRes.text();
+    const countErr = await countRes.text();
+    if (tableMissing(listErr) || tableMissing(countErr)) {
+      return json(200, {
+        ok: true,
+        total: 0,
+        dailyUsed,
+        dailyLimit: DAILY_LIMIT,
+        subscribers: [],
+        setupRequired: true,
+        message: "Newsletter tables not found. Run the latest migration."
+      });
+    }
     throw new Error("Failed to load newsletter subscribers.");
   }
 

@@ -25,6 +25,11 @@ function rest(pathAndQuery) {
   return `${env("SUPABASE_URL")}/rest/v1/${pathAndQuery}`;
 }
 
+function tableMissing(text) {
+  const msg = String(text || "").toLowerCase();
+  return msg.includes("could not find the table") || msg.includes("relation") || msg.includes("does not exist");
+}
+
 exports.handler = async function handler(event) {
   if (event.httpMethod !== "POST") {
     return json(405, { ok: false, error: "Method not allowed" });
@@ -42,7 +47,13 @@ exports.handler = async function handler(event) {
 
     const h = headers();
     const existsRes = await fetch(rest(`newsletter_subscribers?select=id&email=eq.${encodeURIComponent(email)}&limit=1`), { headers: h });
-    if (!existsRes.ok) throw new Error("Unable to check existing subscription.");
+    if (!existsRes.ok) {
+      const err = await existsRes.text();
+      if (tableMissing(err)) {
+        return json(400, { ok: false, error: "Newsletter is not ready yet. Ask admin to run the latest migration." });
+      }
+      throw new Error("Unable to check existing subscription.");
+    }
     const exists = await existsRes.json();
     if (Array.isArray(exists) && exists.length) {
       return json(200, { ok: true, alreadySubscribed: true, message: "You are already subscribed." });
@@ -55,6 +66,9 @@ exports.handler = async function handler(event) {
     });
     if (!insertRes.ok) {
       const err = await insertRes.text();
+      if (tableMissing(err)) {
+        return json(400, { ok: false, error: "Newsletter is not ready yet. Ask admin to run the latest migration." });
+      }
       return json(400, { ok: false, error: `Could not subscribe: ${err}` });
     }
 

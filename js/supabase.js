@@ -153,7 +153,7 @@ export async function getPublicBlogBySlug(slug) {
 export async function getPublicJobs() {
   const query = await jobQuery();
   const { data, error } = await query
-    .select("id,title,slug,location,job_type,industry,description,posted_at,created_at,is_active")
+    .select("id,title,slug,location,job_type,industry,description,experience,salary,city,country,posted_at,created_at,is_active")
     .eq("is_active", true)
     .order("posted_at", { ascending: false, nullsFirst: false })
     .order("created_at", { ascending: false });
