@@ -47,6 +47,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);}
 .top-bar{background:var(--card);border-radius:14px;padding:18px 26px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 12px rgba(0,0,0,.05);}
 .top-bar h2{font-family:'Sora',sans-serif;font-size:20px;font-weight:700;}
 .top-bar .date{font-size:13px;color:var(--muted);}
+.mobile-menu-btn{display:none;background:var(--dark);color:#fff;border:none;border-radius:9px;padding:9px 12px;font-size:14px;cursor:pointer;}
+.mobile-sidebar-overlay{display:none;}
 
 /* ── PANELS ── */
 .panel{display:none;}
@@ -154,7 +156,20 @@ tr:hover td{background:#FAFBFD;}
 .toast.success{border-left:4px solid var(--green);}
 .toast.error{border-left:4px solid #E53E3E;}
 
-@media(max-width:860px){.modal{max-width:100%;margin:0;}.form-grid{grid-template-columns:1fr;}.stats-row{grid-template-columns:1fr 1fr;}.main{margin-left:0;padding:16px;}.sidebar{display:none;}}
+@media(max-width:860px){
+  .modal{max-width:100%;margin:0;}
+  .form-grid{grid-template-columns:1fr;}
+  .stats-row{grid-template-columns:1fr 1fr;}
+  .main{margin-left:0;padding:16px;}
+  .mobile-menu-btn{display:inline-flex;}
+  .top-bar{padding:14px 16px;gap:8px;}
+  .top-bar h2{font-size:18px;}
+  .top-bar .date{font-size:12px;}
+  .sidebar{display:flex;transform:translateX(-100%);transition:transform .25s ease;z-index:1200;box-shadow:12px 0 40px rgba(0,0,0,.35);}
+  .sidebar.open{transform:translateX(0);}
+  .mobile-sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:1100;}
+  .mobile-sidebar-overlay.show{display:block;}
+}
 </style>
 </head>
 <body>
@@ -176,6 +191,7 @@ tr:hover td{background:#FAFBFD;}
 
 <!-- APP -->
 <div class="app" id="app">
+  <div class="mobile-sidebar-overlay" id="mobileSidebarOverlay"></div>
   <aside class="sidebar">
     <div class="sidebar-brand">
       <img src="assets/logo.png" alt="Hocan Holdings">
@@ -194,6 +210,7 @@ tr:hover td{background:#FAFBFD;}
 
   <main class="main">
     <div class="top-bar">
+      <button class="mobile-menu-btn" id="mobileMenuBtn">☰ Menu</button>
       <h2 id="panelTitle">Overview</h2>
       <div class="date" id="todayDate"></div>
     </div>
@@ -444,6 +461,21 @@ document.getElementById('logoutBtn').addEventListener('click',()=>{setAuth(false
 
 const panels={};document.querySelectorAll('.panel').forEach(p=>panels[p.id.replace('panel-','')]=p);
 const navItems=document.querySelectorAll('.nav-item[data-panel]');
+const sidebarEl=document.querySelector('.sidebar');
+const mobileMenuBtn=document.getElementById('mobileMenuBtn');
+const mobileSidebarOverlay=document.getElementById('mobileSidebarOverlay');
+
+function closeMobileSidebar(){
+  if(window.innerWidth>860)return;
+  sidebarEl.classList.remove('open');
+  mobileSidebarOverlay.classList.remove('show');
+}
+
+function toggleMobileSidebar(){
+  if(window.innerWidth>860)return;
+  sidebarEl.classList.toggle('open');
+  mobileSidebarOverlay.classList.toggle('show');
+}
 
 function setPanel(name){
   navItems.forEach(n=>n.classList.toggle('active',n.dataset.panel===name));
@@ -453,7 +485,11 @@ function setPanel(name){
 }
 
 navItems.forEach(n=>n.addEventListener('click',()=>setPanel(n.dataset.panel)));
+navItems.forEach(n=>n.addEventListener('click',closeMobileSidebar));
 document.getElementById('todayDate').textContent=new Date().toLocaleDateString('en-KE',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+mobileMenuBtn?.addEventListener('click',toggleMobileSidebar);
+mobileSidebarOverlay?.addEventListener('click',closeMobileSidebar);
+window.addEventListener('resize',()=>{if(window.innerWidth>860){sidebarEl.classList.remove('open');mobileSidebarOverlay.classList.remove('show');}});
 
 // ── STATE ─────────────────────────────────────────────────────────────────────
 

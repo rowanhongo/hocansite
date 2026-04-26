@@ -3,8 +3,10 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 let cachedConfig = null;
 let cachedClient = null;
 
-const BLOGS_TABLE = "blogs";
-const JOBS_TABLE = "jobs";
+const BLOGS_TABLE_CANDIDATES = ["blog_posts", "blogs"];
+const JOBS_TABLE_CANDIDATES = ["job_posts", "jobs"];
+let resolvedBlogsTable = null;
+let resolvedJobsTable = null;
 
 async function getConfig() {
   if (cachedConfig) return cachedConfig;
@@ -43,6 +45,36 @@ async function getClient() {
   return cachedClient;
 }
 
+async function resolveTable(candidates, cacheKey) {
+  if (cacheKey === "blogs" && resolvedBlogsTable) return resolvedBlogsTable;
+  if (cacheKey === "jobs" && resolvedJobsTable) return resolvedJobsTable;
+
+  const supabase = await getClient();
+
+  for (const table of candidates) {
+    const { error } = await supabase.from(table).select("id", { count: "exact", head: true });
+    if (!error) {
+      if (cacheKey === "blogs") resolvedBlogsTable = table;
+      if (cacheKey === "jobs") resolvedJobsTable = table;
+      return table;
+    }
+  }
+
+  throw new Error(`No usable table found. Tried: ${candidates.join(", ")}`);
+}
+
+async function blogQuery() {
+  const supabase = await getClient();
+  const table = await resolveTable(BLOGS_TABLE_CANDIDATES, "blogs");
+  return supabase.from(table);
+}
+
+async function jobQuery() {
+  const supabase = await getClient();
+  const table = await resolveTable(JOBS_TABLE_CANDIDATES, "jobs");
+  return supabase.from(table);
+}
+
 function normalizeBlog(row) {
   return {
     ...row,
@@ -62,9 +94,8 @@ export async function getRuntimeConfig() {
 }
 
 export async function getPublicBlogs() {
-  const supabase = await getClient();
-  const { data, error } = await supabase
-    .from(BLOGS_TABLE)
+  const query = await blogQuery();
+  const { data, error } = await query
     .select("*")
     .eq("published", true)
     .order("published_at", { ascending: false, nullsFirst: false })
@@ -75,9 +106,8 @@ export async function getPublicBlogs() {
 }
 
 export async function getPublicBlogBySlug(slug) {
-  const supabase = await getClient();
-  const { data, error } = await supabase
-    .from(BLOGS_TABLE)
+  const query = await blogQuery();
+  const { data, error } = await query
     .select("*")
     .eq("published", true)
     .eq("slug", slug)
@@ -88,9 +118,8 @@ export async function getPublicBlogBySlug(slug) {
 }
 
 export async function getPublicJobs() {
-  const supabase = await getClient();
-  const { data, error } = await supabase
-    .from(JOBS_TABLE)
+  const query = await jobQuery();
+  const { data, error } = await query
     .select("*")
     .eq("is_active", true)
     .order("posted_at", { ascending: false, nullsFirst: false })
@@ -101,9 +130,8 @@ export async function getPublicJobs() {
 }
 
 export async function getPublicJobBySlug(slug) {
-  const supabase = await getClient();
-  const { data, error } = await supabase
-    .from(JOBS_TABLE)
+  const query = await jobQuery();
+  const { data, error } = await query
     .select("*")
     .eq("is_active", true)
     .eq("slug", slug)
@@ -114,9 +142,8 @@ export async function getPublicJobBySlug(slug) {
 }
 
 export async function adminGetBlogs() {
-  const supabase = await getClient();
-  const { data, error } = await supabase
-    .from(BLOGS_TABLE)
+  const query = await blogQuery();
+  const { data, error } = await query
     .select("*")
     .order("created_at", { ascending: false });
   if (error) throw error;
@@ -124,9 +151,8 @@ export async function adminGetBlogs() {
 }
 
 export async function adminGetBlog(id) {
-  const supabase = await getClient();
-  const { data, error } = await supabase
-    .from(BLOGS_TABLE)
+  const query = await blogQuery();
+  const { data, error } = await query
     .select("*")
     .eq("id", id)
     .maybeSingle();
@@ -135,15 +161,14 @@ export async function adminGetBlog(id) {
 }
 
 export async function adminSaveBlog(payload, id = null) {
-  const supabase = await getClient();
+  const query = await blogQuery();
   const clean = {
     ...payload,
     updated_at: new Date().toISOString()
   };
 
   if (id) {
-    const { data, error } = await supabase
-      .from(BLOGS_TABLE)
+    const { data, error } = await query
       .update(clean)
       .eq("id", id)
       .select("*")
@@ -152,8 +177,7 @@ export async function adminSaveBlog(payload, id = null) {
     return normalizeBlog(data);
   }
 
-  const { data, error } = await supabase
-    .from(BLOGS_TABLE)
+  const { data, error } = await query
     .insert([{ ...clean, created_at: new Date().toISOString() }])
     .select("*")
     .single();
@@ -162,16 +186,15 @@ export async function adminSaveBlog(payload, id = null) {
 }
 
 export async function adminDeleteBlog(id) {
-  const supabase = await getClient();
-  const { error } = await supabase.from(BLOGS_TABLE).delete().eq("id", id);
+  const query = await blogQuery();
+  const { error } = await query.delete().eq("id", id);
   if (error) throw error;
   return true;
 }
 
 export async function adminGetJobs() {
-  const supabase = await getClient();
-  const { data, error } = await supabase
-    .from(JOBS_TABLE)
+  const query = await jobQuery();
+  const { data, error } = await query
     .select("*")
     .order("created_at", { ascending: false });
   if (error) throw error;
@@ -179,9 +202,8 @@ export async function adminGetJobs() {
 }
 
 export async function adminGetJob(id) {
-  const supabase = await getClient();
-  const { data, error } = await supabase
-    .from(JOBS_TABLE)
+  const query = await jobQuery();
+  const { data, error } = await query
     .select("*")
     .eq("id", id)
     .maybeSingle();
@@ -190,15 +212,14 @@ export async function adminGetJob(id) {
 }
 
 export async function adminSaveJob(payload, id = null) {
-  const supabase = await getClient();
+  const query = await jobQuery();
   const clean = {
     ...payload,
     updated_at: new Date().toISOString()
   };
 
   if (id) {
-    const { data, error } = await supabase
-      .from(JOBS_TABLE)
+    const { data, error } = await query
       .update(clean)
       .eq("id", id)
       .select("*")
@@ -207,8 +228,7 @@ export async function adminSaveJob(payload, id = null) {
     return normalizeJob(data);
   }
 
-  const { data, error } = await supabase
-    .from(JOBS_TABLE)
+  const { data, error } = await query
     .insert([{ ...clean, created_at: new Date().toISOString() }])
     .select("*")
     .single();
@@ -217,8 +237,8 @@ export async function adminSaveJob(payload, id = null) {
 }
 
 export async function adminDeleteJob(id) {
-  const supabase = await getClient();
-  const { error } = await supabase.from(JOBS_TABLE).delete().eq("id", id);
+  const query = await jobQuery();
+  const { error } = await query.delete().eq("id", id);
   if (error) throw error;
   return true;
 }
