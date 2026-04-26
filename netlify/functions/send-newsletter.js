@@ -149,7 +149,7 @@ exports.handler = async function handler(event) {
         <div style="padding:18px 0 12px;border-bottom:1px solid #e5e7eb;margin-bottom:18px;">
           <img src="${logoUrl}" alt="Hocan Holdings" style="height:54px;display:block;">
         </div>
-        <div style="white-space:normal;">${messageHtml}</div>
+        <div style="white-space:normal;">__GREETING__${messageHtml}</div>
         <div style="margin-top:18px;color:#6b7280;font-size:12px;border-top:1px solid #f1f5f9;padding-top:12px;">
           You received this email because you subscribed to Hocan Holdings updates.
           ${site ? `<br><a href="${site}/unsubscribe.html?token=__TOKEN__" style="color:#475569;">Unsubscribe</a>` : ""}
@@ -162,13 +162,18 @@ exports.handler = async function handler(event) {
     // Send individually (better deliverability than BCC blasting)
     const sendOne = async (recipient) => {
       const unsubUrl = site ? `${site}/unsubscribe.html?token=${unsubscribeToken(recipient.email)}` : "";
-      const renderedHtml = html.replace("__TOKEN__", encodeURIComponent(unsubscribeToken(recipient.email)));
+      const firstName = String(recipient.first_name || "").trim();
+      const greeting = firstName ? `Hi ${escapeHtml(firstName)},<br><br>` : "Hi there,<br><br>";
+      const renderedHtml = html
+        .replace("__TOKEN__", encodeURIComponent(unsubscribeToken(recipient.email)))
+        .replace("__GREETING__", greeting);
+      const renderedText = `${firstName ? `Hi ${firstName},` : "Hi there,"}\n\n${message}`;
       const payload = {
         sender: { email: senderEmail, name: senderName },
         to: [{ email: recipient.email, name: `${recipient.first_name || ""} ${recipient.last_name || ""}`.trim() || recipient.email }],
         subject,
         htmlContent: renderedHtml,
-        textContent: message,
+        textContent: renderedText,
         headers: unsubUrl
           ? {
               "List-Unsubscribe": `<${unsubUrl}>`,
