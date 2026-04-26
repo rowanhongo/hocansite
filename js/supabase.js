@@ -3,7 +3,6 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 let cachedConfig = null;
 let cachedClient = null;
 const RUNTIME_CONFIG_CACHE_KEY = "hocan_runtime_config_v1";
-const TABLE_CACHE_KEY = "hocan_table_cache_v1";
 
 const BLOGS_TABLE_CANDIDATES = ["blog_posts", "blogs"];
 const JOBS_TABLE_CANDIDATES = ["job_posts", "jobs"];
@@ -63,48 +62,26 @@ async function getClient() {
   return cachedClient;
 }
 
-async function resolveTable(candidates, cacheKey) {
-  try {
-    const fromStorage = JSON.parse(sessionStorage.getItem(TABLE_CACHE_KEY) || "{}");
-    if (cacheKey === "blogs" && fromStorage.blogs) resolvedBlogsTable = fromStorage.blogs;
-    if (cacheKey === "jobs" && fromStorage.jobs) resolvedJobsTable = fromStorage.jobs;
-  } catch (_e) {
-    // ignore
-  }
-
-  if (cacheKey === "blogs" && resolvedBlogsTable) return resolvedBlogsTable;
-  if (cacheKey === "jobs" && resolvedJobsTable) return resolvedJobsTable;
-
+async function resolveTable(candidates) {
   const supabase = await getClient();
-
   for (const table of candidates) {
-    const { error } = await supabase.from(table).select("id", { count: "exact", head: true });
-    if (!error) {
-      if (cacheKey === "blogs") resolvedBlogsTable = table;
-      if (cacheKey === "jobs") resolvedJobsTable = table;
-      try {
-        const current = JSON.parse(sessionStorage.getItem(TABLE_CACHE_KEY) || "{}");
-        current[cacheKey] = table;
-        sessionStorage.setItem(TABLE_CACHE_KEY, JSON.stringify(current));
-      } catch (_e) {
-        // ignore
-      }
-      return table;
-    }
+    const { error } = await supabase.from(table).select("id").limit(1);
+    if (!error) return table;
   }
-
-  throw new Error(`No usable table found. Tried: ${candidates.join(", ")}`);
+  throw new Error(`No valid table found. Tried: ${candidates.join(", ")}`);
 }
 
 async function blogQuery() {
   const supabase = await getClient();
-  const table = await resolveTable(BLOGS_TABLE_CANDIDATES, "blogs");
+  if (!resolvedBlogsTable) resolvedBlogsTable = await resolveTable(BLOGS_TABLE_CANDIDATES);
+  const table = resolvedBlogsTable;
   return supabase.from(table);
 }
 
 async function jobQuery() {
   const supabase = await getClient();
-  const table = await resolveTable(JOBS_TABLE_CANDIDATES, "jobs");
+  if (!resolvedJobsTable) resolvedJobsTable = await resolveTable(JOBS_TABLE_CANDIDATES);
+  const table = resolvedJobsTable;
   return supabase.from(table);
 }
 
@@ -176,6 +153,7 @@ export async function getPublicBlogBySlug(slug) {
 }
 
 export async function getPublicJobs() {
+  console.log("FETCHING JOBS FROM SUPABASE");
   const build = async () =>
     (await jobQuery())
       .eq("is_active", true)
@@ -189,7 +167,8 @@ export async function getPublicJobs() {
     );
     if (error) throw error;
     return (data || []).map(normalizeJob);
-  } catch (_err) {
+  } catch (err) {
+    console.log("Supabase error:", err);
     const q2 = await build();
     const { data, error } = await q2.select(
       "id,title,slug,location,job_type,industry,description,posted_at,created_at,is_active"

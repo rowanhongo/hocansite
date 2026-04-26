@@ -64,7 +64,9 @@ function escapeHtml(s) {
 function buildLogoUrl() {
   const explicit = env("NEWSLETTER_LOGO_URL", "").trim();
   if (explicit) return explicit;
-  const base = env("URL", env("DEPLOY_PRIME_URL", "")).replace(/\/$/, "");
+  let base = env("URL", env("DEPLOY_PRIME_URL", "")).replace(/\/$/, "");
+  // Ensure absolute https URL (some email clients drop relative/invalid URLs)
+  if (base && !base.startsWith("http")) base = `https://${base}`;
   if (base) return `${base}/Hocan%20Logo.png`;
   return "Hocan%20Logo.png";
 }
@@ -132,33 +134,51 @@ exports.handler = async function handler(event) {
       </div>
     `;
 
-    const brevoPayload = {
-      sender: { email: senderEmail, name: senderName },
-      to: [{ email: senderEmail, name: senderName }],
-      bcc: subscribers.map((s) => ({
-        email: s.email,
-        name: `${s.first_name || ""} ${s.last_name || ""}`.trim() || s.email
-      })),
-      subject,
-      htmlContent: html,
-      textContent: message
+    const apiKey = required("BREVO_API_KEY");
+    const baseUrl = env("URL", env("DEPLOY_PRIME_URL", "")).replace(/\/$/, "");
+    const unsubscribeUrl = baseUrl ? `${baseUrl}/#unsubscribe` : "";
+
+    // Send individually (better deliverability than BCC blasting)
+    const sendOne = async (recipient) => {
+      const payload = {
+        sender: { email: senderEmail, name: senderName },
+        to: [{ email: recipient.email, name: `${recipient.first_name || ""} ${recipient.last_name || ""}`.trim() || recipient.email }],
+        subject,
+        htmlContent: html,
+        textContent: message,
+        headers: unsubscribeUrl
+          ? {
+              "List-Unsubscribe": `<${unsubscribeUrl}>`,
+              "List-Unsubscribe-Post": "List-Unsubscribe=One-Click"
+            }
+          : undefined
+      };
+
+      const res = await fetch("https://api.brevo.com/v3/smtp/email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "api-key": apiKey },
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) {
+        const errBody = await res.text();
+        throw new Error(errBody);
+      }
     };
 
-    const sendRes = await fetch("https://api.brevo.com/v3/smtp/email", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "api-key": required("BREVO_API_KEY")
-      },
-      body: JSON.stringify(brevoPayload)
+    // Simple concurrency limit
+    const concurrency = 5;
+    let idx = 0;
+    let sentCount = 0;
+    const workers = new Array(concurrency).fill(0).map(async () => {
+      while (idx < subscribers.length) {
+        const current = subscribers[idx++];
+        await sendOne(current);
+        sentCount += 1;
+      }
     });
 
-    if (!sendRes.ok) {
-      const errBody = await sendRes.text();
-      return json(400, { ok: false, error: `Brevo send failed: ${errBody}` });
-    }
+    await Promise.all(workers);
 
-    const sentCount = subscribers.length;
     const logRes = await fetch(supabase("newsletter_send_logs"), {
       method: "POST",
       headers: { ...supabaseHeaders(), Prefer: "return=minimal" },
