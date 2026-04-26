@@ -283,6 +283,13 @@ tr:hover td{background:#FAFBFD;}
           </div>
         </div>
         <table style="margin-top:16px;"><thead><tr><th>Name</th><th>Email</th><th>Subscribed</th><th>Actions</th></tr></thead><tbody id="newsletterTable"></tbody></table>
+        <div style="margin-top:12px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
+          <span id="newsletterRange" style="font-size:13px;color:var(--muted);">Showing 0-0</span>
+          <div style="display:flex;gap:8px;">
+            <button class="btn-edit" id="newsletterPrevBtn">Previous</button>
+            <button class="btn-edit" id="newsletterNextBtn">Next</button>
+          </div>
+        </div>
       </div>
 
       <div class="section-card">
@@ -560,6 +567,9 @@ let blogs=[];
 let jobs=[];
 let newsletterSubscribers=[];
 let newsletterDailyUsed=0;
+let newsletterPage=1;
+const newsletterPerPage=10;
+let newsletterTotal=0;
 let newsletterPoller=null;
 let editingBlogId=null;
 let editingJobId=null;
@@ -613,14 +623,16 @@ async function loadJobs(){
 
 // ── NEWSLETTER ────────────────────────────────────────────────────────────────
 
-async function loadNewsletter(){
+async function loadNewsletter(page=newsletterPage){
+  newsletterPage=page;
   try{
-    const res=await fetch('/.netlify/functions/newsletter-admin');
+    const res=await fetch(`/.netlify/functions/newsletter-admin?page=${newsletterPage}&perPage=${newsletterPerPage}`);
     const body=await res.json();
     if(!res.ok||!body.ok)throw new Error(body.error||'Could not load newsletter data');
     newsletterSubscribers=Array.isArray(body.subscribers)?body.subscribers:[];
     newsletterDailyUsed=Number(body.dailyUsed||0);
-    renderNewsletter(body.total||newsletterSubscribers.length,newsletterDailyUsed,Number(body.dailyLimit||300));
+    newsletterTotal=Number(body.total||newsletterSubscribers.length||0);
+    renderNewsletter(newsletterTotal,newsletterDailyUsed,Number(body.dailyLimit||300));
     if(body.setupRequired&&body.message){showToast(body.message,'error');}
   }catch(err){
     showToast(err.message,'error');
@@ -632,6 +644,9 @@ function renderNewsletter(total,dailyUsed,dailyLimit){
   const limitEl=document.getElementById('newsletterLimitBadge');
   const warningEl=document.getElementById('newsletterWarning');
   const tbody=document.getElementById('newsletterTable');
+  const rangeEl=document.getElementById('newsletterRange');
+  const prevBtn=document.getElementById('newsletterPrevBtn');
+  const nextBtn=document.getElementById('newsletterNextBtn');
   totalEl.textContent=`${total} subscriber${total===1?'':'s'}`;
   limitEl.textContent=`${dailyUsed} / ${dailyLimit} daily limit used`;
 
@@ -645,6 +660,9 @@ function renderNewsletter(total,dailyUsed,dailyLimit){
 
   if(!newsletterSubscribers.length){
     tbody.innerHTML='<tr class="empty-row"><td colspan="4">No subscribers yet.</td></tr>';
+    rangeEl.textContent='Showing 0-0';
+    prevBtn.disabled=newsletterPage<=1;
+    nextBtn.disabled=true;
     return;
   }
 
@@ -656,6 +674,12 @@ function renderNewsletter(total,dailyUsed,dailyLimit){
       <td><button class="btn-delete" data-news-del="${esc(s.id)}">Delete</button></td>
     </tr>
   `).join('');
+
+  const start=(newsletterPage-1)*newsletterPerPage+1;
+  const end=Math.min(start+newsletterSubscribers.length-1,total);
+  rangeEl.textContent=`Showing ${start}-${end} of ${total}`;
+  prevBtn.disabled=newsletterPage<=1;
+  nextBtn.disabled=end>=total;
 }
 
 function renderJobTable(data){
@@ -974,7 +998,8 @@ document.getElementById('nAddBtn').addEventListener('click',async()=>{
     document.getElementById('nFirstName').value='';
     document.getElementById('nLastName').value='';
     showToast(body.message||'Subscriber added');
-    await loadNewsletter();
+    newsletterPage=1;
+    await loadNewsletter(newsletterPage);
   }catch(err){showToast(err.message,'error');}
 });
 
@@ -1012,8 +1037,20 @@ document.addEventListener('click',async e=>{
     const body=await res.json();
     if(!res.ok||!body.ok)throw new Error(body.error||'Delete failed');
     showToast(body.message||'Deleted');
-    await loadNewsletter();
+    const maxPage=Math.max(1,Math.ceil((newsletterTotal-1)/newsletterPerPage));
+    newsletterPage=Math.min(newsletterPage,maxPage);
+    await loadNewsletter(newsletterPage);
   }catch(err){showToast(err.message,'error');}
+});
+
+document.getElementById('newsletterPrevBtn').addEventListener('click',()=>{
+  if(newsletterPage<=1)return;
+  loadNewsletter(newsletterPage-1);
+});
+document.getElementById('newsletterNextBtn').addEventListener('click',()=>{
+  const maxPage=Math.max(1,Math.ceil(newsletterTotal/newsletterPerPage));
+  if(newsletterPage>=maxPage)return;
+  loadNewsletter(newsletterPage+1);
 });
 
 document.getElementById('nImageUpload').addEventListener('change',async e=>{

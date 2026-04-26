@@ -97,12 +97,15 @@ async function addSubscriber(body) {
   return json(200, { ok: true, message: "Subscriber added successfully." });
 }
 
-async function getDashboardData() {
+async function getDashboardData(queryParams = {}) {
   const headers = getSupabaseHeaders();
+  const page = Math.max(1, Number(queryParams.page || 1));
+  const perPage = Math.min(50, Math.max(1, Number(queryParams.perPage || 10)));
+  const offset = (page - 1) * perPage;
 
   const [listRes, countRes, dailyUsed] = await Promise.all([
-    fetch(getSupabaseRestUrl("newsletter_subscribers?select=id,first_name,last_name,email,created_at&order=created_at.desc&limit=250"), { headers }),
-    fetch(getSupabaseRestUrl("newsletter_subscribers?select=id"), {
+    fetch(getSupabaseRestUrl(`newsletter_subscribers?select=id,first_name,last_name,email,created_at,unsubscribed_at&unsubscribed_at=is.null&order=created_at.desc&limit=${perPage}&offset=${offset}`), { headers }),
+    fetch(getSupabaseRestUrl("newsletter_subscribers?select=id&unsubscribed_at=is.null"), {
       headers: { ...headers, Prefer: "count=exact" }
     }),
     getDailyUsed()
@@ -131,6 +134,8 @@ async function getDashboardData() {
   return json(200, {
     ok: true,
     total,
+    page,
+    perPage,
     dailyUsed,
     dailyLimit: DAILY_LIMIT,
     subscribers
@@ -175,7 +180,7 @@ exports.handler = async function handler(event) {
       return await deleteSubscriber(body);
     }
 
-    return await getDashboardData();
+    return await getDashboardData(event.queryStringParameters || {});
   } catch (error) {
     return json(500, { ok: false, error: error.message || "Unknown server error" });
   }
