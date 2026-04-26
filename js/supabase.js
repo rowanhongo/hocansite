@@ -303,6 +303,24 @@ export async function adminSaveJob(payload, id = null) {
 
 export async function adminDeleteJob(id) {
   const query = await jobQuery();
+  const appQuery = await applicationQuery();
+  const { data: jobRow } = await query
+    .select("id,slug,title")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (jobRow?.id || jobRow?.slug) {
+    const clauses = [];
+    if (jobRow.id) clauses.push(`job_id.eq.${jobRow.id}`);
+    if (jobRow.slug) clauses.push(`job_slug.eq.${jobRow.slug}`);
+    if (clauses.length) {
+      const { error: appDeleteError } = await appQuery
+        .delete()
+        .or(clauses.join(","));
+      if (appDeleteError) throw appDeleteError;
+    }
+  }
+
   const { error } = await query.delete().eq("id", id);
   if (error) throw error;
   return true;
