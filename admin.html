@@ -264,7 +264,10 @@ tr:hover td{background:#FAFBFD;}
     <!-- APPLICATIONS -->
     <div class="panel" id="panel-applications">
       <div class="section-card">
-        <div class="section-header"><h3>Applications by Job Role</h3></div>
+        <div class="section-header">
+          <h3>Applications by Job Role</h3>
+          <button class="btn-secondary" id="refreshApplicationsBtn">Refresh</button>
+        </div>
         <div class="search-row">
           <input type="text" id="applicationRoleSearch" placeholder="Search role name (e.g. tech)">
           <select id="applicationSort" style="max-width:220px;">
@@ -596,6 +599,9 @@ function setPanel(name){
   Object.entries(panels).forEach(([k,v])=>v.classList.toggle('active',k===name));
   const titles={overview:'Overview',blogs:'Blog Posts',jobs:'Job Listings',applications:'Applications',newsletter:'Newsletter'};
   document.getElementById('panelTitle').textContent=titles[name]||name;
+  if(name==='applications'){
+    loadApplications();
+  }
 }
 
 navItems.forEach(n=>n.addEventListener('click',()=>setPanel(n.dataset.panel)));
@@ -878,6 +884,7 @@ document.getElementById('jobSearch').addEventListener('input',e=>{
 });
 document.getElementById('applicationRoleSearch').addEventListener('input',renderApplicationGroups);
 document.getElementById('applicationSort').addEventListener('change',renderApplicationGroups);
+document.getElementById('refreshApplicationsBtn').addEventListener('click',loadApplications);
 document.getElementById('applicationPrevBtn').addEventListener('click',()=>{
   if(applicationDetailPage<=1)return;
   applicationDetailPage-=1;
