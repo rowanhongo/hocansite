@@ -327,18 +327,25 @@ export async function adminDeleteJob(id) {
   return true;
 }
 
-export async function adminDeleteApplicationsByJobTitles(titles = []) {
-  const cleanTitles = Array.isArray(titles)
-    ? [...new Set(titles.map((t) => String(t || "").trim()).filter(Boolean))]
-    : [];
-  if (!cleanTitles.length) return 0;
+export async function adminDeleteApplication(id) {
+  const query = await applicationQuery();
+  const { error } = await query
+    .delete()
+    .eq("id", id);
+  if (error) throw error;
+  return true;
+}
+
+export async function adminDeleteApplicationsByJobTitle(jobTitle) {
+  const title = String(jobTitle || "").trim();
+  if (!title) return 0;
 
   const query = await applicationQuery();
   const { error } = await query
     .delete()
-    .in("job_title", cleanTitles);
+    .eq("job_title", title);
   if (error) throw error;
-  return cleanTitles.length;
+  return true;
 }
 
 export async function submitJobApplication(payload) {

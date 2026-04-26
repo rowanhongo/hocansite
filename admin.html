@@ -286,7 +286,7 @@ tr:hover td{background:#FAFBFD;}
         </div>
         <div class="app-inline-note" id="applicationDetailNote">Applications are shown per role, newest first.</div>
         <table>
-          <thead><tr><th>Candidate</th><th>Contact</th><th>Location</th><th>Education</th><th>Submitted</th><th>Links</th></tr></thead>
+          <thead><tr><th>Candidate</th><th>Contact</th><th>Location</th><th>Education</th><th>Submitted</th><th>Links</th><th>Actions</th></tr></thead>
           <tbody id="applicationDetailTable"></tbody>
         </table>
         <div style="margin-top:12px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
@@ -521,7 +521,7 @@ tr:hover td{background:#FAFBFD;}
 <script type="module">
 import {
   adminGetBlogs, adminGetBlog, adminSaveBlog, adminDeleteBlog,
-  adminGetJobs, adminGetJob, adminSaveJob, adminDeleteJob, adminGetApplications, getRuntimeConfig
+  adminGetJobs, adminGetJob, adminSaveJob, adminDeleteJob, adminGetApplications, adminDeleteApplication, adminDeleteApplicationsByJobTitle, getRuntimeConfig
 } from './js/supabase.js';
 import { uploadToCloudinary } from './js/cloudinary.js';
 
@@ -802,7 +802,10 @@ function renderApplicationGroups(){
       <td><strong>${esc(g.role)}</strong></td>
       <td>${g.apps.length}</td>
       <td>${fmt(g.latest?new Date(g.latest).toISOString():null)}</td>
-      <td><button class="btn-view" data-view-role="${encodeURIComponent(g.role)}">View Applications</button></td>
+      <td style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn-view" data-view-role="${encodeURIComponent(g.role)}">View Applications</button>
+        <button class="btn-delete" data-delete-role="${encodeURIComponent(g.role)}">Delete All</button>
+      </td>
     </tr>
   `).join('');
 }
@@ -817,7 +820,7 @@ function renderApplicationDetails(role){
   if(!role){
     title.textContent='Select a job role to view applications';
     note.textContent='Applications are shown per role, newest first.';
-    tbody.innerHTML='<tr class="empty-row"><td colspan="6">Choose a role above to inspect candidate applications.</td></tr>';
+    tbody.innerHTML='<tr class="empty-row"><td colspan="7">Choose a role above to inspect candidate applications.</td></tr>';
     rangeEl.textContent='Showing 0-0';
     prevBtn.disabled=true;
     nextBtn.disabled=true;
@@ -829,7 +832,7 @@ function renderApplicationDetails(role){
   title.textContent=`${role} — ${allForRole.length} application${allForRole.length===1?'':'s'}`;
   note.textContent='Click links to review LinkedIn, resume, and cover letter.';
   if(!allForRole.length){
-    tbody.innerHTML='<tr class="empty-row"><td colspan="6">No applications for this role yet.</td></tr>';
+    tbody.innerHTML='<tr class="empty-row"><td colspan="7">No applications for this role yet.</td></tr>';
     rangeEl.textContent='Showing 0-0';
     prevBtn.disabled=true;
     nextBtn.disabled=true;
@@ -863,6 +866,7 @@ function renderApplicationDetails(role){
         <td>${esc(education)}</td>
         <td>${fmt(app.created_at)}</td>
         <td style="display:flex;gap:8px;flex-wrap:wrap;">${linkedIn}${resume}${cover}</td>
+        <td><button class="btn-delete" data-delete-application="${esc(app.id)}">Delete</button></td>
       </tr>
     `;
   }).join('');
@@ -909,6 +913,40 @@ document.addEventListener('click',async e=>{
     selectedApplicationRole=decodeURIComponent(viewRoleBtn.dataset.viewRole||'');
     applicationDetailPage=1;
     renderApplicationDetails(selectedApplicationRole);
+    return;
+  }
+  const deleteRoleBtn=e.target.closest('[data-delete-role]');
+  if(deleteRoleBtn){
+    const role=decodeURIComponent(deleteRoleBtn.dataset.deleteRole||'');
+    if(!role)return;
+    if(!confirm(`Delete all applications for "${role}"? This cannot be undone.`))return;
+    try{
+      await adminDeleteApplicationsByJobTitle(role);
+      await loadApplications();
+      if(selectedApplicationRole===role){
+        selectedApplicationRole=null;
+        applicationDetailPage=1;
+        renderApplicationDetails(null);
+      }
+      showToast(`Deleted all applications for ${role}`);
+    }catch(err){
+      showToast('Delete failed: '+err.message,'error');
+    }
+    return;
+  }
+  const deleteApplicationBtn=e.target.closest('[data-delete-application]');
+  if(deleteApplicationBtn){
+    const appId=deleteApplicationBtn.dataset.deleteApplication;
+    if(!appId)return;
+    if(!confirm('Delete this application? This cannot be undone.'))return;
+    try{
+      await adminDeleteApplication(appId);
+      await loadApplications();
+      renderApplicationDetails(selectedApplicationRole);
+      showToast('Application deleted');
+    }catch(err){
+      showToast('Delete failed: '+err.message,'error');
+    }
     return;
   }
   const editBtn=e.target.closest('.btn-edit');
