@@ -46,7 +46,7 @@ exports.handler = async function handler(event) {
     }
 
     const h = headers();
-    const existsRes = await fetch(rest(`newsletter_subscribers?select=id&email=eq.${encodeURIComponent(email)}&limit=1`), { headers: h });
+    const existsRes = await fetch(rest(`newsletter_subscribers?select=id,unsubscribed_at&email=eq.${encodeURIComponent(email)}&limit=1`), { headers: h });
     if (!existsRes.ok) {
       const err = await existsRes.text();
       if (tableMissing(err)) {
@@ -56,6 +56,19 @@ exports.handler = async function handler(event) {
     }
     const exists = await existsRes.json();
     if (Array.isArray(exists) && exists.length) {
+      const row = exists[0];
+      if (row.unsubscribed_at) {
+        const reactivateRes = await fetch(rest(`newsletter_subscribers?id=eq.${encodeURIComponent(row.id)}`), {
+          method: "PATCH",
+          headers: { ...h, Prefer: "return=minimal" },
+          body: JSON.stringify({ first_name: firstName, last_name: lastName, unsubscribed_at: null })
+        });
+        if (!reactivateRes.ok) {
+          const err = await reactivateRes.text();
+          return json(400, { ok: false, error: `Could not reactivate subscription: ${err}` });
+        }
+        return json(200, { ok: true, message: "You are subscribed again." });
+      }
       return json(200, { ok: true, alreadySubscribed: true, message: "You are already subscribed." });
     }
 

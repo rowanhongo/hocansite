@@ -103,6 +103,9 @@
           .map((s) => s.trim())
           .filter(Boolean);
         const subject = encodeURIComponent(`Application for ${job.title || "Open Role"} - Hocan Holdings`);
+        const body = encodeURIComponent(
+          `Hello Hocan Holdings Team,\n\nI would like to apply for the ${job.title || "role"} position.\n\nPlease find my CV and cover letter attached.\n\nThank you.`
+        );
 
         document.getElementById("jobCard").innerHTML = `
           <div>
@@ -126,7 +129,7 @@
             ${job.state_province ? `<p><strong>State/Province:</strong><br>${esc(job.state_province)}</p>` : ""}
             ${job.country ? `<p><strong>Country:</strong><br>${esc(job.country)}</p>` : ""}
             ${job.zip_postal_code ? `<p><strong>Zip/Postal Code:</strong><br>${esc(job.zip_postal_code)}</p>` : ""}
-            <a class="apply" href="mailto:info@hocanholdings.co.ke?subject=${subject}">I'm interested</a>
+            <a class="apply" href="mailto:careers@hocanholdings.co.ke?subject=${subject}&body=${body}">I'm interested</a>
           </aside>
         `;
 

@@ -62,7 +62,7 @@ async function addSubscriber(body) {
   }
 
   const existsRes = await fetch(
-    getSupabaseRestUrl(`newsletter_subscribers?select=id&email=eq.${encodeURIComponent(email)}&limit=1`),
+    getSupabaseRestUrl(`newsletter_subscribers?select=id,unsubscribed_at&email=eq.${encodeURIComponent(email)}&limit=1`),
     { headers }
   );
   if (!existsRes.ok) {
@@ -74,6 +74,22 @@ async function addSubscriber(body) {
   }
   const existsRows = await existsRes.json();
   if (Array.isArray(existsRows) && existsRows.length) {
+    const row = existsRows[0];
+    if (row.unsubscribed_at) {
+      const reactivateRes = await fetch(getSupabaseRestUrl(`newsletter_subscribers?id=eq.${encodeURIComponent(row.id)}`), {
+        method: "PATCH",
+        headers: {
+          ...headers,
+          Prefer: "return=minimal"
+        },
+        body: JSON.stringify({ first_name: firstName, last_name: lastName, unsubscribed_at: null })
+      });
+      if (!reactivateRes.ok) {
+        const errBody = await reactivateRes.text();
+        return json(400, { ok: false, error: `Could not reactivate subscriber: ${errBody}` });
+      }
+      return json(200, { ok: true, message: "Subscriber reactivated successfully." });
+    }
     return json(200, { ok: true, alreadySubscribed: true, message: "Email already subscribed." });
   }
 
