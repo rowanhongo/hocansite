@@ -84,6 +84,8 @@ tr:hover td{background:#FAFBFD;}
 .action-btns{display:flex;gap:6px;}
 .btn-edit{border:1.5px solid var(--border);background:#fff;color:var(--text);padding:5px 12px;border-radius:7px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:.2s;}
 .btn-edit:hover{border-color:var(--sky);color:var(--sky);}
+.btn-secondary{border:1.5px solid var(--border);background:#fff;color:var(--text);padding:7px 14px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:.2s;display:inline-flex;align-items:center;gap:8px;}
+.btn-secondary:hover{border-color:var(--sky);color:var(--sky);}
 .btn-delete{border:1.5px solid rgba(229,62,62,.2);background:rgba(229,62,62,.05);color:#E53E3E;padding:5px 12px;border-radius:7px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:.2s;}
 .btn-delete:hover{background:#E53E3E;color:#fff;}
 .empty-row td{text-align:center;color:var(--muted);padding:40px;}
@@ -296,7 +298,7 @@ tr:hover td{background:#FAFBFD;}
           <div class="form-group form-full">
             <label>Images (optional)</label>
             <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-              <label class="btn-edit" style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;">
+              <label class="btn-secondary" style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;">
                 Upload Image
                 <input id="nImageUpload" type="file" accept="image/*" style="display:none;">
               </label>

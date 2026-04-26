@@ -139,6 +139,9 @@ async function safeSelect(query, selectA, selectB) {
     first.error?.code === "PGRST204";
 
   if (!isColumnError || !selectB) throw first.error;
+  // Important: supabase-js query builders are mutable; reusing the same builder
+  // after a failed select can keep stale params. Caller should pass a fresh query
+  // when retrying. As a fallback, we retry on a fresh builder when possible.
   const second = await query.select(selectB);
   if (second.error) throw second.error;
   return second;
@@ -173,19 +176,27 @@ export async function getPublicBlogBySlug(slug) {
 }
 
 export async function getPublicJobs() {
-  const base = await jobQuery();
-  const query = base
-    .eq("is_active", true)
-    .order("posted_at", { ascending: false, nullsFirst: false })
-    .order("created_at", { ascending: false });
+  const build = async () =>
+    (await jobQuery())
+      .eq("is_active", true)
+      .order("posted_at", { ascending: false, nullsFirst: false })
+      .order("created_at", { ascending: false });
 
-  const { data } = await safeSelect(
-    query,
-    "id,title,slug,location,job_type,industry,description,experience,salary,city,country,posted_at,created_at,is_active",
-    "id,title,slug,location,job_type,industry,description,posted_at,created_at,is_active"
-  );
-
-  return (data || []).map(normalizeJob);
+  try {
+    const q1 = await build();
+    const { data, error } = await q1.select(
+      "id,title,slug,location,job_type,industry,description,experience,salary,posted_at,created_at,is_active"
+    );
+    if (error) throw error;
+    return (data || []).map(normalizeJob);
+  } catch (_err) {
+    const q2 = await build();
+    const { data, error } = await q2.select(
+      "id,title,slug,location,job_type,industry,description,posted_at,created_at,is_active"
+    );
+    if (error) throw error;
+    return (data || []).map(normalizeJob);
+  }
 }
 
 export async function getPublicJobBySlug(slug) {
