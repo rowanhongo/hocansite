@@ -202,6 +202,7 @@ tr:hover td{background:#FAFBFD;}
       <div class="nav-item active" data-panel="overview"><span class="icon">📊</span> Overview</div>
       <div class="nav-item" data-panel="blogs"><span class="icon">✍️</span> Blog Posts</div>
       <div class="nav-item" data-panel="jobs"><span class="icon">💼</span> Job Listings</div>
+      <div class="nav-item" data-panel="newsletter"><span class="icon">📧</span> Newsletter</div>
     </nav>
     <div class="sidebar-footer">
       <button class="btn-logout" id="logoutBtn">Sign Out</button>
@@ -248,6 +249,55 @@ tr:hover td{background:#FAFBFD;}
         <div class="section-header"><h3>All Job Listings</h3><button class="btn-new" id="newJobBtn">+ New Job</button></div>
         <div class="search-row"><input type="text" id="jobSearch" placeholder="Search jobs…"></div>
         <table><thead><tr><th>Title</th><th>Location</th><th>Type</th><th>Industry</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody id="jobTable"></tbody></table>
+      </div>
+    </div>
+
+    <!-- NEWSLETTER -->
+    <div class="panel" id="panel-newsletter">
+      <div class="section-card">
+        <div class="section-header">
+          <h3>Newsletter Subscribers</h3>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+            <span id="newsletterTotal" class="badge published">0 subscribers</span>
+            <span id="newsletterLimitBadge" class="badge draft">0 / 300 daily limit used</span>
+          </div>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>First Name</label>
+            <input type="text" id="nFirstName" placeholder="e.g. Jane">
+          </div>
+          <div class="form-group">
+            <label>Last Name</label>
+            <input type="text" id="nLastName" placeholder="e.g. Doe">
+          </div>
+          <div class="form-group form-full">
+            <label>Email *</label>
+            <input type="email" id="nEmail" placeholder="you@company.com">
+          </div>
+          <div class="form-group form-full">
+            <button class="btn-new" id="nAddBtn" style="width:max-content;">+ Add Subscriber</button>
+          </div>
+        </div>
+        <table style="margin-top:16px;"><thead><tr><th>Name</th><th>Email</th><th>Subscribed</th></tr></thead><tbody id="newsletterTable"></tbody></table>
+      </div>
+
+      <div class="section-card">
+        <div class="section-header"><h3>Send Newsletter</h3></div>
+        <div class="form-grid">
+          <div class="form-group form-full">
+            <label>Subject *</label>
+            <input type="text" id="nSubject" placeholder="Newsletter subject">
+          </div>
+          <div class="form-group form-full">
+            <label>Message *</label>
+            <textarea id="nMessage" rows="8" placeholder="Write your newsletter content..."></textarea>
+          </div>
+          <div class="form-group form-full" id="newsletterWarning" style="color:#B07D10;font-weight:600;"></div>
+          <div class="form-group form-full">
+            <button class="btn-save" id="nSendBtn" style="width:max-content;">Send Newsletter</button>
+          </div>
+        </div>
       </div>
     </div>
   </main>
@@ -480,7 +530,7 @@ function toggleMobileSidebar(){
 function setPanel(name){
   navItems.forEach(n=>n.classList.toggle('active',n.dataset.panel===name));
   Object.entries(panels).forEach(([k,v])=>v.classList.toggle('active',k===name));
-  const titles={overview:'Overview',blogs:'Blog Posts',jobs:'Job Listings'};
+  const titles={overview:'Overview',blogs:'Blog Posts',jobs:'Job Listings',newsletter:'Newsletter'};
   document.getElementById('panelTitle').textContent=titles[name]||name;
 }
 
@@ -495,6 +545,9 @@ window.addEventListener('resize',()=>{if(window.innerWidth>860){sidebarEl.classL
 
 let blogs=[];
 let jobs=[];
+let newsletterSubscribers=[];
+let newsletterDailyUsed=0;
+let newsletterPoller=null;
 let editingBlogId=null;
 let editingJobId=null;
 let cbBlocks=[];
@@ -502,8 +555,11 @@ let cbBlocks=[];
 // ── INIT ──────────────────────────────────────────────────────────────────────
 
 async function init(){
-  await Promise.all([loadBlogs(),loadJobs()]);
+  await Promise.all([loadBlogs(),loadJobs(),loadNewsletter()]);
   renderOverview();
+  if(!newsletterPoller){
+    newsletterPoller=setInterval(loadNewsletter,15000);
+  }
 }
 
 // ── BLOGS ─────────────────────────────────────────────────────────────────────
@@ -540,6 +596,51 @@ document.getElementById('blogSearch').addEventListener('input',e=>{
 async function loadJobs(){
   jobs=await adminGetJobs()||[];
   renderJobTable(jobs);
+}
+
+// ── NEWSLETTER ────────────────────────────────────────────────────────────────
+
+async function loadNewsletter(){
+  try{
+    const res=await fetch('/.netlify/functions/newsletter-admin');
+    const body=await res.json();
+    if(!res.ok||!body.ok)throw new Error(body.error||'Could not load newsletter data');
+    newsletterSubscribers=Array.isArray(body.subscribers)?body.subscribers:[];
+    newsletterDailyUsed=Number(body.dailyUsed||0);
+    renderNewsletter(body.total||newsletterSubscribers.length,newsletterDailyUsed,Number(body.dailyLimit||300));
+  }catch(err){
+    showToast(err.message,'error');
+  }
+}
+
+function renderNewsletter(total,dailyUsed,dailyLimit){
+  const totalEl=document.getElementById('newsletterTotal');
+  const limitEl=document.getElementById('newsletterLimitBadge');
+  const warningEl=document.getElementById('newsletterWarning');
+  const tbody=document.getElementById('newsletterTable');
+  totalEl.textContent=`${total} subscriber${total===1?'':'s'}`;
+  limitEl.textContent=`${dailyUsed} / ${dailyLimit} daily limit used`;
+
+  if(dailyUsed>=dailyLimit){
+    warningEl.textContent='Daily limit reached (300 emails). sending wont work for past 300 users.';
+  }else if(dailyUsed>=250){
+    warningEl.textContent='Warning: You are approaching the daily send limit (250+).';
+  }else{
+    warningEl.textContent='';
+  }
+
+  if(!newsletterSubscribers.length){
+    tbody.innerHTML='<tr class="empty-row"><td colspan="3">No subscribers yet.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML=newsletterSubscribers.map(s=>`
+    <tr>
+      <td>${esc(`${s.first_name||''} ${s.last_name||''}`.trim()||'—')}</td>
+      <td>${esc(s.email||'')}</td>
+      <td>${fmt(s.created_at)}</td>
+    </tr>
+  `).join('');
 }
 
 function renderJobTable(data){
@@ -840,6 +941,48 @@ function closeJobModal(){document.getElementById('jobModal').classList.remove('o
 document.getElementById('jobModalClose').addEventListener('click',closeJobModal);
 document.getElementById('jobCancelBtn').addEventListener('click',closeJobModal);
 document.getElementById('newJobBtn').addEventListener('click',()=>openJobModal());
+
+document.getElementById('nAddBtn').addEventListener('click',async()=>{
+  const email=document.getElementById('nEmail').value.trim();
+  const firstName=document.getElementById('nFirstName').value.trim();
+  const lastName=document.getElementById('nLastName').value.trim();
+  if(!email){showToast('Email is required','error');return;}
+  try{
+    const res=await fetch('/.netlify/functions/newsletter-admin',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({email,firstName,lastName})
+    });
+    const body=await res.json();
+    if(!res.ok||!body.ok)throw new Error(body.error||'Could not add subscriber');
+    document.getElementById('nEmail').value='';
+    document.getElementById('nFirstName').value='';
+    document.getElementById('nLastName').value='';
+    showToast(body.message||'Subscriber added');
+    await loadNewsletter();
+  }catch(err){showToast(err.message,'error');}
+});
+
+document.getElementById('nSendBtn').addEventListener('click',async()=>{
+  const subject=document.getElementById('nSubject').value.trim();
+  const message=document.getElementById('nMessage').value.trim();
+  if(!subject||!message){showToast('Subject and message are required','error');return;}
+  const btn=document.getElementById('nSendBtn');
+  btn.disabled=true;btn.textContent='Sending...';
+  try{
+    const res=await fetch('/.netlify/functions/send-newsletter',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({subject,message})
+    });
+    const body=await res.json();
+    if(!res.ok||!body.ok)throw new Error(body.error||'Newsletter send failed');
+    showToast(body.message||'Newsletter sent');
+    if(body.warning)showToast(body.warning,'error');
+    await loadNewsletter();
+  }catch(err){showToast(err.message,'error');}
+  btn.disabled=false;btn.textContent='Send Newsletter';
+});
 
 // Close modals on overlay click
 document.getElementById('blogModal').addEventListener('click',e=>{if(e.target===document.getElementById('blogModal'))closeBlogModal();});

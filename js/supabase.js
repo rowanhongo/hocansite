@@ -2,6 +2,8 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 let cachedConfig = null;
 let cachedClient = null;
+const RUNTIME_CONFIG_CACHE_KEY = "hocan_runtime_config_v1";
+const TABLE_CACHE_KEY = "hocan_table_cache_v1";
 
 const BLOGS_TABLE_CANDIDATES = ["blog_posts", "blogs"];
 const JOBS_TABLE_CANDIDATES = ["job_posts", "jobs"];
@@ -17,6 +19,16 @@ async function getConfig() {
   };
 
   try {
+    const fromStorage = sessionStorage.getItem(RUNTIME_CONFIG_CACHE_KEY);
+    if (fromStorage) {
+      cachedConfig = JSON.parse(fromStorage);
+      return cachedConfig;
+    }
+  } catch (_e) {
+    // ignore storage parse failures
+  }
+
+  try {
     const res = await fetch("/.netlify/functions/get-config", { cache: "no-store" });
     if (!res.ok) throw new Error("Could not read runtime config");
     const data = await res.json();
@@ -29,6 +41,12 @@ async function getConfig() {
     };
   } catch (_error) {
     cachedConfig = fallback;
+  }
+
+  try {
+    sessionStorage.setItem(RUNTIME_CONFIG_CACHE_KEY, JSON.stringify(cachedConfig));
+  } catch (_e) {
+    // ignore storage write failures
   }
 
   return cachedConfig;
@@ -46,6 +64,14 @@ async function getClient() {
 }
 
 async function resolveTable(candidates, cacheKey) {
+  try {
+    const fromStorage = JSON.parse(sessionStorage.getItem(TABLE_CACHE_KEY) || "{}");
+    if (cacheKey === "blogs" && fromStorage.blogs) resolvedBlogsTable = fromStorage.blogs;
+    if (cacheKey === "jobs" && fromStorage.jobs) resolvedJobsTable = fromStorage.jobs;
+  } catch (_e) {
+    // ignore
+  }
+
   if (cacheKey === "blogs" && resolvedBlogsTable) return resolvedBlogsTable;
   if (cacheKey === "jobs" && resolvedJobsTable) return resolvedJobsTable;
 
@@ -56,6 +82,13 @@ async function resolveTable(candidates, cacheKey) {
     if (!error) {
       if (cacheKey === "blogs") resolvedBlogsTable = table;
       if (cacheKey === "jobs") resolvedJobsTable = table;
+      try {
+        const current = JSON.parse(sessionStorage.getItem(TABLE_CACHE_KEY) || "{}");
+        current[cacheKey] = table;
+        sessionStorage.setItem(TABLE_CACHE_KEY, JSON.stringify(current));
+      } catch (_e) {
+        // ignore
+      }
       return table;
     }
   }
@@ -96,7 +129,7 @@ export async function getRuntimeConfig() {
 export async function getPublicBlogs() {
   const query = await blogQuery();
   const { data, error } = await query
-    .select("*")
+    .select("id,title,slug,category,author,excerpt,cover_image_url,published,published_at,created_at")
     .eq("published", true)
     .order("published_at", { ascending: false, nullsFirst: false })
     .order("created_at", { ascending: false });
@@ -120,7 +153,7 @@ export async function getPublicBlogBySlug(slug) {
 export async function getPublicJobs() {
   const query = await jobQuery();
   const { data, error } = await query
-    .select("*")
+    .select("id,title,slug,location,job_type,industry,description,posted_at,created_at,is_active")
     .eq("is_active", true)
     .order("posted_at", { ascending: false, nullsFirst: false })
     .order("created_at", { ascending: false });

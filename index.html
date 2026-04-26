@@ -598,6 +598,92 @@
       color: #1a1a1a;
     }
 
+    .newsletter-section {
+      margin-top: 42px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.58);
+      border: 1px solid rgba(255, 255, 255, 0.48);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.07);
+      padding: 28px;
+      display: grid;
+      grid-template-columns: 1fr 1.4fr;
+      gap: 22px;
+      align-items: center;
+    }
+
+    .newsletter-title small {
+      display: block;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #1a1a2e;
+      font-size: 11px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .newsletter-title h3 {
+      font-size: 36px;
+      line-height: 1.12;
+      margin-bottom: 10px;
+      color: #101828;
+    }
+
+    .newsletter-title p {
+      color: #4b5563;
+      line-height: 1.7;
+    }
+
+    .newsletter-form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .newsletter-form .full {
+      grid-column: 1 / -1;
+    }
+
+    .newsletter-form input {
+      border: 1px solid #d8e0ea;
+      border-radius: 10px;
+      background: #fff;
+      padding: 12px 14px;
+      font: inherit;
+      color: #1f2937;
+      width: 100%;
+    }
+
+    .newsletter-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .newsletter-actions button {
+      border: none;
+      border-radius: 10px;
+      background: #1a1a2e;
+      color: #fff;
+      padding: 11px 20px;
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .newsletter-note {
+      color: #6b7280;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .newsletter-status {
+      min-height: 18px;
+      color: #1a1a2e;
+      font-size: 13px;
+    }
+
     .marquee-row {
       overflow: hidden;
       position: relative;
@@ -763,6 +849,10 @@
       .employers-section {
         grid-template-columns: 1fr;
         padding: 20px;
+      }
+
+      .newsletter-section {
+        grid-template-columns: 1fr;
       }
 
       .hero-section {
@@ -993,6 +1083,24 @@
         <div id="row2" class="marquee-row row-reverse"></div>
       </section>
 
+      <section class="newsletter-section" aria-label="Newsletter signup">
+        <div class="newsletter-title">
+          <small>Newsletter</small>
+          <h3>Stay ahead of the curve</h3>
+          <p>Receive curated career insights, industry trends, and exclusive opportunities delivered directly to your inbox.</p>
+        </div>
+        <form class="newsletter-form" id="newsletterForm">
+          <input type="text" id="newsletterFirstName" placeholder="First Name">
+          <input type="text" id="newsletterLastName" placeholder="Last Name">
+          <input class="full" type="email" id="newsletterEmail" placeholder="Email Address" required>
+          <div class="newsletter-actions full">
+            <p class="newsletter-note">By subscribing, you agree to our Privacy Policy. Unsubscribe at any time.</p>
+            <button type="submit">Subscribe</button>
+          </div>
+          <p class="newsletter-status full" id="newsletterStatus"></p>
+        </form>
+      </section>
+
       <footer class="site-footer"><div class="footer-grid"><div class="footer-col"><h4>Hocan Holdings</h4><p>Building the infrastructure behind East Africa's fastest growing businesses.</p></div><div class="footer-col"><h4>Quick Links</h4><ul><li><a href="index.html">Home</a></li><li><a href="hocan-hr-consulting.html">Hocan HR Consulting</a></li><li><a href="hocan-logistics.html">Hocan Logistics</a></li><li><a href="blogs.html">Blogs</a></li><li><a href="contact.html">Contact Us</a></li></ul></div><div class="footer-col"><h4>HR Services</h4><ul><li>Talent Acquisition & Recruitment</li><li>Corporate Training & Professional Development</li><li>Labour Outsourcing & Workforce Solutions</li><li>HR360 - Complete HR Management Solution</li><li>Startup HR Advisory</li></ul></div><div class="footer-col"><h4>Contact</h4><p>+254 791 235 830<br>info@hocanholdings.co.ke<br>iHiT Building, Nairobi, Kenya</p></div><div class="footer-col"><h4>Follow Us</h4><div class="footer-socials"><a href="#" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.52 3.48A11.8 11.8 0 0 0 12.06 0C5.52 0 .24 5.28.24 11.82c0 2.1.54 4.14 1.56 5.94L0 24l6.42-1.68a11.8 11.8 0 0 0 5.64 1.44h.06c6.54 0 11.82-5.28 11.82-11.82 0-3.12-1.2-6.06-3.42-8.46z"/></svg></a><a href="#" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 12a10 10 0 1 0-11.56 9.84v-6.96H7.9V12h2.54V9.8c0-2.52 1.5-3.9 3.78-3.9 1.08 0 2.22.18 2.22.18v2.46h-1.26c-1.26 0-1.62.78-1.62 1.56V12h2.76l-.42 2.88h-2.34v6.96A10 10 0 0 0 22 12z"/></svg></a><a href="#" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.16c3.18 0 3.54 0 4.8.06 1.2.06 1.86.24 2.28.42.54.24.96.48 1.38.9.42.42.66.84.9 1.38.18.42.36 1.08.42 2.28.06 1.26.06 1.62.06 4.8s0 3.54-.06 4.8c-.06 1.2-.24 1.86-.42 2.28-.24.54-.48.96-.9 1.38-.42.42-.84.66-1.38.9-.42.18-1.08.36-2.28.42-1.26.06-1.62.06-4.8.06s-3.54 0-4.8-.06c-1.2-.06-1.86-.24-2.28-.42-.54-.24-.96-.48-1.38-.9-.42-.42-.66-.84-.9-1.38-.18-.42-.36-1.08-.42-2.28C2.16 15.54 2.16 15.18 2.16 12s0-3.54.06-4.8c.06-1.2.24-1.86.42-2.28.24-.54.48-.96.9-1.38.42-.42.84-.66 1.38-.9.42-.18 1.08-.36 2.28-.42 1.26-.06 1.62-.06 4.8-.06z"/></svg></a><a href="#" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.52 7.2a3 3 0 0 0-2.1-2.1C19.56 4.5 12 4.5 12 4.5s-7.56 0-9.42.6A3 3 0 0 0 .48 7.2C0 9.12 0 12 0 12s0 2.88.48 4.8a3 3 0 0 0 2.1 2.1c1.86.6 9.42.6 9.42.6s7.56 0 9.42-.6a3 3 0 0 0 2.1-2.1c.48-1.92.48-4.8.48-4.8s0-2.88-.48-4.8z"/></svg></a><a href="#" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5A2.5 2.5 0 1 0 5 8.5a2.5 2.5 0 0 0-.02-5zM3 9h4v12H3zM9 9h3.84v1.68h.06c.54-1.02 1.86-2.1 3.84-2.1C20.82 8.58 21 11.34 21 14.58V21h-4v-5.7c0-1.38-.06-3.12-1.92-3.12-1.92 0-2.22 1.5-2.22 3.06V21H9z"/></svg></a></div></div></div><div class="footer-bottom"><span>© 2026 Hocan Holdings. All rights reserved.</span><span><a href="#">Privacy Policy</a> | <a href="#">Terms & Conditions</a></span></div></footer>
     </div>
 
@@ -1145,6 +1253,40 @@
       isHidden = window.scrollY > thresholdHide;
       if (isHidden) nav.classList.add("navbar--hidden");
       else nav.classList.remove("navbar--hidden");
+    })();
+
+    (function () {
+      var form = document.getElementById("newsletterForm");
+      var statusEl = document.getElementById("newsletterStatus");
+      if (!form || !statusEl) return;
+
+      form.addEventListener("submit", async function (e) {
+        e.preventDefault();
+        statusEl.textContent = "Submitting...";
+
+        var payload = {
+          firstName: document.getElementById("newsletterFirstName").value.trim(),
+          lastName: document.getElementById("newsletterLastName").value.trim(),
+          email: document.getElementById("newsletterEmail").value.trim()
+        };
+
+        try {
+          var res = await fetch("/.netlify/functions/newsletter-subscribe", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+          var body = await res.json();
+          if (!res.ok || !body.ok) {
+            statusEl.textContent = body.error || "Could not subscribe right now.";
+            return;
+          }
+          statusEl.textContent = body.message || "Subscribed successfully.";
+          form.reset();
+        } catch (_err) {
+          statusEl.textContent = "Could not subscribe right now.";
+        }
+      });
     })();
   </script>
 </body>
