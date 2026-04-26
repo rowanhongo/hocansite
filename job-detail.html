@@ -50,6 +50,22 @@
     .form-msg { margin-top: 10px; font-size: 13px; }
     .form-msg.error { color: #b91c1c; }
     .form-msg.success { color: #166534; }
+    .success-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.52); display: none; align-items: center; justify-content: center; padding: 16px; z-index: 1400; }
+    .success-overlay.open { display: flex; }
+    .success-card { width: min(480px, 100%); background: #fff; border-radius: 18px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.28); overflow: hidden; border: 1px solid #d6e9f0; }
+    .success-head { background: linear-gradient(120deg, #1a1a2e 0%, #4ab3d4 100%); color: #fff; padding: 18px; }
+    .success-head h3 { font-size: 26px; line-height: 1.1; }
+    .success-body { padding: 18px; color: #1f2937; }
+    .success-body p { line-height: 1.6; margin-bottom: 14px; }
+    .success-actions { display: flex; justify-content: flex-end; }
+    .success-actions button { border: 0; border-radius: 10px; padding: 10px 16px; background: #1a1a2e; color: #fff; font-weight: 600; cursor: pointer; }
+    .success-actions button:hover { background: #4ab3d4; }
+    .confetti { position: fixed; inset: 0; z-index: 1390; pointer-events: none; overflow: hidden; }
+    .confetti-piece { position: absolute; width: 10px; height: 14px; top: -24px; opacity: .95; animation: confetti-fall 1800ms linear forwards; }
+    @keyframes confetti-fall {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(105vh) rotate(620deg); opacity: 0; }
+    }
     @media (max-width: 900px) { .content { grid-template-columns: 1fr; } }
     @media (max-width: 760px) { .apply-grid { grid-template-columns: 1fr; } }
   </style>
@@ -115,6 +131,19 @@
       </form>
     </div>
   </div>
+  <div class="success-overlay" id="successModal">
+    <div class="success-card">
+      <div class="success-head">
+        <h3>Application Submitted!</h3>
+      </div>
+      <div class="success-body">
+        <p>Your application was sent successfully. Our team will review it and reach out to you if your profile is shortlisted.</p>
+        <div class="success-actions">
+          <button type="button" id="successOkBtn">Great, thanks</button>
+        </div>
+      </div>
+    </div>
+  </div>
   <script type="module">
     import { getPublicJobBySlug, submitJobApplication } from "/js/supabase.js";
 
@@ -147,6 +176,28 @@
       } catch (_e) {
         return false;
       }
+    }
+
+    function launchConfetti() {
+      const layer = document.createElement("div");
+      layer.className = "confetti";
+      const colors = ["#4ab3d4", "#c47a5a", "#1a1a2e", "#f59e0b", "#22c55e", "#ffffff"];
+      const pieces = 90;
+      for (let i = 0; i < pieces; i += 1) {
+        const piece = document.createElement("span");
+        piece.className = "confetti-piece";
+        piece.style.left = `${Math.random() * 100}%`;
+        piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.width = `${6 + Math.random() * 8}px`;
+        piece.style.height = `${8 + Math.random() * 10}px`;
+        piece.style.animationDuration = `${1200 + Math.random() * 1200}ms`;
+        piece.style.animationDelay = `${Math.random() * 200}ms`;
+        layer.appendChild(piece);
+      }
+      document.body.appendChild(layer);
+      setTimeout(() => {
+        layer.remove();
+      }, 2600);
     }
 
     function shareLinks(title) {
@@ -231,8 +282,10 @@
 
         const applyBtn = document.getElementById("applyInterestBtn");
         const applyModal = document.getElementById("applyModal");
+        const successModal = document.getElementById("successModal");
         const closeApplyModalBtn = document.getElementById("closeApplyModalBtn");
         const cancelApplyBtn = document.getElementById("cancelApplyBtn");
+        const successOkBtn = document.getElementById("successOkBtn");
         const applyForm = document.getElementById("applyForm");
         const applyFormMsg = document.getElementById("applyFormMsg");
         const submitApplyBtn = document.getElementById("submitApplyBtn");
@@ -244,6 +297,9 @@
           applyFormMsg.textContent = "";
           applyFormMsg.className = "form-msg";
         };
+        const closeSuccessModal = () => {
+          successModal.classList.remove("open");
+        };
 
         applyBtn?.addEventListener("click", () => {
           applyModal.classList.add("open");
@@ -254,6 +310,10 @@
         applyModal?.addEventListener("click", (evt) => {
           if (evt.target === applyModal) closeModal();
         });
+        successModal?.addEventListener("click", (evt) => {
+          if (evt.target === successModal) closeSuccessModal();
+        });
+        successOkBtn?.addEventListener("click", closeSuccessModal);
 
         applyForm?.addEventListener("submit", async (evt) => {
           evt.preventDefault();
@@ -303,8 +363,9 @@
               cover_letter_url: coverLetterUrl
             });
             applyForm.reset();
-            applyFormMsg.textContent = "Application submitted successfully. We'll review and contact you.";
-            applyFormMsg.classList.add("success");
+            closeModal();
+            successModal.classList.add("open");
+            launchConfetti();
           } catch (_error) {
             applyFormMsg.textContent = "Application failed to submit. Please try again.";
             applyFormMsg.classList.add("error");
