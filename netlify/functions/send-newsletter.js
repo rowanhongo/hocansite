@@ -143,6 +143,7 @@ exports.handler = async function handler(event) {
       ? message
       : escapeHtml(message).replaceAll("\n", "<br>");
 
+    const site = baseUrl();
     const html = `
       <div style="font-family:Arial,sans-serif;line-height:1.65;">
         <div style="padding:18px 0 12px;border-bottom:1px solid #e5e7eb;margin-bottom:18px;">
@@ -157,7 +158,6 @@ exports.handler = async function handler(event) {
     `;
 
     const apiKey = required("BREVO_API_KEY");
-    const site = baseUrl();
 
     // Send individually (better deliverability than BCC blasting)
     const sendOne = async (recipient) => {

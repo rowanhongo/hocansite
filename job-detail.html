@@ -106,6 +106,8 @@
 
         document.getElementById("jobCard").innerHTML = `
           <div>
+            <h2 style="margin-bottom:6px;">${esc(job.title || "Open Role")}</h2>
+            <p class="muted" style="margin-bottom:16px;">${esc(job.location || "Kenya")}</p>
             <h2>Job Description</h2>
             <div class="body">${esc(job.description || "No description has been provided yet.")}</div>
             <h2>Requirements</h2>
