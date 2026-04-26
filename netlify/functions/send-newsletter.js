@@ -52,6 +52,23 @@ async function getDailyUsed() {
   return rows.reduce((sum, row) => sum + Number(row.sent_count || 0), 0);
 }
 
+function escapeHtml(s) {
+  return String(s ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function buildLogoUrl() {
+  const explicit = env("NEWSLETTER_LOGO_URL", "").trim();
+  if (explicit) return explicit;
+  const base = env("URL", env("DEPLOY_PRIME_URL", "")).replace(/\/$/, "");
+  if (base) return `${base}/Hocan%20Logo.png`;
+  return "Hocan%20Logo.png";
+}
+
 exports.handler = async function handler(event) {
   if (event.httpMethod !== "POST") {
     return json(405, { ok: false, error: "Method not allowed" });
@@ -97,6 +114,24 @@ exports.handler = async function handler(event) {
 
     const senderEmail = env("BREVO_SENDER_EMAIL", "info@hocanholdings.co.ke");
     const senderName = env("BREVO_SENDER_NAME", "Hocan Holdings");
+    const logoUrl = buildLogoUrl();
+
+    const messageHtml = message.includes("<")
+      ? message
+      : escapeHtml(message).replaceAll("\n", "<br>");
+
+    const html = `
+      <div style="font-family:Arial,sans-serif;line-height:1.65;">
+        <div style="padding:18px 0 12px;border-bottom:1px solid #e5e7eb;margin-bottom:18px;">
+          <img src="${logoUrl}" alt="Hocan Holdings" style="height:54px;display:block;">
+        </div>
+        <div style="white-space:normal;">${messageHtml}</div>
+        <div style="margin-top:18px;color:#6b7280;font-size:12px;border-top:1px solid #f1f5f9;padding-top:12px;">
+          You received this email because you subscribed to Hocan Holdings updates.
+        </div>
+      </div>
+    `;
+
     const brevoPayload = {
       sender: { email: senderEmail, name: senderName },
       to: [{ email: senderEmail, name: senderName }],
@@ -105,11 +140,7 @@ exports.handler = async function handler(event) {
         name: `${s.first_name || ""} ${s.last_name || ""}`.trim() || s.email
       })),
       subject,
-      htmlContent: `<div style="font-family:Arial,sans-serif;line-height:1.65;white-space:pre-wrap;">${message
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll("\n", "<br>")}</div>`,
+      htmlContent: html,
       textContent: message
     };
 

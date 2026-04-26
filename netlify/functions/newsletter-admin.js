@@ -137,11 +137,42 @@ async function getDashboardData() {
   });
 }
 
+async function deleteSubscriber(body) {
+  const headers = getSupabaseHeaders();
+  const id = String(body.id || "").trim();
+  const email = String(body.email || "").trim().toLowerCase();
+
+  if (!id && !email) {
+    return json(400, { ok: false, error: "Subscriber id or email is required." });
+  }
+
+  const filter = id ? `id=eq.${encodeURIComponent(id)}` : `email=eq.${encodeURIComponent(email)}`;
+  const delRes = await fetch(getSupabaseRestUrl(`newsletter_subscribers?${filter}`), {
+    method: "DELETE",
+    headers,
+    body: JSON.stringify({})
+  });
+
+  if (!delRes.ok) {
+    const errBody = await delRes.text();
+    if (tableMissing(errBody)) {
+      return json(400, { ok: false, error: "Newsletter tables are missing. Run the latest Supabase migration first." });
+    }
+    return json(400, { ok: false, error: `Delete failed: ${errBody}` });
+  }
+
+  return json(200, { ok: true, message: "Subscriber deleted." });
+}
+
 exports.handler = async function handler(event) {
   try {
     if (event.httpMethod === "POST") {
       const body = JSON.parse(event.body || "{}");
       return await addSubscriber(body);
+    }
+    if (event.httpMethod === "DELETE") {
+      const body = JSON.parse(event.body || "{}");
+      return await deleteSubscriber(body);
     }
 
     return await getDashboardData();

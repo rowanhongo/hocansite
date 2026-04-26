@@ -122,6 +122,28 @@ function normalizeJob(row) {
   };
 }
 
+async function safeSelect(query, selectA, selectB) {
+  const first = await query.select(selectA);
+  if (!first.error) return first;
+
+  const msg = String(first.error?.message || "").toLowerCase();
+  // Supabase REST returns 400 for unknown columns in select()
+  const isColumnError =
+    msg.includes("column") ||
+    msg.includes("parse") ||
+    msg.includes("unknown") ||
+    msg.includes("failed to parse") ||
+    msg.includes("bad request") ||
+    msg.includes("schema cache") ||
+    msg.includes("could not find the") ||
+    first.error?.code === "PGRST204";
+
+  if (!isColumnError || !selectB) throw first.error;
+  const second = await query.select(selectB);
+  if (second.error) throw second.error;
+  return second;
+}
+
 export async function getRuntimeConfig() {
   return getConfig();
 }
@@ -151,14 +173,18 @@ export async function getPublicBlogBySlug(slug) {
 }
 
 export async function getPublicJobs() {
-  const query = await jobQuery();
-  const { data, error } = await query
-    .select("id,title,slug,location,job_type,industry,description,experience,salary,city,country,posted_at,created_at,is_active")
+  const base = await jobQuery();
+  const query = base
     .eq("is_active", true)
     .order("posted_at", { ascending: false, nullsFirst: false })
     .order("created_at", { ascending: false });
 
-  if (error) throw error;
+  const { data } = await safeSelect(
+    query,
+    "id,title,slug,location,job_type,industry,description,experience,salary,city,country,posted_at,created_at,is_active",
+    "id,title,slug,location,job_type,industry,description,posted_at,created_at,is_active"
+  );
+
   return (data || []).map(normalizeJob);
 }
 

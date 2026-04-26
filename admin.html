@@ -279,7 +279,7 @@ tr:hover td{background:#FAFBFD;}
             <button class="btn-new" id="nAddBtn" style="width:max-content;">+ Add Subscriber</button>
           </div>
         </div>
-        <table style="margin-top:16px;"><thead><tr><th>Name</th><th>Email</th><th>Subscribed</th></tr></thead><tbody id="newsletterTable"></tbody></table>
+        <table style="margin-top:16px;"><thead><tr><th>Name</th><th>Email</th><th>Subscribed</th><th>Actions</th></tr></thead><tbody id="newsletterTable"></tbody></table>
       </div>
 
       <div class="section-card">
@@ -292,6 +292,16 @@ tr:hover td{background:#FAFBFD;}
           <div class="form-group form-full">
             <label>Message *</label>
             <textarea id="nMessage" rows="8" placeholder="Write your newsletter content..."></textarea>
+          </div>
+          <div class="form-group form-full">
+            <label>Images (optional)</label>
+            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+              <label class="btn-edit" style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;">
+                Upload Image
+                <input id="nImageUpload" type="file" accept="image/*" style="display:none;">
+              </label>
+              <span style="color:var(--muted);font-size:13px;">Uploads to Cloudinary and inserts into message.</span>
+            </div>
           </div>
           <div class="form-group form-full" id="newsletterWarning" style="color:#B07D10;font-weight:600;"></div>
           <div class="form-group form-full">
@@ -631,7 +641,7 @@ function renderNewsletter(total,dailyUsed,dailyLimit){
   }
 
   if(!newsletterSubscribers.length){
-    tbody.innerHTML='<tr class="empty-row"><td colspan="3">No subscribers yet.</td></tr>';
+    tbody.innerHTML='<tr class="empty-row"><td colspan="4">No subscribers yet.</td></tr>';
     return;
   }
 
@@ -640,6 +650,7 @@ function renderNewsletter(total,dailyUsed,dailyLimit){
       <td>${esc(`${s.first_name||''} ${s.last_name||''}`.trim()||'—')}</td>
       <td>${esc(s.email||'')}</td>
       <td>${fmt(s.created_at)}</td>
+      <td><button class="btn-delete" data-news-del="${esc(s.id)}">Delete</button></td>
     </tr>
   `).join('');
 }
@@ -983,6 +994,37 @@ document.getElementById('nSendBtn').addEventListener('click',async()=>{
     await loadNewsletter();
   }catch(err){showToast(err.message,'error');}
   btn.disabled=false;btn.textContent='Send Newsletter';
+});
+
+document.addEventListener('click',async e=>{
+  const del=e.target.closest('[data-news-del]');
+  if(!del)return;
+  if(!confirm('Delete this subscriber?'))return;
+  try{
+    const res=await fetch('/.netlify/functions/newsletter-admin',{
+      method:'DELETE',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({id:del.dataset.newsDel})
+    });
+    const body=await res.json();
+    if(!res.ok||!body.ok)throw new Error(body.error||'Delete failed');
+    showToast(body.message||'Deleted');
+    await loadNewsletter();
+  }catch(err){showToast(err.message,'error');}
+});
+
+document.getElementById('nImageUpload').addEventListener('change',async e=>{
+  const file=e.target.files?.[0];
+  if(!file)return;
+  try{
+    showToast('Uploading image…');
+    const result=await uploadToCloudinary(file,{folder:'hocan/newsletter-images'});
+    const ta=document.getElementById('nMessage');
+    const insert=`\n\n<img src="${result.url}" alt="Newsletter image" style="max-width:100%;border-radius:12px;display:block;margin:16px 0;">\n\n`;
+    ta.value=(ta.value||'')+insert;
+    showToast('Image added to message');
+  }catch(err){showToast('Upload failed: '+err.message,'error');}
+  e.target.value='';
 });
 
 // Close modals on overlay click
