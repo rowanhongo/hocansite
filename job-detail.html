@@ -129,7 +129,7 @@
             ${job.state_province ? `<p><strong>State/Province:</strong><br>${esc(job.state_province)}</p>` : ""}
             ${job.country ? `<p><strong>Country:</strong><br>${esc(job.country)}</p>` : ""}
             ${job.zip_postal_code ? `<p><strong>Zip/Postal Code:</strong><br>${esc(job.zip_postal_code)}</p>` : ""}
-            <a class="apply" href="mailto:careers@hocanholdings.co.ke?subject=${subject}&body=${body}">I'm interested</a>
+            <a class="apply" id="applyInterestBtn" href="mailto:careers@hocanholdings.co.ke?subject=${subject}&body=${body}">I'm interested</a>
           </aside>
         `;
 
@@ -144,6 +144,12 @@
           } catch (_e) {
             copyBtn.textContent = "Copy failed";
           }
+        });
+
+        const applyBtn = document.getElementById("applyInterestBtn");
+        applyBtn?.addEventListener("click", (evt) => {
+          evt.preventDefault();
+          window.location.href = applyBtn.getAttribute("href");
         });
       } catch (_err) {
         renderMissing();

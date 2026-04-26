@@ -61,6 +61,12 @@ function escapeHtml(s) {
     .replaceAll("'", "&#039;");
 }
 
+function capitalizeFirst(name) {
+  const trimmed = String(name || "").trim();
+  if (!trimmed) return "";
+  return trimmed.charAt(0).toUpperCase() + trimmed.slice(1).toLowerCase();
+}
+
 function buildLogoUrl() {
   const explicit = env("NEWSLETTER_LOGO_URL", "").trim();
   if (explicit) return explicit;
@@ -162,7 +168,7 @@ exports.handler = async function handler(event) {
     // Send individually (better deliverability than BCC blasting)
     const sendOne = async (recipient) => {
       const unsubUrl = site ? `${site}/unsubscribe.html?token=${unsubscribeToken(recipient.email)}` : "";
-      const firstName = String(recipient.first_name || "").trim();
+      const firstName = capitalizeFirst(recipient.first_name);
       const greeting = firstName ? `Hi ${escapeHtml(firstName)},<br><br>` : "Hi there,<br><br>";
       const renderedHtml = html
         .replace("__TOKEN__", encodeURIComponent(unsubscribeToken(recipient.email)))
