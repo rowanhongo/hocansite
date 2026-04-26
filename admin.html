@@ -85,6 +85,8 @@ tr:hover td{background:#FAFBFD;}
 .action-btns{display:flex;gap:6px;}
 .btn-edit{border:1.5px solid var(--border);background:#fff;color:var(--text);padding:5px 12px;border-radius:7px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:.2s;}
 .btn-edit:hover{border-color:var(--sky);color:var(--sky);}
+.btn-view{border:1.5px solid rgba(74,179,212,.3);background:rgba(74,179,212,.08);color:#1d6f8a;padding:5px 12px;border-radius:7px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:.2s;}
+.btn-view:hover{background:var(--sky);color:#fff;}
 .btn-secondary{border:1.5px solid var(--border);background:#fff;color:var(--text);padding:7px 14px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:.2s;display:inline-flex;align-items:center;gap:8px;}
 .btn-secondary:hover{border-color:var(--sky);color:var(--sky);}
 .btn-delete{border:1.5px solid rgba(229,62,62,.2);background:rgba(229,62,62,.05);color:#E53E3E;padding:5px 12px;border-radius:7px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:.2s;}
@@ -158,6 +160,9 @@ tr:hover td{background:#FAFBFD;}
 .toast.show{transform:translateY(0);opacity:1;}
 .toast.success{border-left:4px solid var(--green);}
 .toast.error{border-left:4px solid #E53E3E;}
+.app-inline-note{font-size:12px;color:var(--muted);margin-bottom:8px;}
+.app-link{color:#1d6f8a;text-decoration:none;}
+.app-link:hover{text-decoration:underline;}
 
 @media(max-width:860px){
   .modal{max-width:100%;margin:0;}
@@ -205,6 +210,7 @@ tr:hover td{background:#FAFBFD;}
       <div class="nav-item active" data-panel="overview"><span class="icon">📊</span> Overview</div>
       <div class="nav-item" data-panel="blogs"><span class="icon">✍️</span> Blog Posts</div>
       <div class="nav-item" data-panel="jobs"><span class="icon">💼</span> Job Listings</div>
+      <div class="nav-item" data-panel="applications"><span class="icon">🗂️</span> Applications</div>
       <div class="nav-item" data-panel="newsletter"><span class="icon">📧</span> Newsletter</div>
     </nav>
     <div class="sidebar-footer">
@@ -252,6 +258,37 @@ tr:hover td{background:#FAFBFD;}
         <div class="section-header"><h3>All Job Listings</h3><button class="btn-new" id="newJobBtn">+ New Job</button></div>
         <div class="search-row"><input type="text" id="jobSearch" placeholder="Search jobs…"></div>
         <table><thead><tr><th>Title</th><th>Location</th><th>Type</th><th>Industry</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody id="jobTable"></tbody></table>
+      </div>
+    </div>
+
+    <!-- APPLICATIONS -->
+    <div class="panel" id="panel-applications">
+      <div class="section-card">
+        <div class="section-header"><h3>Applications by Job Role</h3></div>
+        <div class="search-row">
+          <input type="text" id="applicationRoleSearch" placeholder="Search role name (e.g. tech)">
+          <select id="applicationSort" style="max-width:220px;">
+            <option value="newest">Newest activity first</option>
+            <option value="role-asc">Role A-Z</option>
+            <option value="role-desc">Role Z-A</option>
+            <option value="count-desc">Highest applications first</option>
+            <option value="count-asc">Lowest applications first</option>
+          </select>
+        </div>
+        <table>
+          <thead><tr><th>Job Role</th><th>Applications</th><th>Latest</th><th>Actions</th></tr></thead>
+          <tbody id="applicationGroupTable"></tbody>
+        </table>
+      </div>
+      <div class="section-card">
+        <div class="section-header">
+          <h3 id="applicationDetailTitle">Select a job role to view applications</h3>
+        </div>
+        <div class="app-inline-note" id="applicationDetailNote">Applications are shown per role, newest first.</div>
+        <table>
+          <thead><tr><th>Candidate</th><th>Contact</th><th>Location</th><th>Education</th><th>Submitted</th><th>Links</th></tr></thead>
+          <tbody id="applicationDetailTable"></tbody>
+        </table>
       </div>
     </div>
 
@@ -477,7 +514,7 @@ tr:hover td{background:#FAFBFD;}
 <script type="module">
 import {
   adminGetBlogs, adminGetBlog, adminSaveBlog, adminDeleteBlog,
-  adminGetJobs, adminGetJob, adminSaveJob, adminDeleteJob, getRuntimeConfig
+  adminGetJobs, adminGetJob, adminSaveJob, adminDeleteJob, adminGetApplications, getRuntimeConfig
 } from './js/supabase.js';
 import { uploadToCloudinary } from './js/cloudinary.js';
 
@@ -550,7 +587,7 @@ function toggleMobileSidebar(){
 function setPanel(name){
   navItems.forEach(n=>n.classList.toggle('active',n.dataset.panel===name));
   Object.entries(panels).forEach(([k,v])=>v.classList.toggle('active',k===name));
-  const titles={overview:'Overview',blogs:'Blog Posts',jobs:'Job Listings',newsletter:'Newsletter'};
+  const titles={overview:'Overview',blogs:'Blog Posts',jobs:'Job Listings',applications:'Applications',newsletter:'Newsletter'};
   document.getElementById('panelTitle').textContent=titles[name]||name;
 }
 
@@ -570,6 +607,8 @@ let newsletterDailyUsed=0;
 let newsletterPage=1;
 const newsletterPerPage=10;
 let newsletterTotal=0;
+let applications=[];
+let selectedApplicationRole=null;
 let newsletterPoller=null;
 let editingBlogId=null;
 let editingJobId=null;
@@ -578,7 +617,7 @@ let cbBlocks=[];
 // ── INIT ──────────────────────────────────────────────────────────────────────
 
 async function init(){
-  await Promise.all([loadBlogs(),loadJobs(),loadNewsletter()]);
+  await Promise.all([loadBlogs(),loadJobs(),loadNewsletter(),loadApplications()]);
   renderOverview();
   if(!newsletterPoller){
     newsletterPoller=setInterval(loadNewsletter,15000);
@@ -700,10 +739,112 @@ function renderJobTable(data){
     </tr>`).join('');
 }
 
+// ── APPLICATIONS ───────────────────────────────────────────────────────────────
+
+async function loadApplications(){
+  try{
+    applications=await adminGetApplications()||[];
+    renderApplicationGroups();
+    renderApplicationDetails(selectedApplicationRole);
+  }catch(err){
+    showToast('Could not load applications: '+err.message,'error');
+    applications=[];
+    renderApplicationGroups();
+    renderApplicationDetails(null);
+  }
+}
+
+function getApplicationGroups(){
+  const grouped=new Map();
+  applications.forEach(app=>{
+    const key=String(app.job_title||'Unassigned role').trim()||'Unassigned role';
+    const current=grouped.get(key)||{role:key,apps:[],latest:0};
+    current.apps.push(app);
+    const ts=new Date(app.created_at||0).getTime();
+    current.latest=Math.max(current.latest,Number.isFinite(ts)?ts:0);
+    grouped.set(key,current);
+  });
+  return [...grouped.values()];
+}
+
+function sortApplicationGroups(data){
+  const sort=document.getElementById('applicationSort')?.value||'newest';
+  const copy=[...data];
+  if(sort==='role-asc') return copy.sort((a,b)=>a.role.localeCompare(b.role));
+  if(sort==='role-desc') return copy.sort((a,b)=>b.role.localeCompare(a.role));
+  if(sort==='count-asc') return copy.sort((a,b)=>a.apps.length-b.apps.length);
+  if(sort==='count-desc') return copy.sort((a,b)=>b.apps.length-a.apps.length);
+  return copy.sort((a,b)=>b.latest-a.latest);
+}
+
+function renderApplicationGroups(){
+  const tbody=document.getElementById('applicationGroupTable');
+  const q=(document.getElementById('applicationRoleSearch')?.value||'').trim().toLowerCase();
+  let groups=getApplicationGroups();
+  if(q) groups=groups.filter(g=>g.role.toLowerCase().includes(q));
+  groups=sortApplicationGroups(groups);
+  if(!groups.length){
+    tbody.innerHTML='<tr class="empty-row"><td colspan="4">No applications found.</td></tr>';
+    return;
+  }
+  tbody.innerHTML=groups.map(g=>`
+    <tr>
+      <td><strong>${esc(g.role)}</strong></td>
+      <td>${g.apps.length}</td>
+      <td>${fmt(g.latest?new Date(g.latest).toISOString():null)}</td>
+      <td><button class="btn-view" data-view-role="${encodeURIComponent(g.role)}">View Applications</button></td>
+    </tr>
+  `).join('');
+}
+
+function renderApplicationDetails(role){
+  const title=document.getElementById('applicationDetailTitle');
+  const note=document.getElementById('applicationDetailNote');
+  const tbody=document.getElementById('applicationDetailTable');
+  if(!role){
+    title.textContent='Select a job role to view applications';
+    note.textContent='Applications are shown per role, newest first.';
+    tbody.innerHTML='<tr class="empty-row"><td colspan="6">Choose a role above to inspect candidate applications.</td></tr>';
+    return;
+  }
+  const list=applications
+    .filter(app=>(String(app.job_title||'Unassigned role').trim()||'Unassigned role')===role)
+    .sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));
+  title.textContent=`${role} — ${list.length} application${list.length===1?'':'s'}`;
+  note.textContent='Click links to review LinkedIn, resume, and cover letter.';
+  if(!list.length){
+    tbody.innerHTML='<tr class="empty-row"><td colspan="6">No applications for this role yet.</td></tr>';
+    return;
+  }
+  tbody.innerHTML=list.map(app=>{
+    const experiences=Array.isArray(app.previous_experience)?app.previous_experience.filter(Boolean):[];
+    const fullName=`${app.first_name||''} ${app.last_name||''}`.trim()||'Unnamed candidate';
+    const contact=[app.email,app.phone].filter(Boolean).join(' | ')||'—';
+    const location=[app.city,app.country].filter(Boolean).join(', ')||'—';
+    const education=[app.education_level,app.education_details].filter(Boolean).join(' — ')||'—';
+    const linkedIn=app.linkedin_url?`<a class="app-link" href="${esc(app.linkedin_url)}" target="_blank" rel="noopener noreferrer">LinkedIn</a>`:'—';
+    const resume=app.resume_url?`<a class="app-link" href="${esc(app.resume_url)}" target="_blank" rel="noopener noreferrer">Resume</a>`:'—';
+    const cover=app.cover_letter_url?`<a class="app-link" href="${esc(app.cover_letter_url)}" target="_blank" rel="noopener noreferrer">Cover Letter</a>`:'—';
+    const expText=experiences.length?`<div class="app-inline-note">Experience: ${esc(experiences.join(' | '))}</div>`:'';
+    return `
+      <tr>
+        <td><strong>${esc(fullName)}</strong>${expText}</td>
+        <td>${esc(contact)}</td>
+        <td>${esc(location)}</td>
+        <td>${esc(education)}</td>
+        <td>${fmt(app.created_at)}</td>
+        <td style="display:flex;gap:8px;flex-wrap:wrap;">${linkedIn}${resume}${cover}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
 document.getElementById('jobSearch').addEventListener('input',e=>{
   const q=e.target.value.toLowerCase();
   renderJobTable(q?jobs.filter(j=>(j.title+j.location+j.industry).toLowerCase().includes(q)):jobs);
 });
+document.getElementById('applicationRoleSearch').addEventListener('input',renderApplicationGroups);
+document.getElementById('applicationSort').addEventListener('change',renderApplicationGroups);
 
 // ── OVERVIEW ──────────────────────────────────────────────────────────────────
 
@@ -724,6 +865,12 @@ document.getElementById('overviewNewJob').addEventListener('click',()=>{setPanel
 // ── DELEGATE EDIT/DELETE ──────────────────────────────────────────────────────
 
 document.addEventListener('click',async e=>{
+  const viewRoleBtn=e.target.closest('[data-view-role]');
+  if(viewRoleBtn){
+    selectedApplicationRole=decodeURIComponent(viewRoleBtn.dataset.viewRole||'');
+    renderApplicationDetails(selectedApplicationRole);
+    return;
+  }
   const editBtn=e.target.closest('.btn-edit');
   const delBtn=e.target.closest('.btn-delete');
   if(editBtn){

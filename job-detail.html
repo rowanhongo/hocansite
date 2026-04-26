@@ -25,9 +25,33 @@
     .side-card { background: #f8fafc; border: 1px solid #e5e7eb; border-radius: 14px; padding: 16px; }
     .side-card h3 { margin-bottom: 10px; color: #111827; }
     .side-card p { margin-bottom: 10px; color: #4b5563; }
-    .apply { display: inline-block; margin-top: 14px; background: #c47a5a; color: #fff; text-decoration: none; font-weight: 600; padding: 12px 20px; border-radius: 10px; }
+    .apply { display: inline-block; margin-top: 14px; background: #c47a5a; color: #fff; text-decoration: none; font-weight: 600; padding: 12px 20px; border-radius: 10px; border: 0; cursor: pointer; font-family: inherit; font-size: 15px; }
     .muted { color: #6b7280; }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.58); display: none; align-items: center; justify-content: center; padding: 14px; z-index: 1200; }
+    .modal-overlay.open { display: flex; }
+    .apply-modal { width: min(900px, 100%); max-height: calc(100vh - 28px); overflow-y: auto; background: #fff; border-radius: 18px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.28); }
+    .apply-head { background: linear-gradient(120deg, #1a1a2e 0%, #4ab3d4 100%); color: #fff; padding: 18px 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .apply-head h3 { font-size: 24px; }
+    .apply-head button { border: 0; background: rgba(255, 255, 255, 0.18); color: #fff; width: 34px; height: 34px; border-radius: 999px; cursor: pointer; font-size: 22px; line-height: 1; }
+    .apply-body { padding: 18px; }
+    .apply-note { background: #ecf7fb; border: 1px solid #cde9f2; color: #1d4f61; border-radius: 12px; padding: 10px 12px; margin-bottom: 14px; font-size: 13px; line-height: 1.5; }
+    .apply-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .apply-field { display: flex; flex-direction: column; gap: 6px; }
+    .apply-field label { font-size: 12px; text-transform: uppercase; color: #64748b; font-weight: 700; letter-spacing: .4px; }
+    .apply-field input, .apply-field select, .apply-field textarea { border: 1px solid #dbe2ea; border-radius: 10px; padding: 11px 12px; font: inherit; color: #0f172a; }
+    .apply-field textarea { min-height: 84px; resize: vertical; }
+    .span-2 { grid-column: 1 / -1; }
+    .exp-grid { display: grid; gap: 8px; }
+    .apply-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px; }
+    .btn-ghost, .btn-submit { border: 0; border-radius: 10px; padding: 10px 16px; font-weight: 600; cursor: pointer; }
+    .btn-ghost { background: #edf2f7; color: #1f2937; }
+    .btn-submit { background: #1a1a2e; color: #fff; }
+    .btn-submit:hover { background: #4ab3d4; }
+    .form-msg { margin-top: 10px; font-size: 13px; }
+    .form-msg.error { color: #b91c1c; }
+    .form-msg.success { color: #166534; }
     @media (max-width: 900px) { .content { grid-template-columns: 1fr; } }
+    @media (max-width: 760px) { .apply-grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -37,8 +61,62 @@
     <section class="hero" id="jobHero"></section>
     <section class="content" id="jobCard"></section>
   </main>
+  <div class="modal-overlay" id="applyModal">
+    <div class="apply-modal">
+      <div class="apply-head">
+        <div>
+          <h3>Submit Application</h3>
+          <p id="applyRoleText"></p>
+        </div>
+        <button type="button" id="closeApplyModalBtn" aria-label="Close">×</button>
+      </div>
+      <form class="apply-body" id="applyForm">
+        <div class="apply-note">
+          Please use public share links for your resume and cover letter (Google Drive, Dropbox, etc.) so our team can view them.
+        </div>
+        <div class="apply-grid">
+          <div class="apply-field"><label for="firstName">First Name *</label><input id="firstName" required></div>
+          <div class="apply-field"><label for="lastName">Last Name *</label><input id="lastName" required></div>
+          <div class="apply-field"><label for="email">Email *</label><input id="email" type="email" required></div>
+          <div class="apply-field"><label for="phone">Phone Number *</label><input id="phone" type="tel" required></div>
+          <div class="apply-field"><label for="city">City *</label><input id="city" required></div>
+          <div class="apply-field"><label for="country">Country *</label><input id="country" required></div>
+          <div class="apply-field span-2">
+            <label>Previous Job Experience (up to 3)</label>
+            <div class="exp-grid">
+              <input id="experience1" placeholder="Most recent role">
+              <input id="experience2" placeholder="Second role (optional)">
+              <input id="experience3" placeholder="Third role (optional)">
+            </div>
+          </div>
+          <div class="apply-field">
+            <label for="educationLevel">Highest Education *</label>
+            <select id="educationLevel" required>
+              <option value="">Select level</option>
+              <option value="High School">High School</option>
+              <option value="Undergraduate">Undergraduate</option>
+              <option value="Master's">Master's</option>
+              <option value="PhD">PhD</option>
+            </select>
+          </div>
+          <div class="apply-field">
+            <label for="educationDetails">Education Details</label>
+            <input id="educationDetails" placeholder="School / degree / year (optional)">
+          </div>
+          <div class="apply-field span-2"><label for="linkedinUrl">LinkedIn URL</label><input id="linkedinUrl" type="url" placeholder="https://linkedin.com/in/your-profile"></div>
+          <div class="apply-field span-2"><label for="resumeUrl">Resume URL *</label><input id="resumeUrl" type="url" placeholder="Public share link" required></div>
+          <div class="apply-field span-2"><label for="coverLetterUrl">Cover Letter URL *</label><input id="coverLetterUrl" type="url" placeholder="Public share link" required></div>
+        </div>
+        <div class="apply-actions">
+          <button class="btn-ghost" type="button" id="cancelApplyBtn">Cancel</button>
+          <button class="btn-submit" type="submit" id="submitApplyBtn">Submit Application</button>
+        </div>
+        <div class="form-msg" id="applyFormMsg"></div>
+      </form>
+    </div>
+  </div>
   <script type="module">
-    import { getPublicJobBySlug } from "/js/supabase.js";
+    import { getPublicJobBySlug, submitJobApplication } from "/js/supabase.js";
 
     function esc(s) {
       return String(s ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
@@ -59,6 +137,16 @@
     function renderMissing() {
       document.getElementById("jobHero").innerHTML = "<h1>Job not found</h1><div class='meta'><span>This role may have been removed.</span></div>";
       document.getElementById("jobCard").innerHTML = "<div><p class='muted'>Please return to the listings and select another vacancy.</p></div>";
+    }
+
+    function isValidHttpUrl(value) {
+      if (!value) return false;
+      try {
+        const parsed = new URL(value);
+        return parsed.protocol === "http:" || parsed.protocol === "https:";
+      } catch (_e) {
+        return false;
+      }
     }
 
     function shareLinks(title) {
@@ -102,11 +190,6 @@
           .split("\n")
           .map((s) => s.trim())
           .filter(Boolean);
-        const subject = encodeURIComponent(`Application for ${job.title || "Open Role"} - Hocan Holdings`);
-        const body = encodeURIComponent(
-          `Hello Hocan Holdings Team,\n\nI would like to apply for the ${job.title || "role"} position.\n\nPlease find my CV and cover letter attached.\n\nThank you.`
-        );
-
         document.getElementById("jobCard").innerHTML = `
           <div>
             <p style="margin-bottom:6px;color:#111827;"><strong>Job Title:</strong> ${esc(job.title || "Open Role")}</p>
@@ -129,7 +212,7 @@
             ${job.state_province ? `<p><strong>State/Province:</strong><br>${esc(job.state_province)}</p>` : ""}
             ${job.country ? `<p><strong>Country:</strong><br>${esc(job.country)}</p>` : ""}
             ${job.zip_postal_code ? `<p><strong>Zip/Postal Code:</strong><br>${esc(job.zip_postal_code)}</p>` : ""}
-            <a class="apply" id="applyInterestBtn" href="mailto:careers@hocanholdings.co.ke?subject=${subject}&body=${body}">I'm interested</a>
+            <button class="apply" id="applyInterestBtn" type="button">I'm interested</button>
           </aside>
         `;
 
@@ -147,9 +230,88 @@
         });
 
         const applyBtn = document.getElementById("applyInterestBtn");
-        applyBtn?.addEventListener("click", (evt) => {
+        const applyModal = document.getElementById("applyModal");
+        const closeApplyModalBtn = document.getElementById("closeApplyModalBtn");
+        const cancelApplyBtn = document.getElementById("cancelApplyBtn");
+        const applyForm = document.getElementById("applyForm");
+        const applyFormMsg = document.getElementById("applyFormMsg");
+        const submitApplyBtn = document.getElementById("submitApplyBtn");
+        const applyRoleText = document.getElementById("applyRoleText");
+        applyRoleText.textContent = job.title ? `Applying for ${job.title}` : "Job Application";
+
+        const closeModal = () => {
+          applyModal.classList.remove("open");
+          applyFormMsg.textContent = "";
+          applyFormMsg.className = "form-msg";
+        };
+
+        applyBtn?.addEventListener("click", () => {
+          applyModal.classList.add("open");
+        });
+
+        closeApplyModalBtn?.addEventListener("click", closeModal);
+        cancelApplyBtn?.addEventListener("click", closeModal);
+        applyModal?.addEventListener("click", (evt) => {
+          if (evt.target === applyModal) closeModal();
+        });
+
+        applyForm?.addEventListener("submit", async (evt) => {
           evt.preventDefault();
-          window.location.href = applyBtn.getAttribute("href");
+          applyFormMsg.textContent = "";
+          applyFormMsg.className = "form-msg";
+
+          const resumeUrl = document.getElementById("resumeUrl").value.trim();
+          const coverLetterUrl = document.getElementById("coverLetterUrl").value.trim();
+          const linkedinUrl = document.getElementById("linkedinUrl").value.trim();
+
+          if (!isValidHttpUrl(resumeUrl) || !isValidHttpUrl(coverLetterUrl)) {
+            applyFormMsg.textContent = "Please provide valid public URLs for resume and cover letter.";
+            applyFormMsg.classList.add("error");
+            return;
+          }
+          if (linkedinUrl && !isValidHttpUrl(linkedinUrl)) {
+            applyFormMsg.textContent = "Please provide a valid LinkedIn URL.";
+            applyFormMsg.classList.add("error");
+            return;
+          }
+
+          submitApplyBtn.disabled = true;
+          submitApplyBtn.textContent = "Submitting...";
+
+          const previousExperience = [
+            document.getElementById("experience1").value.trim(),
+            document.getElementById("experience2").value.trim(),
+            document.getElementById("experience3").value.trim()
+          ].filter(Boolean).slice(0, 3);
+
+          try {
+            await submitJobApplication({
+              job_id: job.id || null,
+              job_slug: job.slug || null,
+              job_title: job.title || "Open Role",
+              first_name: document.getElementById("firstName").value.trim(),
+              last_name: document.getElementById("lastName").value.trim(),
+              email: document.getElementById("email").value.trim(),
+              phone: document.getElementById("phone").value.trim(),
+              city: document.getElementById("city").value.trim(),
+              country: document.getElementById("country").value.trim(),
+              previous_experience: previousExperience,
+              education_level: document.getElementById("educationLevel").value,
+              education_details: document.getElementById("educationDetails").value.trim() || null,
+              linkedin_url: linkedinUrl || null,
+              resume_url: resumeUrl,
+              cover_letter_url: coverLetterUrl
+            });
+            applyForm.reset();
+            applyFormMsg.textContent = "Application submitted successfully. We'll review and contact you.";
+            applyFormMsg.classList.add("success");
+          } catch (_error) {
+            applyFormMsg.textContent = "Application failed to submit. Please try again.";
+            applyFormMsg.classList.add("error");
+          } finally {
+            submitApplyBtn.disabled = false;
+            submitApplyBtn.textContent = "Submit Application";
+          }
         });
       } catch (_err) {
         renderMissing();

@@ -6,8 +6,10 @@ const RUNTIME_CONFIG_CACHE_KEY = "hocan_runtime_config_v1";
 
 const BLOGS_TABLE_CANDIDATES = ["blog_posts", "blogs"];
 const JOBS_TABLE_CANDIDATES = ["job_posts", "jobs"];
+const APPLICATIONS_TABLE_CANDIDATES = ["job_applications"];
 let resolvedBlogsTable = null;
 let resolvedJobsTable = null;
+let resolvedApplicationsTable = null;
 
 async function getConfig() {
   if (cachedConfig) return cachedConfig;
@@ -85,6 +87,15 @@ async function jobQuery() {
   return supabase.from(table);
 }
 
+async function applicationQuery() {
+  const supabase = await getClient();
+  if (!resolvedApplicationsTable) {
+    resolvedApplicationsTable = await resolveTable(APPLICATIONS_TABLE_CANDIDATES);
+  }
+  const table = resolvedApplicationsTable;
+  return supabase.from(table);
+}
+
 function normalizeBlog(row) {
   return {
     ...row,
@@ -96,6 +107,13 @@ function normalizeJob(row) {
   return {
     ...row,
     requirements: row?.requirements || ""
+  };
+}
+
+function normalizeApplication(row) {
+  return {
+    ...row,
+    previous_experience: Array.isArray(row?.previous_experience) ? row.previous_experience : []
   };
 }
 
@@ -288,4 +306,31 @@ export async function adminDeleteJob(id) {
   const { error } = await query.delete().eq("id", id);
   if (error) throw error;
   return true;
+}
+
+export async function submitJobApplication(payload) {
+  const query = await applicationQuery();
+  const clean = {
+    ...payload,
+    previous_experience: Array.isArray(payload?.previous_experience)
+      ? payload.previous_experience.slice(0, 3).map((v) => String(v || "").trim()).filter(Boolean)
+      : [],
+    created_at: new Date().toISOString()
+  };
+
+  const { data, error } = await query
+    .insert([clean])
+    .select("*")
+    .single();
+  if (error) throw error;
+  return normalizeApplication(data);
+}
+
+export async function adminGetApplications() {
+  const query = await applicationQuery();
+  const { data, error } = await query
+    .select("*")
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data || []).map(normalizeApplication);
 }
