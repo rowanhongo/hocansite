@@ -9,89 +9,97 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: Inter, sans-serif; background: #f4f6f8; color: #333; }
-    .container { width: min(980px, 92%); margin: 28px auto 80px; }
-    .back { display: inline-block; margin-bottom: 14px; color: #C47A5A; text-decoration: none; font-weight: 600; }
-    .card { background: #fff; border-radius: 20px; padding: 26px; box-shadow: 0 12px 30px rgba(0,0,0,0.08); }
-    h1 { font-size: 34px; margin-bottom: 10px; color: #111827; }
-    .meta { color: #4b5563; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px; }
-    h2 { margin-top: 22px; margin-bottom: 10px; color: #111827; font-size: 22px; }
-    .body { line-height: 1.8; color: #1f2937; white-space: pre-wrap; }
+    .container { width: min(1100px, 92%); margin: 18px auto 80px; }
+    .back { display: inline-block; margin-bottom: 14px; color: #5b2ca5; text-decoration: none; font-weight: 600; }
+    .hero { border-radius: 18px; padding: 34px 26px; color: #fff; background: linear-gradient(120deg, rgba(15,23,42,.85), rgba(91,44,165,.85)), url("image%203.jpeg") center/cover no-repeat; margin-bottom: 18px; }
+    .hero h1 { font-size: clamp(30px, 5vw, 52px); margin-bottom: 8px; }
+    .meta { display: flex; flex-wrap: wrap; gap: 12px; font-size: 14px; }
+    .meta span { opacity: .95; }
+    .content { background: #fff; border-radius: 18px; box-shadow: 0 10px 24px rgba(0,0,0,.08); padding: 24px; display: grid; grid-template-columns: 2fr 1fr; gap: 24px; }
+    h2 { margin-bottom: 10px; color: #111827; font-size: 24px; }
+    .body { line-height: 1.8; color: #1f2937; white-space: pre-wrap; margin-bottom: 20px; }
     ul { padding-left: 22px; line-height: 1.8; color: #1f2937; }
-    .apply { display: inline-block; margin-top: 24px; background: #C47A5A; color: #fff; text-decoration: none; font-weight: 600; padding: 12px 20px; border-radius: 10px; }
-    .note { margin-top: 10px; color: #4b5563; }
+    .side-card { background: #f8fafc; border: 1px solid #e5e7eb; border-radius: 14px; padding: 16px; }
+    .side-card h3 { margin-bottom: 10px; color: #111827; }
+    .side-card p { margin-bottom: 10px; color: #4b5563; }
+    .apply { display: inline-block; margin-top: 14px; background: #5b2ca5; color: #fff; text-decoration: none; font-weight: 600; padding: 12px 20px; border-radius: 10px; }
+    .muted { color: #6b7280; }
+    @media (max-width: 900px) { .content { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
   <main class="container">
     <a class="back" href="jobs.html">&larr; Back to jobs</a>
-    <article class="card" id="jobCard"></article>
+    <section class="hero" id="jobHero"></section>
+    <section class="content" id="jobCard"></section>
   </main>
-  <script>
-    const SANITY_PROJECT_ID = "ktbj8t65";
-    const SANITY_DATASET = "production";
-    const SANITY_API_VERSION = "2023-10-01";
-    const SANITY_API = `https://${SANITY_PROJECT_ID}.api.sanity.io/v${SANITY_API_VERSION}/data/query/${SANITY_DATASET}`;
-    const slug = new URLSearchParams(window.location.search).get("slug");
+  <script type="module">
+    import { getPublicJobBySlug } from "./js/supabase.js";
 
-    function portableTextToPlain(blocks) {
-      if (!Array.isArray(blocks)) return "";
-      return blocks
-        .map(block => Array.isArray(block.children) ? block.children.map(child => child.text || "").join("") : "")
-        .filter(Boolean)
-        .join("\n\n");
+    function esc(s) {
+      return String(s ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
     }
 
-    async function fetchJobBySlug(value) {
-      const safeSlug = value.replace(/"/g, '\\"');
-      const query = `*[_type == "jobPost" && (slug.current == "${safeSlug}" || _id == "${safeSlug}")][0]{
-        title,
-        location,
-        jobType,
-        "company": coalesce(company, "Hocan Holdings"),
-        description,
-        requirements
-      }`;
-      const res = await fetch(`${SANITY_API}?query=${encodeURIComponent(query)}`);
-      if (!res.ok) throw new Error("Unable to load job");
-      const data = await res.json();
-      return data.result;
+    function formatDate(iso) {
+      if (!iso) return "";
+      return new Date(iso).toLocaleDateString("en-KE", { year: "numeric", month: "2-digit", day: "2-digit" });
     }
 
-    function render(job) {
-      const card = document.getElementById("jobCard");
-      if (!job) {
-        card.innerHTML = "<h1>Job not found</h1><p>This role may have been removed.</p>";
-        return;
-      }
-      const requirements = Array.isArray(job.requirements) && job.requirements.length
-        ? job.requirements.map(item => `<li>${item}</li>`).join("")
-        : "<li>Submit a complete CV and cover letter (both are required).</li>";
-      const subject = encodeURIComponent(`Application: ${job.title || "Open Role"}`);
-      card.innerHTML = `
-        <h1>${job.title || "Open Role"}</h1>
-        <p class="meta">
-          <span>${job.company || "Hocan Holdings"}</span>
-          <span>&bull;</span>
-          <span>${job.location || "Kenya"}</span>
-          <span>&bull;</span>
-          <span>${job.jobType || "Full-time"}</span>
-        </p>
-        <h2>Description</h2>
-        <div class="body">${portableTextToPlain(job.description) || "No description provided yet."}</div>
-        <h2>Requirements</h2>
-        <ul>${requirements}</ul>
-        <p class="note"><strong>CV and cover letter are always required.</strong></p>
-        <a class="apply" href="mailto:info@hocanholdings.co.ke?subject=${subject}">Apply via Email</a>
-      `;
+    function getSlugFromPath() {
+      const path = window.location.pathname || "";
+      const parts = path.split("/").filter(Boolean);
+      if (parts[0] === "jobs" && parts.length > 1) return parts[parts.length - 1];
+      return new URLSearchParams(window.location.search).get("slug") || "";
     }
 
-    (async function init() {
-      if (!slug) return render(null);
+    function renderMissing() {
+      document.getElementById("jobHero").innerHTML = "<h1>Job not found</h1><div class='meta'><span>This role may have been removed.</span></div>";
+      document.getElementById("jobCard").innerHTML = "<div><p class='muted'>Please return to the listings and select another vacancy.</p></div>";
+    }
+
+    (async () => {
+      const slug = getSlugFromPath();
+      if (!slug) return renderMissing();
       try {
-        const job = await fetchJobBySlug(slug);
-        render(job);
-      } catch (e) {
-        render(null);
+        const job = await getPublicJobBySlug(slug);
+        if (!job) return renderMissing();
+
+        document.getElementById("jobHero").innerHTML = `
+          <h1>${esc(job.title || "Open Role")}</h1>
+          <div class="meta">
+            <span>${esc(job.location || "Kenya")}</span>
+            <span>|</span>
+            <span>${esc(job.job_type || "Full time")}</span>
+            <span>|</span>
+            <span>Posted on ${esc(formatDate(job.posted_at || job.created_at))}</span>
+          </div>
+        `;
+
+        const reqItems = String(job.requirements || "")
+          .split("\n")
+          .map((s) => s.trim())
+          .filter(Boolean);
+        const subject = encodeURIComponent(`Application for ${job.title || "Open Role"} - Hocan Holdings`);
+
+        document.getElementById("jobCard").innerHTML = `
+          <div>
+            <h2>Job Description</h2>
+            <div class="body">${esc(job.description || "No description has been provided yet.")}</div>
+            <h2>Requirements</h2>
+            <ul>${reqItems.length ? reqItems.map((item) => `<li>${esc(item)}</li>`).join("") : "<li>CV and cover letter are required.</li>"}</ul>
+          </div>
+          <aside class="side-card">
+            <h3>Job Information</h3>
+            <p><strong>Date Opened:</strong><br>${esc(formatDate(job.posted_at || job.created_at))}</p>
+            <p><strong>Job Type:</strong><br>${esc(job.job_type || "Full time")}</p>
+            <p><strong>Industry:</strong><br>${esc(job.industry || "Not specified")}</p>
+            <p><strong>Experience:</strong><br>${esc(job.experience || "Not specified")}</p>
+            ${job.salary ? `<p><strong>Salary:</strong><br>${esc(job.salary)}</p>` : ""}
+            <a class="apply" href="mailto:info@hocanholdings.co.ke?subject=${subject}">I'm interested</a>
+          </aside>
+        `;
+      } catch (_err) {
+        renderMissing();
       }
     })();
   </script>

@@ -1,4 +1,4 @@
-import {getJobPosts} from "./sanity.js";
+import { getPublicJobs } from "./supabase.js";
 
 function escapeHtml(str) {
   return String(str ?? "")
@@ -9,6 +9,15 @@ function escapeHtml(str) {
     .replaceAll("'", "&#039;");
 }
 
+function formatDate(iso) {
+  if (!iso) return "";
+  return new Date(iso).toLocaleDateString("en-KE", { year: "numeric", month: "short", day: "numeric" });
+}
+
+function toJobUrl(slug) {
+  return `/jobs/${encodeURIComponent(slug)}`;
+}
+
 async function renderJobs() {
   const list = document.getElementById("jobList") || document.getElementById("jobs-container");
   const count = document.getElementById("jobCount");
@@ -17,7 +26,7 @@ async function renderJobs() {
   list.innerHTML = `<div class="jobs-loading">Loading jobs...</div>`;
 
   try {
-    const jobs = await getJobPosts();
+    const jobs = await getPublicJobs();
     if (count) count.textContent = String(jobs?.length || 0);
 
     if (!jobs?.length) {
@@ -28,18 +37,20 @@ async function renderJobs() {
     list.innerHTML = "";
 
     jobs.forEach((job) => {
-      const card = document.createElement("div");
+      const card = document.createElement("a");
       card.className = "job-card";
-      card.tabIndex = 0;
+      card.href = toJobUrl(job.slug);
 
       card.innerHTML = `
         <div class="job-main">
-          <div class="job-title">${escapeHtml(job?.title || "")}</div>
+          <h3 class="job-title">${escapeHtml(job?.title || "")}</h3>
           <div class="job-meta">
-            <span>${escapeHtml(job?.location || "")}</span>
-            <span class="dot">•</span>
-            <span>${escapeHtml(job?.jobType || "")}</span>
+            <span class="pill">${escapeHtml(job?.job_type || "Full time")}</span>
+            ${job?.industry ? `<span class="pill">${escapeHtml(job.industry)}</span>` : ""}
+            ${job?.location ? `<span class="pill">${escapeHtml(job.location)}</span>` : ""}
           </div>
+          <p class="desc">${escapeHtml((job?.description || "").slice(0, 170))}${(job?.description || "").length > 170 ? "..." : ""}</p>
+          <div class="job-footer"><span>${escapeHtml(formatDate(job?.posted_at || job?.created_at))}</span><span>View Details</span></div>
         </div>
       `;
 

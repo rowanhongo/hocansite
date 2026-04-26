@@ -8,40 +8,45 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: Inter, sans-serif; background: radial-gradient(circle at 10% 20%, #e0f2ff 0%, transparent 40%), radial-gradient(circle at 90% 80%, #ffd9cf 0%, transparent 40%), #f4f6f8; color: #333; overflow-x: hidden; position: relative; }
-    body::before { content: ""; position: fixed; inset: -40% -40%; pointer-events: none; z-index: -1; background: radial-gradient(circle at 25% 30%, rgba(169,216,237,0.45), transparent 45%), radial-gradient(circle at 75% 70%, rgba(243,222,217,0.4), transparent 45%); animation: pageGlow 12s ease-in-out infinite; }
-    @keyframes pageGlow { 0%,100% { transform: translate(0,0) rotate(0deg); } 50% { transform: translate(18px,18px) rotate(170deg);} }
-    .container { width: 90%; max-width: 1200px; margin: 0 auto; padding-bottom: 80px; }
-    .glass { background: rgba(255,255,255,0.35); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.3); border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.08); }
-    .topbar { margin-top: 20px; padding: 8px 20px; min-height: 36px; display: flex; justify-content: space-between; align-items: center; }
-    .topbar-left { font-size: 13px; color: #666; font-weight: 500; } .topbar-socials { display: flex; gap: 12px; } .topbar-socials a { color: #666; display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; text-decoration: none; } .topbar-socials svg { width: 16px; height: 16px; }
-    .navbar { margin-top: 10px; padding: 18px 24px; } .nav-inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
-    .logo img { height: 102px; display: block; } .links a { margin: 0 10px; color: #444; font-weight: 500; text-decoration: none; } .links a:hover { color: #C47A5A; }
-    .hero { margin-top: 36px; padding: 42px; } .hero h1 { font-size: 40px; color: #1a1a1a; margin-bottom: 10px; } .hero p { color: #555; }
-    .cards { margin-top: 24px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
-    .card { background: #fff; border-radius: 16px; box-shadow: 0 8px 22px rgba(0,0,0,0.06); overflow: hidden; border: 1px solid rgba(0,0,0,0.04); text-decoration: none; color: inherit; display: block; }
-    .card:hover { transform: translateY(-2px); transition: transform 0.2s ease; }
-    .card-image { background: #d9dde3; height: 180px; width: 100%; object-fit: cover; display: block; }
-    .card-body { padding: 18px; } .card h3 { margin-bottom: 8px; color: #1a1a1a; line-height: 1.3; } .date { color: #777; font-size: 13px; margin-bottom: 8px; }
-    .category { display: inline-block; padding: 4px 10px; border-radius: 999px; background: #eef4ff; color: #2e5a89; font-size: 12px; margin-bottom: 10px; }
-    .empty-state { margin-top: 24px; padding: 24px; border-radius: 16px; background: rgba(255,255,255,0.7); color: #555; }
-    .site-footer { margin-top: 40px; background: #1C1C2E; color: #fff; border-radius: 20px; overflow: hidden; }
-    .footer-grid { display: grid; grid-template-columns: 1.2fr 1fr 1.2fr 1fr 1fr; gap: 24px; padding: 32px; }
-    .footer-col h4 { margin-bottom: 10px; font-size: 16px; }
-    .footer-col p, .footer-col a, .footer-col li { color: rgba(255,255,255,0.85); font-size: 14px; line-height: 1.6; text-decoration: none; list-style: none; }
-    .footer-col ul { padding: 0; } .footer-socials { display: flex; gap: 10px; } .footer-socials a { color: #b8bec8; background: #101322; border-radius: 999px; display: inline-flex; width: 28px; height: 28px; align-items: center; justify-content: center; } .footer-socials svg { width: 16px; height: 16px; }
-    .footer-bottom { border-top: 1px solid rgba(255,255,255,0.15); padding: 14px 32px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: 13px; } .footer-bottom a { color: rgba(255,255,255,0.85); text-decoration: none; }
-    @media (max-width: 900px) { .nav-inner { flex-direction: column; } .cards { grid-template-columns: 1fr; } .footer-grid { grid-template-columns: 1fr; } .hero { padding: 28px; } .hero h1 { font-size: 30px; } }
+    body { font-family: Inter, sans-serif; background: #f4f6f8; color: #1f2937; }
+    .container { width: min(1180px, 92%); margin: 0 auto; padding: 24px 0 70px; }
+    .top-nav { background: #fff; border-radius: 16px; padding: 10px 18px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 25px rgba(0,0,0,.06); }
+    .top-nav img { height: 52px; }
+    .top-nav a { text-decoration: none; color: #374151; font-weight: 500; margin: 0 10px; }
+    .top-nav a.active { color: #5b2ca5; border-bottom: 2px solid #5b2ca5; padding-bottom: 6px; }
+    .hero { margin-top: 22px; background: #fff; border-radius: 18px; padding: 30px; box-shadow: 0 10px 25px rgba(0,0,0,.05); }
+    .hero h1 { font-size: 40px; margin-bottom: 8px; color: #111827; }
+    .hero p { color: #6b7280; line-height: 1.7; max-width: 720px; }
+    .blog-grid { margin-top: 18px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+    .blog-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 16px; overflow: hidden; text-decoration: none; color: inherit; box-shadow: 0 6px 16px rgba(0,0,0,.04); display: block; }
+    .blog-card-img { width: 100%; height: 190px; object-fit: cover; background: #e5e7eb; }
+    .blog-card-body { padding: 16px; }
+    .blog-card-meta { color: #6b7280; font-size: 13px; margin-bottom: 8px; }
+    .blog-card-title { font-size: 21px; font-weight: 700; line-height: 1.25; margin-bottom: 8px; color: #111827; }
+    .blog-card-excerpt { color: #4b5563; line-height: 1.65; }
+    .blog-loading, .blog-empty { padding: 18px; color: #6b7280; background: #fff; border-radius: 16px; border: 1px solid #e5e7eb; grid-column: 1/-1; }
+    @media (max-width: 960px) { .blog-grid { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 680px) { .blog-grid { grid-template-columns: 1fr; } .hero h1 { font-size: 30px; } .top-nav { flex-direction: column; gap: 8px; } }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="topbar glass"><div class="topbar-left">Hotline: +254 791 235 830</div><div class="topbar-socials"><a href="https://wa.me/254791235830" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.52 3.48A11.8 11.8 0 0 0 12.06 0C5.52 0 .24 5.28.24 11.82c0 2.1.54 4.14 1.56 5.94L0 24l6.42-1.68a11.8 11.8 0 0 0 5.64 1.44h.06c6.54 0 11.82-5.28 11.82-11.82 0-3.12-1.2-6.06-3.42-8.46z"/></svg></a><a href="#" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 12a10 10 0 1 0-11.56 9.84v-6.96H7.9V12h2.54V9.8c0-2.52 1.5-3.9 3.78-3.9 1.08 0 2.22.18 2.22.18v2.46h-1.26c-1.26 0-1.62.78-1.62 1.56V12h2.76l-.42 2.88h-2.34v6.96A10 10 0 0 0 22 12z"/></svg></a><a href="#" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.16c3.18 0 3.54 0 4.8.06 1.2.06 1.86.24 2.28.42.54.24.96.48 1.38.9.42.42.66.84.9 1.38.18.42.36 1.08.42 2.28.06 1.26.06 1.62.06 4.8s0 3.54-.06 4.8c-.06 1.2-.24 1.86-.42 2.28-.24.54-.48.96-.9 1.38-.42.42-.84.66-1.38.9-.42.18-1.08.36-2.28.42-1.26.06-1.62.06-4.8.06s-3.54 0-4.8-.06c-1.2-.06-1.86-.24-2.28-.42-.54-.24-.96-.48-1.38-.9-.42-.42-.66-.84-.9-1.38-.18-.42-.36-1.08-.42-2.28C2.16 15.54 2.16 15.18 2.16 12s0-3.54.06-4.8c.06-1.2.24-1.86.42-2.28.24-.54.48-.96.9-1.38.42-.42.84-.66 1.38-.9.42-.18 1.08-.36 2.28-.42 1.26-.06 1.62-.06 4.8-.06z"/></svg></a><a href="#" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.52 7.2a3 3 0 0 0-2.1-2.1C19.56 4.5 12 4.5 12 4.5s-7.56 0-9.42.6A3 3 0 0 0 .48 7.2C0 9.12 0 12 0 12s0 2.88.48 4.8a3 3 0 0 0 2.1 2.1c1.86.6 9.42.6 9.42.6s7.56 0 9.42-.6a3 3 0 0 0 2.1-2.1c.48-1.92.48-4.8.48-4.8s0-2.88-.48-4.8z"/></svg></a><a href="#" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5A2.5 2.5 0 1 0 5 8.5a2.5 2.5 0 0 0-.02-5zM3 9h4v12H3zM9 9h3.84v1.68h.06c.54-1.02 1.86-2.1 3.84-2.1C20.82 8.58 21 11.34 21 14.58V21h-4v-5.7c0-1.38-.06-3.12-1.92-3.12-1.92 0-2.22 1.5-2.22 3.06V21H9z"/></svg></a></div></div>
-    <nav class="navbar glass"><div class="nav-inner"><a class="logo" href="index.html"><img src="assets/logo.png" alt="Hocan Holdings"></a><div class="links"><a href="index.html">Home</a><a href="about-us.html">About Us</a><a href="hocan-hr-consulting.html">Hocan HR Consulting</a><a href="hocan-logistics.html">Hocan Logistics</a><a href="blog.html">Blogs</a><a href="contact.html">Contact Us</a></div></div></nav>
-    <section class="hero glass"><h1>Insights &amp; Updates</h1><p>Latest stories from Hocan Holdings</p></section>
-    <section class="cards" id="blog-container"></section>
-    <footer class="site-footer"><div class="footer-grid"><div class="footer-col"><h4>Hocan Holdings</h4><p>Building the infrastructure behind East Africa's fastest growing businesses.</p></div><div class="footer-col"><h4>Quick Links</h4><ul><li><a href="index.html">Home</a></li><li><a href="hocan-hr-consulting.html">Hocan HR Consulting</a></li><li><a href="hocan-logistics.html">Hocan Logistics</a></li><li><a href="blogs.html">Blogs</a></li><li><a href="contact.html">Contact Us</a></li></ul></div><div class="footer-col"><h4>HR Services</h4><ul><li>Talent Acquisition & Recruitment</li><li>Corporate Training & Professional Development</li><li>Labour Outsourcing & Workforce Solutions</li><li>HR360 - Complete HR Management Solution</li><li>Startup HR Advisory</li></ul></div><div class="footer-col"><h4>Contact</h4><p>+254 791 235 830<br>info@hocanholdings.co.ke<br>iHiT Building, Nairobi, Kenya</p></div><div class="footer-col"><h4>Follow Us</h4><div class="footer-socials"><a href="#" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.52 3.48A11.8 11.8 0 0 0 12.06 0C5.52 0 .24 5.28.24 11.82c0 2.1.54 4.14 1.56 5.94L0 24l6.42-1.68a11.8 11.8 0 0 0 5.64 1.44h.06c6.54 0 11.82-5.28 11.82-11.82 0-3.12-1.2-6.06-3.42-8.46z"/></svg></a><a href="#" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 12a10 10 0 1 0-11.56 9.84v-6.96H7.9V12h2.54V9.8c0-2.52 1.5-3.9 3.78-3.9 1.08 0 2.22.18 2.22.18v2.46h-1.26c-1.26 0-1.62.78-1.62 1.56V12h2.76l-.42 2.88h-2.34v6.96A10 10 0 0 0 22 12z"/></svg></a><a href="#" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.16c3.18 0 3.54 0 4.8.06 1.2.06 1.86.24 2.28.42.54.24.96.48 1.38.9.42.42.66.84.9 1.38.18.42.36 1.08.42 2.28.06 1.26.06 1.62.06 4.8s0 3.54-.06 4.8c-.06 1.2-.24 1.86-.42 2.28-.24.54-.48.96-.9 1.38-.42.42-.84.66-1.38.9-.42.18-1.08.36-2.28.42-1.26.06-1.62.06-4.8.06s-3.54 0-4.8-.06c-1.2-.06-1.86-.24-2.28-.42-.54-.24-.96-.48-1.38-.9-.42-.42-.66-.84-.9-1.38-.18-.42-.36-1.08-.42-2.28C2.16 15.54 2.16 15.18 2.16 12s0-3.54.06-4.8c.06-1.2.24-1.86.42-2.28.24-.54.48-.96.9-1.38.42-.42.84-.66 1.38-.9.42-.18 1.08-.36 2.28-.42 1.26-.06 1.62-.06 4.8-.06z"/></svg></a><a href="#" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.52 7.2a3 3 0 0 0-2.1-2.1C19.56 4.5 12 4.5 12 4.5s-7.56 0-9.42.6A3 3 0 0 0 .48 7.2C0 9.12 0 12 0 12s0 2.88.48 4.8a3 3 0 0 0 2.1 2.1c1.86.6 9.42.6 9.42.6s7.56 0 9.42-.6a3 3 0 0 0 2.1-2.1c.48-1.92.48-4.8.48-4.8s0-2.88-.48-4.8z"/></svg></a><a href="#" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5A2.5 2.5 0 1 0 5 8.5a2.5 2.5 0 0 0-.02-5zM3 9h4v12H3zM9 9h3.84v1.68h.06c.54-1.02 1.86-2.1 3.84-2.1C20.82 8.58 21 11.34 21 14.58V21h-4v-5.7c0-1.38-.06-3.12-1.92-3.12-1.92 0-2.22 1.5-2.22 3.06V21H9z"/></svg></a></div></div></div><div class="footer-bottom"><span>© 2026 Hocan Holdings. All rights reserved.</span><span><a href="#">Privacy Policy</a> | <a href="#">Terms & Conditions</a></span></div></footer>
-  </div>
+  <main class="container">
+    <header class="top-nav">
+      <a href="index.html"><img src="assets/logo.png" alt="Hocan Holdings"></a>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="about-us.html">About Us</a>
+        <a href="hocan-hr-consulting.html">Services</a>
+        <a href="blogs.html" class="active">Blogs</a>
+        <a href="contact.html">Contact Us</a>
+      </nav>
+    </header>
+    <section class="hero">
+      <h1>Insights &amp; Resources</h1>
+      <p>Explore practical articles from the Hocan team on HR strategy, operations and growth.</p>
+    </section>
+    <section id="blog-container" class="blog-grid"></section>
+  </main>
   <script type="module" src="js/blog.js"></script>
 </body>
 </html>

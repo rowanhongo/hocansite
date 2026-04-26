@@ -1,5 +1,4 @@
-import {getBlogPosts} from "./sanity.js";
-import {urlFor} from "./imageBuilder.js";
+import { getPublicBlogs } from "./supabase.js";
 
 function formatDate(iso) {
   if (!iso) return "";
@@ -16,6 +15,10 @@ function escapeHtml(str) {
     .replaceAll("'", "&#039;");
 }
 
+function toPostUrl(slug) {
+  return `/blog/${encodeURIComponent(slug)}`;
+}
+
 async function renderBlogs() {
   const container = document.getElementById("blog-container");
   if (!container) return;
@@ -23,7 +26,7 @@ async function renderBlogs() {
   container.innerHTML = `<div class="blog-loading">Loading posts...</div>`;
 
   try {
-    const posts = await getBlogPosts();
+    const posts = await getPublicBlogs();
     if (!posts?.length) {
       container.innerHTML = `<div class="blog-empty">No blog posts yet.</div>`;
       return;
@@ -32,8 +35,8 @@ async function renderBlogs() {
     container.innerHTML = "";
 
     posts.forEach((post) => {
-      const href = post?.slug ? `/blog/${post.slug}` : "#";
-      const img = post?.coverImage ? urlFor(post.coverImage).width(600).url() : "";
+      const href = post?.slug ? toPostUrl(post.slug) : "#";
+      const img = post?.cover_image_url || "";
 
       const card = document.createElement("a");
       card.className = "blog-card";
@@ -42,7 +45,7 @@ async function renderBlogs() {
       card.innerHTML = `
         ${img ? `<img class="blog-card-img" src="${escapeHtml(img)}" alt="${escapeHtml(post?.title || "Blog post")}" loading="lazy" decoding="async">` : ""}
         <div class="blog-card-body">
-          <div class="blog-card-meta">${escapeHtml(formatDate(post?._createdAt))}</div>
+          <div class="blog-card-meta">${escapeHtml(formatDate(post?.published_at || post?.created_at))}</div>
           <div class="blog-card-title">${escapeHtml(post?.title || "")}</div>
           <div class="blog-card-excerpt">${escapeHtml(post?.excerpt || "")}</div>
         </div>

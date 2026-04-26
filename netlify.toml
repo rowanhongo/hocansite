@@ -1,18 +1,15 @@
 [[redirects]]
-from = "/admin"
-to = "https://hocan-admin.sanity.studio/"
-status = 301
-force = true
-
-# Pretty blog URLs: /blog/my-slug -> serves blog-post.html (client fetches by slug)
-[[redirects]]
 from = "/blog/*"
 to = "/blog-post.html"
 status = 200
 
 [[redirects]]
 from = "/blog"
-to = "/blog.html"
+to = "/blogs.html"
 status = 301
 force = true
 
+[[redirects]]
+from = "/jobs/*"
+to = "/job-detail.html"
+status = 200

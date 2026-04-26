@@ -949,22 +949,7 @@
       <section class="hero-section glass" id="heroSection">
         <section class="hero">
           <div class="hero-text">
-            <h1>
-              <!--
-                TYPEWRITER STRUCTURE:
-                [tw-sizer: holds width via invisible ghost] [cursor] [tw-brand: "Hocan Holdings"]
-
-                tw-sizer width = longest phrase ("Добро пожаловать в") via tw-ghost
-                tw-inner is absolutely positioned inside tw-sizer, right-aligned
-                so typed text grows left-to-right and the cursor (flex sibling) tracks it
-              -->
-              <span class="typewriter" aria-label="Welcome to Hocan Holdings">
-                <span class="tw-sizer">
-                  <span class="tw-ghost" id="twGhost"></span>
-                  <span class="tw-inner" id="twPrefix"></span>
-                </span><span class="typewriter-cursor" aria-hidden="true"></span><span class="tw-brand"> Hocan Holdings</span>
-              </span>
-            </h1>
+            <h1>Welcome to Hocan Holdings</h1>
             <p>
               Established since 2015. Comprehensive logistics and consulting provider dedicated to your success across Kenya and East Africa.
             </p>
@@ -1067,67 +1052,6 @@
       if (!img.hasAttribute("loading")) img.loading = idx < 2 ? "eager" : "lazy";
       if (!img.hasAttribute("decoding")) img.decoding = "async";
     });
-
-    /* ─── TYPEWRITER ─── */
-    (function () {
-      const phrases = [
-        "Welcome to",
-        "Bienvenue chez",
-        "Karibu kwa",
-        "Bienvenidos a",
-        "Willkommen bei",
-        "Добро пожаловать в",
-        "欢迎来到",
-        "مرحبا بكم في",
-        "へようこそ"
-      ];
-
-      const prefixEl = document.getElementById("twPrefix");
-      const ghostEl  = document.getElementById("twGhost");
-      if (!prefixEl || !ghostEl) return;
-
-      /* Set ghost to longest phrase so the sizer width never changes */
-      const longest = phrases.reduce(function(a, b) { return a.length > b.length ? a : b; }, "");
-      ghostEl.textContent = longest + "\u00A0";
-
-      var wordIndex   = 0;
-      var charIndex   = 0;
-      var isDeleting  = false;
-
-      var typingSpeed      = 90;
-      var deletingSpeed    = 55;
-      var pauseAfterType   = 2000;
-      var pauseAfterDelete = 250;
-
-      function tick() {
-        var current = phrases[wordIndex] || "";
-
-        if (!isDeleting) {
-          charIndex = Math.min(charIndex + 1, current.length);
-          prefixEl.textContent = current.slice(0, charIndex);
-
-          if (charIndex === current.length) {
-            isDeleting = true;
-            return setTimeout(tick, pauseAfterType);
-          }
-          return setTimeout(tick, typingSpeed);
-        }
-
-        charIndex = Math.max(charIndex - 1, 0);
-        prefixEl.textContent = current.slice(0, charIndex);
-
-        if (charIndex === 0) {
-          isDeleting = false;
-          wordIndex = (wordIndex + 1) % phrases.length;
-          return setTimeout(tick, pauseAfterDelete);
-        }
-        return setTimeout(tick, deletingSpeed);
-      }
-
-      prefixEl.textContent = "";
-      tick();
-    })();
-    /* ─── END TYPEWRITER ─── */
 
     /* ─── PARTNERS MARQUEE ─── */
     var IMG_PREFIX = "./scroll";

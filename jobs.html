@@ -15,16 +15,15 @@
     .hero h1 { font-size: 44px; margin-bottom: 4px; color: #111827; }
     .hero p { color: #4b5563; line-height: 1.7; }
     .count { color: #6b21a8; font-weight: 600; }
-    .sort-wrap { display: flex; gap: 8px; align-items: center; color: #374151; }
-    .sort-select { border: 1px solid #e5e7eb; border-radius: 10px; padding: 9px 12px; background: #fff; color: #111827; }
-    .back { display: inline-block; margin-bottom: 10px; background: #2563eb; color: #fff; text-decoration: none; border-radius: 10px; padding: 10px 14px; font-weight: 600; }
+    .back { display: inline-block; margin-bottom: 10px; background: #5b2ca5; color: #fff; text-decoration: none; border-radius: 10px; padding: 10px 14px; font-weight: 600; }
     .job-list { display: grid; gap: 14px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .job-card { background: #fff; border-radius: 16px; border: 1px solid #e5e7eb; box-shadow: 0 6px 18px rgba(0,0,0,0.06); padding: 20px; text-decoration: none; color: inherit; display: block; }
     .job-card:hover { border-color: #d0d7e2; }
     .job-card h3 { font-size: 30px; margin-bottom: 10px; color: #111827; }
     .meta { display: flex; gap: 10px; flex-wrap: wrap; color: #4b5563; font-size: 14px; }
-    .pill { background: #eef4ff; color: #2e5a89; border-radius: 999px; padding: 4px 10px; font-size: 12px; }
+    .pill { background: #f1ebff; color: #5b2ca5; border-radius: 999px; padding: 4px 10px; font-size: 12px; }
     .desc { margin-top: 12px; color: #4b5563; line-height: 1.6; font-size: 14px; }
+    .job-footer { margin-top: 14px; display: flex; justify-content: space-between; color: #6b7280; font-size: 13px; }
     .empty { background: #fff; border-radius: 16px; padding: 20px; color: #4b5563; }
     @media (max-width: 1000px) { .job-list { grid-template-columns: 1fr 1fr; } }
     @media (max-width: 680px) { .job-list { grid-template-columns: 1fr; } .hero h1 { font-size: 34px; } }
@@ -39,13 +38,6 @@
           <h1>Open Positions</h1>
           <p><span class="count" id="jobCount">0</span> positions available</p>
         </div>
-        <label class="sort-wrap">Sort by:
-          <select id="sortSelect" class="sort-select">
-            <option value="newest">Newest First</option>
-            <option value="oldest">Oldest First</option>
-            <option value="title">Title A-Z</option>
-          </select>
-        </label>
       </div>
     </section>
     <section class="job-list" id="jobList"></section>

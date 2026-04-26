@@ -1,5 +1,4 @@
-import {getBlogPost} from "./sanity.js";
-import {urlFor} from "./imageBuilder.js";
+import { getPublicBlogBySlug } from "./supabase.js";
 
 function escapeHtml(str) {
   return String(str ?? "")
@@ -17,99 +16,46 @@ function formatDate(iso) {
 }
 
 function getSlugFromPath() {
-  // Supports:
-  // - /blog/my-slug
-  // - /blog/my-slug.html
   const path = window.location.pathname || "";
   const parts = path.split("/").filter(Boolean);
+  if (!parts.length) return "";
+  if (parts[0] !== "blog") return "";
   const last = parts[parts.length - 1] || "";
-  if (!last) return "";
   return last.replace(/\.html$/i, "");
 }
 
-function renderPortableText(blocks) {
+function renderContentBlocks(blocks) {
   if (!Array.isArray(blocks)) return "";
+  return blocks
+    .map((block) => {
+      if (!block || !block.type) return "";
 
-  // Minimal, production-safe renderer for common Portable Text blocks:
-  // - block: p, h2, h3, blockquote
-  // - lists: bullet/number
-  // - image blocks
-  const out = [];
-  let listType = null; // "ul" | "ol"
-
-  const closeList = () => {
-    if (listType) out.push(`</${listType}>`);
-    listType = null;
-  };
-
-  const markWrap = (text, marks, markDefs) => {
-    if (!marks?.length) return text;
-    let wrapped = text;
-    marks.forEach((m) => {
-      if (m === "strong") wrapped = `<strong>${wrapped}</strong>`;
-      else if (m === "em") wrapped = `<em>${wrapped}</em>`;
-      else {
-        // link mark
-        const def = (markDefs || []).find((d) => d?._key === m && d?._type === "link");
-        if (def?.href) wrapped = `<a href="${escapeHtml(def.href)}" target="_blank" rel="noopener noreferrer">${wrapped}</a>`;
+      if (block.type === "heading") {
+        return `<h2>${escapeHtml(block.text || "")}</h2>`;
       }
-    });
-    return wrapped;
-  };
-
-  const renderSpans = (children, markDefs) => {
-    return (children || [])
-      .map((c) => {
-        if (c?._type !== "span") return "";
-        const text = escapeHtml(c.text || "");
-        return markWrap(text, c.marks, markDefs);
-      })
-      .join("");
-  };
-
-  for (const b of blocks) {
-    if (!b) continue;
-
-    if (b._type === "image") {
-      closeList();
-      const src = urlFor(b).width(1200).url();
-      if (src) out.push(`<figure class="pt-figure"><img src="${escapeHtml(src)}" alt="" loading="lazy" decoding="async"></figure>`);
-      continue;
-    }
-
-    if (b._type !== "block") {
-      closeList();
-      continue;
-    }
-
-    // Lists
-    if (b.listItem) {
-      const nextType = b.listItem === "number" ? "ol" : "ul";
-      if (listType && listType !== nextType) closeList();
-      if (!listType) {
-        listType = nextType;
-        out.push(`<${listType} class="pt-list">`);
+      if (block.type === "subheading") {
+        return `<h3>${escapeHtml(block.text || "")}</h3>`;
       }
-      out.push(`<li>${renderSpans(b.children, b.markDefs)}</li>`);
-      continue;
-    }
-
-    closeList();
-
-    const style = b.style || "normal";
-    const inner = renderSpans(b.children, b.markDefs);
-
-    if (!inner.trim()) continue;
-
-    if (style === "h1") out.push(`<h1>${inner}</h1>`);
-    else if (style === "h2") out.push(`<h2>${inner}</h2>`);
-    else if (style === "h3") out.push(`<h3>${inner}</h3>`);
-    else if (style === "blockquote") out.push(`<blockquote>${inner}</blockquote>`);
-    else out.push(`<p>${inner}</p>`);
-  }
-
-  closeList();
-  return out.join("\n");
+      if (block.type === "quote") {
+        return `<blockquote>${escapeHtml(block.text || "")}</blockquote>`;
+      }
+      if (block.type === "list") {
+        const items = Array.isArray(block.items) ? block.items : [];
+        if (!items.length) return "";
+        return `<ul class="pt-list">${items.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`;
+      }
+      if (block.type === "image") {
+        if (!block.url) return "";
+        return `
+          <figure class="pt-figure">
+            <img src="${escapeHtml(block.url)}" alt="${escapeHtml(block.caption || "Blog image")}" loading="lazy" decoding="async">
+            ${block.caption ? `<figcaption>${escapeHtml(block.caption)}</figcaption>` : ""}
+          </figure>
+        `;
+      }
+      return `<p>${escapeHtml(block.text || "")}</p>`;
+    })
+    .join("\n");
 }
 
 async function init() {
@@ -125,25 +71,25 @@ async function init() {
   root.innerHTML = `<div class="article-loading">Loading article...</div>`;
 
   try {
-    const post = await getBlogPost(slug);
+    const post = await getPublicBlogBySlug(slug);
     if (!post) {
       root.innerHTML = `<div class="article-empty">This article was not found.</div>`;
       return;
     }
 
-    const cover = post?.coverImage ? urlFor(post.coverImage).width(1400).url() : "";
+    const cover = post?.cover_image_url || "";
 
     root.innerHTML = `
-      <a class="article-back" href="/blog.html">&larr; Back</a>
+      <a class="article-back" href="/blogs.html">&larr; Back</a>
       <article class="article">
         <header class="article-header">
-          <div class="article-meta">${escapeHtml(formatDate(post?._createdAt))}</div>
+          <div class="article-meta">${escapeHtml(formatDate(post?.published_at || post?.created_at))}</div>
           <h1 class="article-title">${escapeHtml(post?.title || "")}</h1>
           ${post?.excerpt ? `<p class="article-excerpt">${escapeHtml(post.excerpt)}</p>` : ""}
         </header>
         ${cover ? `<img class="article-cover" src="${escapeHtml(cover)}" alt="${escapeHtml(post?.title || "Article")}" decoding="async">` : ""}
         <div class="article-body">
-          ${renderPortableText(post?.content)}
+          ${renderContentBlocks(post?.content)}
         </div>
       </article>
     `;
