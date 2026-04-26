@@ -71,6 +71,27 @@ function buildLogoUrl() {
   return "Hocan%20Logo.png";
 }
 
+function baseUrl() {
+  let base = env("URL", env("DEPLOY_PRIME_URL", "")).replace(/\/$/, "");
+  if (base && !base.startsWith("http")) base = `https://${base}`;
+  return base;
+}
+
+function b64urlEncode(str) {
+  return Buffer.from(str, "utf8")
+    .toString("base64")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/g, "");
+}
+
+function unsubscribeToken(email) {
+  const secret = required("NEWSLETTER_UNSUBSCRIBE_SECRET");
+  const ts = String(Date.now());
+  const sig = require("crypto").createHmac("sha256", secret).update(`${email}|${ts}`).digest("hex");
+  return b64urlEncode(JSON.stringify({ email, ts, sig }));
+}
+
 exports.handler = async function handler(event) {
   if (event.httpMethod !== "POST") {
     return json(405, { ok: false, error: "Method not allowed" });
@@ -98,7 +119,7 @@ exports.handler = async function handler(event) {
     }
 
     const listRes = await fetch(
-      supabase(`newsletter_subscribers?select=email,first_name,last_name&order=created_at.desc&limit=${remaining}`),
+      supabase(`newsletter_subscribers?select=email,first_name,last_name,unsubscribed_at&unsubscribed_at=is.null&order=created_at.desc&limit=${remaining}`),
       { headers: supabaseHeaders() }
     );
     if (!listRes.ok) {
@@ -130,25 +151,27 @@ exports.handler = async function handler(event) {
         <div style="white-space:normal;">${messageHtml}</div>
         <div style="margin-top:18px;color:#6b7280;font-size:12px;border-top:1px solid #f1f5f9;padding-top:12px;">
           You received this email because you subscribed to Hocan Holdings updates.
+          ${site ? `<br><a href="${site}/unsubscribe.html?token=__TOKEN__" style="color:#475569;">Unsubscribe</a>` : ""}
         </div>
       </div>
     `;
 
     const apiKey = required("BREVO_API_KEY");
-    const baseUrl = env("URL", env("DEPLOY_PRIME_URL", "")).replace(/\/$/, "");
-    const unsubscribeUrl = baseUrl ? `${baseUrl}/#unsubscribe` : "";
+    const site = baseUrl();
 
     // Send individually (better deliverability than BCC blasting)
     const sendOne = async (recipient) => {
+      const unsubUrl = site ? `${site}/unsubscribe.html?token=${unsubscribeToken(recipient.email)}` : "";
+      const renderedHtml = html.replace("__TOKEN__", encodeURIComponent(unsubscribeToken(recipient.email)));
       const payload = {
         sender: { email: senderEmail, name: senderName },
         to: [{ email: recipient.email, name: `${recipient.first_name || ""} ${recipient.last_name || ""}`.trim() || recipient.email }],
         subject,
-        htmlContent: html,
+        htmlContent: renderedHtml,
         textContent: message,
-        headers: unsubscribeUrl
+        headers: unsubUrl
           ? {
-              "List-Unsubscribe": `<${unsubscribeUrl}>`,
+              "List-Unsubscribe": `<${unsubUrl}>`,
               "List-Unsubscribe-Post": "List-Unsubscribe=One-Click"
             }
           : undefined
@@ -166,7 +189,7 @@ exports.handler = async function handler(event) {
     };
 
     // Simple concurrency limit
-    const concurrency = 5;
+    const concurrency = 3;
     let idx = 0;
     let sentCount = 0;
     const workers = new Array(concurrency).fill(0).map(async () => {

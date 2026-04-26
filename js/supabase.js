@@ -154,25 +154,23 @@ export async function getPublicBlogBySlug(slug) {
 
 export async function getPublicJobs() {
   console.log("FETCHING JOBS FROM SUPABASE");
-  const build = async () =>
-    (await jobQuery())
+  try {
+    const query = await jobQuery();
+    const { data, error } = await query
+      .select("id,title,slug,location,job_type,industry,description,experience,salary,posted_at,created_at,is_active")
       .eq("is_active", true)
       .order("posted_at", { ascending: false, nullsFirst: false })
       .order("created_at", { ascending: false });
-
-  try {
-    const q1 = await build();
-    const { data, error } = await q1.select(
-      "id,title,slug,location,job_type,industry,description,experience,salary,posted_at,created_at,is_active"
-    );
     if (error) throw error;
     return (data || []).map(normalizeJob);
   } catch (err) {
     console.log("Supabase error:", err);
-    const q2 = await build();
-    const { data, error } = await q2.select(
-      "id,title,slug,location,job_type,industry,description,posted_at,created_at,is_active"
-    );
+    const query = await jobQuery();
+    const { data, error } = await query
+      .select("id,title,slug,location,job_type,industry,description,posted_at,created_at,is_active")
+      .eq("is_active", true)
+      .order("posted_at", { ascending: false, nullsFirst: false })
+      .order("created_at", { ascending: false });
     if (error) throw error;
     return (data || []).map(normalizeJob);
   }

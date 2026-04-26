@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Unsubscribe - Hocan Holdings</title>
+  <link rel="icon" type="image/png" href="Hocan%20Logo.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:Inter,sans-serif;background:#f4f6f8;color:#111827}
+    .wrap{width:min(720px,92%);margin:48px auto;background:#fff;border:1px solid #e5e7eb;border-radius:18px;box-shadow:0 16px 40px rgba(0,0,0,.08);padding:28px}
+    .logo{height:54px;margin-bottom:16px}
+    h1{font-size:28px;margin-bottom:10px}
+    p{color:#4b5563;line-height:1.7;margin-bottom:14px}
+    .btn{background:#1a1a2e;color:#fff;border:none;border-radius:12px;padding:12px 16px;font-weight:700;cursor:pointer}
+    .status{margin-top:12px;min-height:20px;color:#1a1a2e}
+    .muted{font-size:13px;color:#6b7280}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <img class="logo" src="assets/logo.png" alt="Hocan Holdings">
+    <h1>Unsubscribe</h1>
+    <p>If you no longer want to receive emails from Hocan Holdings, you can unsubscribe here.</p>
+    <button class="btn" id="unsubBtn">Unsubscribe</button>
+    <div class="status" id="status"></div>
+    <p class="muted">You can subscribe again anytime from our website.</p>
+  </main>
+
+  <script>
+    const statusEl = document.getElementById('status');
+    const token = new URLSearchParams(location.search).get('token') || '';
+
+    document.getElementById('unsubBtn').addEventListener('click', async () => {
+      if (!token) {
+        statusEl.textContent = 'Invalid unsubscribe link.';
+        return;
+      }
+      statusEl.textContent = 'Processing...';
+      try {
+        const res = await fetch('/.netlify/functions/newsletter-unsubscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token })
+        });
+        const body = await res.json();
+        if (!res.ok || !body.ok) {
+          statusEl.textContent = body.error || 'Unable to unsubscribe right now.';
+          return;
+        }
+        statusEl.textContent = 'You have been unsubscribed successfully.';
+        document.getElementById('unsubBtn').disabled = true;
+      } catch (e) {
+        statusEl.textContent = 'Unable to unsubscribe right now.';
+      }
+    });
+  </script>
+</body>
+</html>
+
