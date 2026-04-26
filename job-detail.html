@@ -39,6 +39,7 @@
     .apply-field { display: flex; flex-direction: column; gap: 6px; }
     .apply-field label { font-size: 12px; text-transform: uppercase; color: #64748b; font-weight: 700; letter-spacing: .4px; }
     .apply-field input, .apply-field select, .apply-field textarea { border: 1px solid #dbe2ea; border-radius: 10px; padding: 11px 12px; font: inherit; color: #0f172a; }
+    .phone-row { display: grid; grid-template-columns: 140px 1fr; gap: 10px; }
     .apply-field textarea { min-height: 84px; resize: vertical; }
     .span-2 { grid-column: 1 / -1; }
     .exp-grid { display: grid; gap: 8px; }
@@ -67,7 +68,7 @@
       100% { transform: translateY(105vh) rotate(620deg); opacity: 0; }
     }
     @media (max-width: 900px) { .content { grid-template-columns: 1fr; } }
-    @media (max-width: 760px) { .apply-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 760px) { .apply-grid { grid-template-columns: 1fr; } .phone-row { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -94,7 +95,13 @@
           <div class="apply-field"><label for="firstName">First Name *</label><input id="firstName" required></div>
           <div class="apply-field"><label for="lastName">Last Name *</label><input id="lastName" required></div>
           <div class="apply-field"><label for="email">Email *</label><input id="email" type="email" required></div>
-          <div class="apply-field"><label for="phone">Phone Number *</label><input id="phone" type="tel" required></div>
+          <div class="apply-field">
+            <label for="phoneNumber">Phone Number *</label>
+            <div class="phone-row">
+              <input id="countryCode" type="text" inputmode="numeric" placeholder="e.g. 250" required>
+              <input id="phoneNumber" type="tel" placeholder="e.g. 0724535739" required>
+            </div>
+          </div>
           <div class="apply-field"><label for="city">City *</label><input id="city" required></div>
           <div class="apply-field"><label for="country">Country *</label><input id="country" required></div>
           <div class="apply-field span-2">
@@ -200,6 +207,13 @@
       }, 2600);
     }
 
+    function normalizePhone(countryCode, localNumber) {
+      const cleanCode = String(countryCode || "").replace(/\D/g, "");
+      const cleanLocal = String(localNumber || "").replace(/\D/g, "").replace(/^0+/, "");
+      if (!cleanCode || !cleanLocal) return "";
+      return `${cleanCode}${cleanLocal}`;
+    }
+
     function shareLinks(title) {
       const url = encodeURIComponent(window.location.href);
       const text = encodeURIComponent(title || "Hocan Job Opening");
@@ -230,7 +244,6 @@
           </div>
           <div class="hero-actions">
             <a href="${links.facebook}" target="_blank" rel="noopener noreferrer">Facebook</a>
-            <a href="${links.x}" target="_blank" rel="noopener noreferrer">X</a>
             <a href="${links.linkedin}" target="_blank" rel="noopener noreferrer">LinkedIn</a>
             <a href="${links.whatsapp}" target="_blank" rel="noopener noreferrer">WhatsApp</a>
             <button type="button" id="copyJobLinkBtn">Copy Link</button>
@@ -320,9 +333,18 @@
           applyFormMsg.textContent = "";
           applyFormMsg.className = "form-msg";
 
+          const countryCode = document.getElementById("countryCode").value.trim();
+          const localPhone = document.getElementById("phoneNumber").value.trim();
+          const phone = normalizePhone(countryCode, localPhone);
           const resumeUrl = document.getElementById("resumeUrl").value.trim();
           const coverLetterUrl = document.getElementById("coverLetterUrl").value.trim();
           const linkedinUrl = document.getElementById("linkedinUrl").value.trim();
+
+          if (!phone) {
+            applyFormMsg.textContent = "Please enter a valid country code and phone number.";
+            applyFormMsg.classList.add("error");
+            return;
+          }
 
           if (!isValidHttpUrl(resumeUrl) || !isValidHttpUrl(coverLetterUrl)) {
             applyFormMsg.textContent = "Please provide valid public URLs for resume and cover letter.";
@@ -352,7 +374,7 @@
               first_name: document.getElementById("firstName").value.trim(),
               last_name: document.getElementById("lastName").value.trim(),
               email: document.getElementById("email").value.trim(),
-              phone: document.getElementById("phone").value.trim(),
+              phone,
               city: document.getElementById("city").value.trim(),
               country: document.getElementById("country").value.trim(),
               previous_experience: previousExperience,

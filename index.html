@@ -183,6 +183,10 @@
       width: 16px;
       height: 16px;
     }
+    .topbar-socials a[aria-label="Instagram"],
+    .topbar-socials a[aria-label="YouTube"] {
+      display: none;
+    }
 
     .navbar--hidden {
       position: absolute;
@@ -1046,7 +1050,10 @@
             <p>
               Building the infrastructure behind East Africa's fastest growing businesses. Since 2015, Hocan Holdings has supported companies across Kenya and the region with logistics and consulting solutions designed for scale.
             </p>
-            <a href="success-stories.html" class="btn">Explore our work</a>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;">
+              <a href="success-stories.html" class="btn">Explore our work</a>
+              <a href="jobs.html" class="btn">Find a Job</a>
+            </div>
           </div>
           <div class="hero-image">
             <img src="image%206.png" alt="Hocan Holdings office and facility" />

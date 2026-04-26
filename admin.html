@@ -289,6 +289,13 @@ tr:hover td{background:#FAFBFD;}
           <thead><tr><th>Candidate</th><th>Contact</th><th>Location</th><th>Education</th><th>Submitted</th><th>Links</th></tr></thead>
           <tbody id="applicationDetailTable"></tbody>
         </table>
+        <div style="margin-top:12px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
+          <span id="applicationDetailRange" style="font-size:13px;color:var(--muted);">Showing 0-0</span>
+          <div style="display:flex;gap:8px;">
+            <button class="btn-edit" id="applicationPrevBtn">Previous</button>
+            <button class="btn-edit" id="applicationNextBtn">Next</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -609,6 +616,8 @@ const newsletterPerPage=10;
 let newsletterTotal=0;
 let applications=[];
 let selectedApplicationRole=null;
+let applicationDetailPage=1;
+const applicationDetailPerPage=10;
 let newsletterPoller=null;
 let editingBlogId=null;
 let editingJobId=null;
@@ -801,22 +810,41 @@ function renderApplicationDetails(role){
   const title=document.getElementById('applicationDetailTitle');
   const note=document.getElementById('applicationDetailNote');
   const tbody=document.getElementById('applicationDetailTable');
+  const rangeEl=document.getElementById('applicationDetailRange');
+  const prevBtn=document.getElementById('applicationPrevBtn');
+  const nextBtn=document.getElementById('applicationNextBtn');
   if(!role){
     title.textContent='Select a job role to view applications';
     note.textContent='Applications are shown per role, newest first.';
     tbody.innerHTML='<tr class="empty-row"><td colspan="6">Choose a role above to inspect candidate applications.</td></tr>';
+    rangeEl.textContent='Showing 0-0';
+    prevBtn.disabled=true;
+    nextBtn.disabled=true;
     return;
   }
-  const list=applications
+  const allForRole=applications
     .filter(app=>(String(app.job_title||'Unassigned role').trim()||'Unassigned role')===role)
     .sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));
-  title.textContent=`${role} — ${list.length} application${list.length===1?'':'s'}`;
+  title.textContent=`${role} — ${allForRole.length} application${allForRole.length===1?'':'s'}`;
   note.textContent='Click links to review LinkedIn, resume, and cover letter.';
-  if(!list.length){
+  if(!allForRole.length){
     tbody.innerHTML='<tr class="empty-row"><td colspan="6">No applications for this role yet.</td></tr>';
+    rangeEl.textContent='Showing 0-0';
+    prevBtn.disabled=true;
+    nextBtn.disabled=true;
     return;
   }
-  tbody.innerHTML=list.map(app=>{
+  const total=allForRole.length;
+  const maxPage=Math.max(1,Math.ceil(total/applicationDetailPerPage));
+  applicationDetailPage=Math.min(Math.max(applicationDetailPage,1),maxPage);
+  const start=(applicationDetailPage-1)*applicationDetailPerPage;
+  const pagedList=allForRole.slice(start,start+applicationDetailPerPage);
+  const end=Math.min(start+pagedList.length,total);
+  rangeEl.textContent=`Showing ${start+1}-${end} of ${total}`;
+  prevBtn.disabled=applicationDetailPage<=1;
+  nextBtn.disabled=applicationDetailPage>=maxPage;
+
+  tbody.innerHTML=pagedList.map(app=>{
     const experiences=Array.isArray(app.previous_experience)?app.previous_experience.filter(Boolean):[];
     const fullName=`${app.first_name||''} ${app.last_name||''}`.trim()||'Unnamed candidate';
     const contact=[app.email,app.phone].filter(Boolean).join(' | ')||'—';
@@ -845,6 +873,16 @@ document.getElementById('jobSearch').addEventListener('input',e=>{
 });
 document.getElementById('applicationRoleSearch').addEventListener('input',renderApplicationGroups);
 document.getElementById('applicationSort').addEventListener('change',renderApplicationGroups);
+document.getElementById('applicationPrevBtn').addEventListener('click',()=>{
+  if(applicationDetailPage<=1)return;
+  applicationDetailPage-=1;
+  renderApplicationDetails(selectedApplicationRole);
+});
+document.getElementById('applicationNextBtn').addEventListener('click',()=>{
+  if(!selectedApplicationRole)return;
+  applicationDetailPage+=1;
+  renderApplicationDetails(selectedApplicationRole);
+});
 
 // ── OVERVIEW ──────────────────────────────────────────────────────────────────
 
@@ -868,6 +906,7 @@ document.addEventListener('click',async e=>{
   const viewRoleBtn=e.target.closest('[data-view-role]');
   if(viewRoleBtn){
     selectedApplicationRole=decodeURIComponent(viewRoleBtn.dataset.viewRole||'');
+    applicationDetailPage=1;
     renderApplicationDetails(selectedApplicationRole);
     return;
   }

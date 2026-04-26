@@ -18,6 +18,8 @@
     .topbar-socials { display: flex; gap: 12px; }
     .topbar-socials a { color: #666; display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; text-decoration: none; }
     .topbar-socials svg { width: 16px; height: 16px; }
+    .topbar-socials a[aria-label="Instagram"],
+    .topbar-socials a[aria-label="YouTube"] { display: none; }
     .navbar { margin-top: 10px; padding: 18px 24px; }
     .nav-inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
     .logo img { height: 102px; display: block; }
@@ -141,7 +143,6 @@
           <p>Your trusted partner for workforce solutions, talent growth, and practical HR support.</p>
           <div class="cta-row">
             <button class="btn" type="button" data-contact-type="schedule">Schedule a Call</button>
-            <a class="btn" href="jobs.html">Find a Job</a>
           </div>
         </div>
         <div class="hero-image">
