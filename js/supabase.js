@@ -303,16 +303,17 @@ export async function adminSaveJob(payload, id = null) {
 
 export async function adminDeleteJob(id) {
   const query = await jobQuery();
-  const appQuery = await applicationQuery();
   const { data: jobRow } = await query
     .select("id,slug,title")
     .eq("id", id)
     .maybeSingle();
 
-  if (jobRow?.id || jobRow?.slug) {
+  if (jobRow?.id || jobRow?.slug || jobRow?.title) {
+    const appQuery = await applicationQuery();
     const clauses = [];
     if (jobRow.id) clauses.push(`job_id.eq.${jobRow.id}`);
     if (jobRow.slug) clauses.push(`job_slug.eq.${jobRow.slug}`);
+    if (jobRow.title) clauses.push(`job_title.eq.${jobRow.title}`);
     if (clauses.length) {
       const { error: appDeleteError } = await appQuery
         .delete()
@@ -324,6 +325,20 @@ export async function adminDeleteJob(id) {
   const { error } = await query.delete().eq("id", id);
   if (error) throw error;
   return true;
+}
+
+export async function adminDeleteApplicationsByJobTitles(titles = []) {
+  const cleanTitles = Array.isArray(titles)
+    ? [...new Set(titles.map((t) => String(t || "").trim()).filter(Boolean))]
+    : [];
+  if (!cleanTitles.length) return 0;
+
+  const query = await applicationQuery();
+  const { error } = await query
+    .delete()
+    .in("job_title", cleanTitles);
+  if (error) throw error;
+  return cleanTitles.length;
 }
 
 export async function submitJobApplication(payload) {

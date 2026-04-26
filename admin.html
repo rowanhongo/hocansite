@@ -521,7 +521,7 @@ tr:hover td{background:#FAFBFD;}
 <script type="module">
 import {
   adminGetBlogs, adminGetBlog, adminSaveBlog, adminDeleteBlog,
-  adminGetJobs, adminGetJob, adminSaveJob, adminDeleteJob, adminGetApplications, getRuntimeConfig
+  adminGetJobs, adminGetJob, adminSaveJob, adminDeleteJob, adminGetApplications, adminDeleteApplicationsByJobTitles, getRuntimeConfig
 } from './js/supabase.js';
 import { uploadToCloudinary } from './js/cloudinary.js';
 
@@ -626,7 +626,8 @@ let cbBlocks=[];
 // ── INIT ──────────────────────────────────────────────────────────────────────
 
 async function init(){
-  await Promise.all([loadBlogs(),loadJobs(),loadNewsletter(),loadApplications()]);
+  await Promise.all([loadBlogs(),loadJobs(),loadNewsletter()]);
+  await loadApplications();
   renderOverview();
   if(!newsletterPoller){
     newsletterPoller=setInterval(loadNewsletter,15000);
@@ -753,6 +754,25 @@ function renderJobTable(data){
 async function loadApplications(){
   try{
     applications=await adminGetApplications()||[];
+    const liveTitles=new Set((jobs||[]).map(j=>String(j.title||'').trim().toLowerCase()).filter(Boolean));
+    const orphanTitles=[...new Set(
+      applications
+        .map(app=>String(app.job_title||'').trim())
+        .filter(Boolean)
+        .filter(title=>!liveTitles.has(title.toLowerCase()))
+    )];
+
+    if(orphanTitles.length){
+      try{
+        await adminDeleteApplicationsByJobTitles(orphanTitles);
+        applications=await adminGetApplications()||[];
+        showToast(`Removed ${orphanTitles.length} deleted job application group(s).`);
+      }catch(_cleanupErr){
+        // Keep rendering, but surface likely RLS/policy issue.
+        showToast('Could not auto-clean old applications. Update application DELETE policy in SQL.','error');
+      }
+    }
+
     renderApplicationGroups();
     renderApplicationDetails(selectedApplicationRole);
   }catch(err){
