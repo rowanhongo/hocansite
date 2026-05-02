@@ -5,6 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Job Detail - Hocan Holdings</title>
   <link rel="icon" type="image/png" href="Hocan%20Logo.png">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Hocan Holdings">
+  <meta property="og:image" content="https://hocanholdings.co.ke/Hocan%20Logo.png">
+  <meta property="og:image:width" content="400">
+  <meta property="og:image:height" content="400">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:image" content="https://hocanholdings.co.ke/Hocan%20Logo.png">
+  <meta property="og:title" id="ogTitle" content="Job Opening — Hocan Holdings">
+  <meta property="og:description" id="ogDescription" content="Browse open roles at Hocan Holdings.">
+  <meta property="og:url" id="ogUrl" content="">
+  <meta name="twitter:title" id="twitterTitle" content="Job Opening — Hocan Holdings">
+  <meta name="twitter:description" id="twitterDescription" content="Browse open roles at Hocan Holdings.">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -216,14 +228,18 @@
       return `${cleanCode}${cleanLocal}`;
     }
 
-    function shareLinks(title) {
-      const url = encodeURIComponent(window.location.href);
-      const text = encodeURIComponent(title || "Hocan Job Opening");
+    function shareLinks(title, location, description) {
+      const url = window.location.href;
+      const encodedUrl = encodeURIComponent(url);
+      const snippet = (description || '').slice(0, 60).trim();
+      const shareText = `Check out this job on hocanholdings.co.ke and apply now!\n\n${title || 'Open Role'}${location ? ' — ' + location : ''}\n${snippet}...\n\n${url}`;
+      const encodedText = encodeURIComponent(shareText);
+      const encodedTitle = encodeURIComponent(title || 'Job Opening at Hocan Holdings');
       return {
-        facebook: `https://www.facebook.com/sharer/sharer.php?u=${url}`,
-        x: `https://twitter.com/intent/tweet?url=${url}&text=${text}`,
-        linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${url}`,
-        whatsapp: `https://wa.me/?text=${text}%20${url}`
+        facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
+        x: `https://twitter.com/intent/tweet?text=${encodedText}`,
+        linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`,
+        whatsapp: `https://wa.me/?text=${encodedText}`
       };
     }
 
@@ -234,7 +250,16 @@
         const job = await getPublicJobBySlug(slug);
         if (!job) return renderMissing();
 
-        const links = shareLinks(job.title);
+        const snippet = (job.description || '').slice(0, 60).trim();
+        const ogDesc = `${job.title || 'Open Role'}${job.location ? ' — ' + job.location : ''}. ${snippet}... Apply now at hocanholdings.co.ke`;
+        document.getElementById('ogTitle').setAttribute('content', `${job.title || 'Open Role'} — Hocan Holdings`);
+        document.getElementById('ogDescription').setAttribute('content', ogDesc);
+        document.getElementById('ogUrl').setAttribute('content', window.location.href);
+        document.getElementById('twitterTitle').setAttribute('content', `${job.title || 'Open Role'} — Hocan Holdings`);
+        document.getElementById('twitterDescription').setAttribute('content', ogDesc);
+        document.title = `${job.title || 'Open Role'} — Hocan Holdings`;
+
+        const links = shareLinks(job.title, job.location, job.description);
         document.getElementById("jobHero").innerHTML = `
           <h1>${esc(job.title || "Open Role")}</h1>
           <div class="meta">
@@ -285,7 +310,9 @@
         const copyBtn = document.getElementById("copyJobLinkBtn");
         copyBtn?.addEventListener("click", async () => {
           try {
-            await navigator.clipboard.writeText(window.location.href);
+            const snippet = (job.description || '').slice(0, 60).trim();
+            const shareText = `Check out this job on hocanholdings.co.ke and apply now!\n\n${job.title || 'Open Role'}${job.location ? ' — ' + job.location : ''}\n${snippet}...\n\n${window.location.href}`;
+            await navigator.clipboard.writeText(shareText);
             copyBtn.textContent = "Copied";
             setTimeout(() => {
               copyBtn.textContent = "Copy Link";
