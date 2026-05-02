@@ -232,7 +232,7 @@
       const url = window.location.href;
       const encodedUrl = encodeURIComponent(url);
       const snippet = (description || '').slice(0, 60).trim();
-      const shareText = `Check out this job on hocanholdings.co.ke and apply now!\n\n${title || 'Open Role'}${location ? ' — ' + location : ''}\n${snippet}...\n\n${url}`;
+      const shareText = `Check out this job at Hocan Holdings and apply now!\n\n${title || 'Open Role'}${location ? ' — ' + location : ''}\n${snippet}...\n\n${url}`;
       const encodedText = encodeURIComponent(shareText);
       const encodedTitle = encodeURIComponent(title || 'Job Opening at Hocan Holdings');
       return {
@@ -251,7 +251,7 @@
         if (!job) return renderMissing();
 
         const snippet = (job.description || '').slice(0, 60).trim();
-        const ogDesc = `${job.title || 'Open Role'}${job.location ? ' — ' + job.location : ''}. ${snippet}... Apply now at hocanholdings.co.ke`;
+        const ogDesc = `${job.title || 'Open Role'}${job.location ? ' — ' + job.location : ''}. ${snippet}... Apply now at Hocan Holdings`;
         document.getElementById('ogTitle').setAttribute('content', `${job.title || 'Open Role'} — Hocan Holdings`);
         document.getElementById('ogDescription').setAttribute('content', ogDesc);
         document.getElementById('ogUrl').setAttribute('content', window.location.href);
@@ -311,7 +311,7 @@
         copyBtn?.addEventListener("click", async () => {
           try {
             const snippet = (job.description || '').slice(0, 60).trim();
-            const shareText = `Check out this job on hocanholdings.co.ke and apply now!\n\n${job.title || 'Open Role'}${job.location ? ' — ' + job.location : ''}\n${snippet}...\n\n${window.location.href}`;
+            const shareText = `Check out this job at Hocan Holdings and apply now!\n\n${job.title || 'Open Role'}${job.location ? ' — ' + job.location : ''}\n${snippet}...\n\n${window.location.href}`;
             await navigator.clipboard.writeText(shareText);
             copyBtn.textContent = "Copied";
             setTimeout(() => {
