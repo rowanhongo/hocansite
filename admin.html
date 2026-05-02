@@ -836,7 +836,7 @@ function renderApplicationDetails(role){
     .filter(app=>(String(app.job_title||'Unassigned role').trim()||'Unassigned role')===role)
     .sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));
   title.textContent=`${role} — ${allForRole.length} application${allForRole.length===1?'':'s'}`;
-  note.textContent='Click links to review LinkedIn, resume, and cover letter.';
+  note.textContent='Click "View CV" to review candidate resumes.';
   if(!allForRole.length){
     tbody.innerHTML='<tr class="empty-row"><td colspan="7">No applications for this role yet.</td></tr>';
     rangeEl.textContent='Showing 0-0';
@@ -860,9 +860,7 @@ function renderApplicationDetails(role){
     const contact=[app.email,app.phone].filter(Boolean).join(' | ')||'—';
     const location=[app.city,app.country].filter(Boolean).join(', ')||'—';
     const education=[app.education_level,app.education_details].filter(Boolean).join(' — ')||'—';
-    const linkedIn=app.linkedin_url?`<a class="app-link" href="${esc(app.linkedin_url)}" target="_blank" rel="noopener noreferrer">LinkedIn</a>`:'—';
-    const resume=app.resume_url?`<a class="app-link" href="${esc(app.resume_url)}" target="_blank" rel="noopener noreferrer">Resume</a>`:'—';
-    const cover=app.cover_letter_url?`<a class="app-link" href="${esc(app.cover_letter_url)}" target="_blank" rel="noopener noreferrer">Cover Letter</a>`:'—';
+    const cvButton=app.cv_url?`<a class="btn-view" href="${esc(app.cv_url)}" target="_blank" rel="noopener noreferrer">View CV</a>`:'—';
     const expText=experiences.length?`<div class="app-inline-note">Experience: ${esc(experiences.join(' | '))}</div>`:'';
     return `
       <tr>
@@ -871,7 +869,7 @@ function renderApplicationDetails(role){
         <td>${esc(location)}</td>
         <td>${esc(education)}</td>
         <td>${fmt(app.created_at)}</td>
-        <td style="display:flex;gap:8px;flex-wrap:wrap;">${linkedIn}${resume}${cover}</td>
+        <td>${cvButton}</td>
         <td><button class="btn-delete" data-delete-application="${esc(app.id)}">Delete</button></td>
       </tr>
     `;

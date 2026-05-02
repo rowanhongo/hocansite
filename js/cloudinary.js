@@ -13,7 +13,20 @@ export async function uploadToCloudinary(file, options = {}) {
     throw new Error("Cloudinary is not configured. Check Netlify env vars.");
   }
 
-  const endpoint = `https://api.cloudinary.com/v1_1/${encodeURIComponent(cloudName)}/image/upload`;
+  // Determine resource type based on file extension
+  const fileName = file.name.toLowerCase();
+  const isPdf = fileName.endsWith('.pdf');
+  const isDocx = fileName.endsWith('.docx');
+  const isImage = fileName.match(/\.(jpg|jpeg|png)$/i);
+
+  if (!isPdf && !isDocx && !isImage) {
+    throw new Error("Invalid file type. Please upload a PDF, DOCX, or image file.");
+  }
+
+  // Use 'raw' for PDF/DOCX, 'image' for images
+  const resourceType = isPdf || isDocx ? 'raw' : 'image';
+  const endpoint = `https://api.cloudinary.com/v1_1/${encodeURIComponent(cloudName)}/${resourceType}/upload`;
+
   const form = new FormData();
   form.append("file", file);
   form.append("upload_preset", uploadPreset);
@@ -43,13 +56,15 @@ export async function uploadToCloudinary(file, options = {}) {
       resolve({
         url: body.secure_url,
         publicId: body.public_id,
+        originalFilename: body.original_filename || file.name,
         width: body.width,
         height: body.height,
-        format: body.format
+        format: body.format,
+        resourceType: body.resource_type
       });
     };
 
-    xhr.onerror = () => reject(new Error("Network error while uploading image"));
+    xhr.onerror = () => reject(new Error("Network error while uploading file"));
     xhr.send(form);
   });
 }
