@@ -524,9 +524,8 @@ tr:hover td{background:#FAFBFD;}
 <script type="module">
 import {
   adminGetBlogs, adminGetBlog, adminSaveBlog, adminDeleteBlog,
-  adminGetJobs, adminGetJob, adminSaveJob, adminDeleteJob, adminGetApplications, adminDeleteApplication, adminDeleteApplicationsByJobTitle, getRuntimeConfig
+  adminGetJobs, adminGetJob, adminSaveJob, adminDeleteJob, adminGetApplications, adminDeleteApplication, adminDeleteApplicationsByJobTitle, getRuntimeConfig, deleteCvFromSupabase
 } from './js/supabase.js';
-import { uploadToCloudinary } from './js/cloudinary.js';
 
 // ── HELPERS ──────────────────────────────────────────────────────────────────
 
@@ -860,7 +859,12 @@ function renderApplicationDetails(role){
     const contact=[app.email,app.phone].filter(Boolean).join(' | ')||'—';
     const location=[app.city,app.country].filter(Boolean).join(', ')||'—';
     const education=[app.education_level,app.education_details].filter(Boolean).join(' — ')||'—';
-    const cvButton=app.cv_url?`<button class="btn-view" data-download-cv="${esc(app.cv_url)}" data-download-filename="${esc(app.cv_filename||'CV')}" data-download-name="${esc(fullName)}" data-download-job="${esc(app.job_title||'Job')}" data-download-date="${esc(app.created_at||'')}">Download CV</button>`:'—';
+    const cvButton = app.cv_url
+      ? `<div style="display:flex;gap:6px;">
+           <button class="btn-view" data-open-cv="${esc(app.cv_url)}">View CV</button>
+           <button class="btn-edit" data-download-cv="${esc(app.cv_url)}" data-download-filename="${esc(app.cv_filename||'CV')}" data-download-name="${esc(fullName)}" data-download-job="${esc(app.job_title||'Job')}" data-download-date="${esc(app.created_at||'')}">Download</button>
+         </div>`
+      : '—';
     const expText=experiences.length?`<div class="app-inline-note">Experience: ${esc(experiences.join(' | '))}</div>`:'';
     return `
       <tr>
@@ -942,20 +946,16 @@ document.addEventListener('click',async e=>{
   const deleteApplicationBtn=e.target.closest('[data-delete-application]');
   if(deleteApplicationBtn){
     const appId=deleteApplicationBtn.dataset.deleteApplication;
-    const publicId=deleteApplicationBtn.dataset.deletePublicId;
+    const cvPath=deleteApplicationBtn.dataset.deletePublicId;
     if(!appId)return;
     if(!confirm('Delete this application? This cannot be undone.'))return;
     try{
       await adminDeleteApplication(appId);
-      if(publicId){
+      if(cvPath){
         try{
-          await fetch('/.netlify/functions/cloudinary-delete',{
-            method:'POST',
-            headers:{'Content-Type':'application/json'},
-            body:JSON.stringify({publicId,resourceType:'raw'})
-          });
+          await deleteCvFromSupabase(cvPath);
         }catch(deleteErr){
-          console.error('Failed to delete from Cloudinary:',deleteErr);
+          console.error('Failed to delete CV from Supabase:',deleteErr);
         }
       }
       await loadApplications();
@@ -966,41 +966,31 @@ document.addEventListener('click',async e=>{
     }
     return;
   }
-  const downloadCvBtn=e.target.closest('[data-download-cv]');
-  if(downloadCvBtn){
-    const url=downloadCvBtn.dataset.downloadCv;
-    const originalFilename=downloadCvBtn.dataset.downloadFilename;
-    const applicantName=downloadCvBtn.dataset.downloadName;
-    const jobTitle=downloadCvBtn.dataset.downloadJob;
-    const dateStr=downloadCvBtn.dataset.downloadDate;
-    if(!url)return;
-    const date=dateStr?new Date(dateStr).toISOString().split('T')[0]:'';
-    const ext=originalFilename.split('.').pop()||'pdf';
-    const cleanName=applicantName.replace(/[^a-zA-Z0-9]/g,'_');
-    const cleanJob=jobTitle.replace(/[^a-zA-Z0-9]/g,'_');
-    const downloadFilename=`${cleanName}_${cleanJob}_${date}.${ext}`;
-    const originalText=downloadCvBtn.textContent;
-    downloadCvBtn.textContent='Downloading...';
-    downloadCvBtn.disabled=true;
-    try{
-      const proxyUrl=`/.netlify/functions/download-cv?url=${encodeURIComponent(url)}&filename=${encodeURIComponent(downloadFilename)}`;
-      const response=await fetch(proxyUrl);
-      if(!response.ok)throw new Error('Failed to fetch file');
-      const blob=await response.blob();
-      const blobUrl=URL.createObjectURL(blob);
-      const link=document.createElement('a');
-      link.href=blobUrl;
-      link.download=downloadFilename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      setTimeout(()=>URL.revokeObjectURL(blobUrl),10000);
-    }catch(err){
-      window.open(url,'_blank');
-    }finally{
-      downloadCvBtn.textContent=originalText;
-      downloadCvBtn.disabled=false;
-    }
+  const openCvBtn = e.target.closest('[data-open-cv]');
+  if (openCvBtn) {
+    const url = openCvBtn.dataset.openCv;
+    if (url) window.open(url, '_blank');
+    return;
+  }
+  const downloadCvBtn = e.target.closest('[data-download-cv]');
+  if (downloadCvBtn) {
+    const url = downloadCvBtn.dataset.downloadCv;
+    const filename = downloadCvBtn.dataset.downloadFilename || 'CV';
+    const name = downloadCvBtn.dataset.downloadName || 'Applicant';
+    const job = downloadCvBtn.dataset.downloadJob || 'Job';
+    const dateStr = downloadCvBtn.dataset.downloadDate;
+    const date = dateStr ? new Date(dateStr).toISOString().split('T')[0] : '';
+    const ext = filename.split('.').pop() || 'pdf';
+    const cleanName = name.replace(/[^a-zA-Z0-9]/g, '_');
+    const cleanJob = job.replace(/[^a-zA-Z0-9]/g, '_');
+    const downloadFilename = `${cleanName}_${cleanJob}_${date}.${ext}`;
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = downloadFilename;
+    link.target = '_blank';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
     return;
   }
   const editBtn=e.target.closest('.btn-edit');

@@ -154,8 +154,7 @@
     </div>
   </div>
   <script type="module">
-    import { getPublicJobBySlug, submitJobApplication } from "/js/supabase.js";
-    import { uploadToCloudinary } from "/js/cloudinary.js";
+    import { getPublicJobBySlug, submitJobApplication, uploadCvToSupabase } from "/js/supabase.js";
 
     function esc(s) {
       return String(s ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
@@ -368,15 +367,9 @@
 
           let cvUploadResult = null;
           try {
-            cvUploadResult = await uploadToCloudinary(cvFile, { 
-              folder: "job_applications",
-              onProgress: (pct) => {
-                cvUploadMsg.textContent = `Uploading: ${pct}%`;
-                cvUploadMsg.classList.remove("error");
-              }
-            });
-            cvUploadMsg.textContent = "CV uploaded successfully!";
-            cvUploadMsg.classList.add("success");
+            cvUploadMsg.textContent = 'Uploading...';
+            cvUploadResult = await uploadCvToSupabase(cvFile);
+            cvUploadMsg.textContent = '';
           } catch (uploadError) {
             cvUploadMsg.textContent = uploadError.message || "Failed to upload CV. Please try again.";
             cvUploadMsg.classList.add("error");
@@ -408,8 +401,8 @@
               education_level: document.getElementById("educationLevel").value,
               education_details: document.getElementById("educationDetails").value.trim() || null,
               cv_url: cvUploadResult.url,
-              cv_filename: cvUploadResult.originalFilename,
-              cv_public_id: cvUploadResult.publicId
+              cv_filename: cvUploadResult.filename,
+              cv_public_id: cvUploadResult.path
             });
             applyForm.reset();
             cvUploadMsg.textContent = "";

@@ -374,3 +374,38 @@ export async function adminGetApplications() {
   if (error) throw error;
   return (data || []).map(normalizeApplication);
 }
+
+export async function uploadCvToSupabase(file) {
+  const supabase = await getClient();
+  const ext = file.name.split('.').pop();
+  const filename = `${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+  const path = `applications/${filename}`;
+
+  const { data, error } = await supabase.storage
+    .from('CV')
+    .upload(path, file, {
+      cacheControl: '3600',
+      upsert: false,
+      contentType: file.type
+    });
+
+  if (error) throw new Error(error.message);
+
+  const { data: urlData } = supabase.storage
+    .from('CV')
+    .getPublicUrl(path);
+
+  return {
+    url: urlData.publicUrl,
+    filename: file.name,
+    path: path
+  };
+}
+
+export async function deleteCvFromSupabase(path) {
+  const supabase = await getClient();
+  const { error } = await supabase.storage
+    .from('CV')
+    .remove([path]);
+  if (error) throw new Error(error.message);
+}
