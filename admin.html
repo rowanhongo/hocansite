@@ -860,7 +860,7 @@ function renderApplicationDetails(role){
     const contact=[app.email,app.phone].filter(Boolean).join(' | ')||'—';
     const location=[app.city,app.country].filter(Boolean).join(', ')||'—';
     const education=[app.education_level,app.education_details].filter(Boolean).join(' — ')||'—';
-    const cvButton=app.cv_url?`<a class="btn-view" href="${esc(app.cv_url)}" target="_blank" rel="noopener noreferrer">View CV</a>`:'—';
+    const cvButton=app.cv_url?`<button class="btn-view" data-download-cv="${esc(app.cv_url)}" data-download-filename="${esc(app.cv_filename||'CV')}" data-download-name="${esc(fullName)}" data-download-job="${esc(app.job_title||'Job')}" data-download-date="${esc(app.created_at||'')}">Download CV</button>`:'—';
     const expText=experiences.length?`<div class="app-inline-note">Experience: ${esc(experiences.join(' | '))}</div>`:'';
     return `
       <tr>
@@ -870,7 +870,7 @@ function renderApplicationDetails(role){
         <td>${esc(education)}</td>
         <td>${fmt(app.created_at)}</td>
         <td>${cvButton}</td>
-        <td><button class="btn-delete" data-delete-application="${esc(app.id)}">Delete</button></td>
+        <td><button class="btn-delete" data-delete-application="${esc(app.id)}" data-delete-public-id="${esc(app.cv_public_id||'')}">Delete</button></td>
       </tr>
     `;
   }).join('');
@@ -942,16 +942,50 @@ document.addEventListener('click',async e=>{
   const deleteApplicationBtn=e.target.closest('[data-delete-application]');
   if(deleteApplicationBtn){
     const appId=deleteApplicationBtn.dataset.deleteApplication;
+    const publicId=deleteApplicationBtn.dataset.deletePublicId;
     if(!appId)return;
     if(!confirm('Delete this application? This cannot be undone.'))return;
     try{
       await adminDeleteApplication(appId);
+      if(publicId){
+        try{
+          await fetch('/.netlify/functions/cloudinary-delete',{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({publicId,resourceType:'raw'})
+          });
+        }catch(deleteErr){
+          console.error('Failed to delete from Cloudinary:',deleteErr);
+        }
+      }
       await loadApplications();
       renderApplicationDetails(selectedApplicationRole);
       showToast('Application deleted');
     }catch(err){
       showToast('Delete failed: '+err.message,'error');
     }
+    return;
+  }
+  const downloadCvBtn=e.target.closest('[data-download-cv]');
+  if(downloadCvBtn){
+    const url=downloadCvBtn.dataset.downloadCv;
+    const originalFilename=downloadCvBtn.dataset.downloadFilename;
+    const applicantName=downloadCvBtn.dataset.downloadName;
+    const jobTitle=downloadCvBtn.dataset.downloadJob;
+    const dateStr=downloadCvBtn.dataset.downloadDate;
+    if(!url)return;
+    const date=dateStr?new Date(dateStr).toISOString().split('T')[0]:'';
+    const ext=originalFilename.split('.').pop()||'pdf';
+    const cleanName=applicantName.replace(/[^a-zA-Z0-9]/g,'_');
+    const cleanJob=jobTitle.replace(/[^a-zA-Z0-9]/g,'_');
+    const downloadFilename=`${cleanName}_${cleanJob}_${date}.${ext}`;
+    const link=document.createElement('a');
+    link.href=url;
+    link.download=downloadFilename;
+    link.target='_blank';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
     return;
   }
   const editBtn=e.target.closest('.btn-edit');

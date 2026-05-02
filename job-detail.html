@@ -408,7 +408,8 @@
               education_level: document.getElementById("educationLevel").value,
               education_details: document.getElementById("educationDetails").value.trim() || null,
               cv_url: cvUploadResult.url,
-              cv_filename: cvUploadResult.originalFilename
+              cv_filename: cvUploadResult.originalFilename,
+              cv_public_id: cvUploadResult.publicId
             });
             applyForm.reset();
             cvUploadMsg.textContent = "";
