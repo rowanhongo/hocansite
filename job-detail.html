@@ -331,6 +331,13 @@
         });
         successOkBtn?.addEventListener("click", closeSuccessModal);
 
+        const cvFileInput = document.getElementById("cvFile");
+        cvFileInput?.addEventListener("change", () => {
+          const cvUploadMsg = document.getElementById("cvUploadMsg");
+          cvUploadMsg.textContent = "";
+          cvUploadMsg.className = "form-msg";
+        });
+
         applyForm?.addEventListener("submit", async (evt) => {
           evt.preventDefault();
           applyFormMsg.textContent = "";

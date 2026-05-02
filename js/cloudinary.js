@@ -30,7 +30,15 @@ export async function uploadToCloudinary(file, options = {}) {
   const form = new FormData();
   form.append("file", file);
   form.append("upload_preset", uploadPreset);
+  form.append("type", "upload");
+  form.append("resource_type", resourceType);
   if (options.folder) form.append("folder", options.folder);
+
+  // Format file size in MB for error messages
+  function formatFileSize(bytes) {
+    const mb = bytes / (1024 * 1024);
+    return mb.toFixed(2) + ' MB';
+  }
 
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
@@ -49,7 +57,12 @@ export async function uploadToCloudinary(file, options = {}) {
       const ok = xhr.status >= 200 && xhr.status < 300;
       const body = xhr.response || {};
       if (!ok || !body.secure_url) {
-        const msg = body.error?.message || "Cloudinary upload failed";
+        let msg = body.error?.message || "Cloudinary upload failed";
+        // Format file size errors to show MB
+        if (msg.includes('Got') && msg.includes('Maximum')) {
+          msg = msg.replace(/Got (\d+)/, (match, bytes) => `Got ${formatFileSize(parseInt(bytes))}`)
+                   .replace(/Maximum is (\d+)/, (match, bytes) => `Maximum is ${formatFileSize(parseInt(bytes))}`);
+        }
         reject(new Error(msg));
         return;
       }
