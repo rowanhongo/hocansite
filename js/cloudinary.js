@@ -30,8 +30,6 @@ export async function uploadToCloudinary(file, options = {}) {
   const form = new FormData();
   form.append("file", file);
   form.append("upload_preset", uploadPreset);
-  form.append("type", "upload");
-  form.append("resource_type", resourceType);
   if (options.folder) form.append("folder", options.folder);
 
   // Format file size in MB for error messages
