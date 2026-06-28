@@ -9,7 +9,8 @@
 <style>
 :root{--sky:#4AB3D4;--rose:#C47A5A;--dark:#1A1A2E;--sidebar:#1E2435;--bg:#F0F3F6;--card:#fff;--text:#2D3748;--muted:#8896A4;--border:#E8ECF0;--green:#5DBA7E;--amber:#E6A817;}
 *{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);}
+html{overflow-x:hidden;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;}
 
 /* ── LOGIN ── */
 .login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#d8eaf3,#eef2f5,#f0e8e4);position:fixed;inset:0;z-index:1000;transition:opacity .4s,transform .4s;}
@@ -177,13 +178,15 @@ tr:hover td{background:#FAFBFD;}
 .video-preview video{width:100%;max-height:280px;display:block;}
 .video-preview .video-remove{position:absolute;top:8px;right:8px;background:#E53E3E;color:#fff;border:none;border-radius:50%;width:28px;height:28px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;}
 
-/* ── PARTNER LOGO GRID ── */
-.partner-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin-top:14px;}
-.partner-card{background:#FAFBFD;border:1.5px solid var(--border);border-radius:12px;padding:14px;display:flex;flex-direction:column;align-items:center;gap:10px;position:relative;}
-.partner-card img{max-height:60px;max-width:100%;object-fit:contain;}
-.partner-card .partner-name{font-size:13px;font-weight:600;color:var(--text);text-align:center;word-break:break-word;}
-.partner-card .partner-actions{display:flex;gap:6px;}
-.partner-card .badge{font-size:10px;position:absolute;top:6px;right:6px;}
+/* ── PARTNER LIST ── */
+.partner-list{display:flex;flex-direction:column;gap:8px;}
+.partner-row{display:flex;align-items:center;gap:14px;padding:12px 14px;background:#FAFBFD;border:1.5px solid var(--border);border-radius:12px;transition:background .15s;}
+.partner-row:hover{background:#F0F3F6;}
+.partner-row-logo{width:80px;height:48px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:#fff;border-radius:8px;border:1px solid var(--border);overflow:hidden;}
+.partner-row-logo img{max-width:100%;max-height:100%;object-fit:contain;display:block;}
+.partner-row-info{flex:1;min-width:0;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.partner-row-name{font-size:14px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.partner-row-actions{display:flex;gap:6px;flex-shrink:0;}
 
 @media(max-width:860px){
   /* Sidebar */
@@ -193,7 +196,7 @@ tr:hover td{background:#FAFBFD;}
   .mobile-sidebar-overlay.show{display:block;}
 
   /* Main area */
-  .main{margin-left:0;padding:14px 10px;}
+  .main{margin-left:0;padding:14px 10px;overflow-x:hidden;max-width:100vw;}
   .mobile-menu-btn{display:inline-flex;}
 
   /* Top bar */
@@ -218,15 +221,29 @@ tr:hover td{background:#FAFBFD;}
   .search-row input{font-size:13px;padding:10px 12px;}
   .search-row select{max-width:100% !important;font-size:13px;padding:10px 12px;border:1.5px solid var(--border);border-radius:9px;font-family:'DM Sans',sans-serif;}
 
-  /* Tables → horizontally scrollable via wrapper */
-  .table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -12px;padding:0 12px;}
-  table{min-width:520px;font-size:12px;white-space:nowrap;}
-  th{padding:8px 10px;font-size:10px;}
-  td{padding:10px 10px;}
+  /* Tables → card layout on mobile */
+  .table-scroll{overflow:hidden;}
+  table,thead,tbody,tr,th,td{display:block;width:100%;}
+  thead{display:none;}
+  tr{background:#FAFBFD;border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:8px;}
+  tr:last-child{margin-bottom:0;}
+  tr:hover td{background:transparent;}
+  td{padding:4px 0;border-bottom:none;font-size:13px;display:flex;align-items:center;gap:6px;white-space:normal;overflow-wrap:break-word;}
+  td[data-label]:before{content:attr(data-label);font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;min-width:80px;flex-shrink:0;}
+  td:empty{display:none;}
+  .empty-row{background:transparent;border:none;padding:0;}
+  .empty-row td{display:block;text-align:center;padding:30px 10px;}
+  .empty-row td:before{display:none;}
 
   /* Action buttons */
-  .action-btns{gap:4px;}
-  .btn-edit,.btn-delete,.btn-view{padding:5px 8px;font-size:11px;}
+  .action-btns{gap:6px;justify-content:flex-start;padding-top:4px;}
+  .btn-edit,.btn-delete,.btn-view{padding:6px 12px;font-size:12px;}
+
+  /* Partner row on mobile */
+  .partner-row{flex-wrap:wrap;gap:10px;padding:12px;}
+  .partner-row-logo{width:60px;height:40px;}
+  .partner-row-name{font-size:13px;}
+  .partner-row-actions{width:100%;justify-content:flex-end;padding-top:4px;border-top:1px solid var(--border);margin-top:4px;}
 
   /* Modals */
   .modal-overlay{padding:10px 6px;}
@@ -247,9 +264,8 @@ tr:hover td{background:#FAFBFD;}
   .cb-toolbar{padding:8px 10px;gap:6px;}
   .cb-btn{padding:5px 8px;font-size:11px;}
 
-  /* Gallery & partner grids */
+  /* Gallery grid */
   .gallery-grid{grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px;}
-  .partner-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;}
 
   /* Video preview */
   .video-preview video{max-height:200px;}
@@ -284,7 +300,6 @@ tr:hover td{background:#FAFBFD;}
   .section-card{padding:12px 10px;}
   .modal-body{padding:14px 10px;}
   .gallery-grid{grid-template-columns:repeat(auto-fill,minmax(75px,1fr));}
-  .partner-grid{grid-template-columns:1fr 1fr;gap:8px;}
   .top-bar h2{font-size:15px;}
 }
 </style>
@@ -422,7 +437,7 @@ tr:hover td{background:#FAFBFD;}
       <div class="section-card">
         <div class="section-header"><h3>All Success Stories</h3><button class="btn-new" id="newStoryBtn">+ New Story</button></div>
         <div class="table-scroll"><table>
-          <thead><tr><th>Title</th><th>Media</th><th>Status</th><th>Order</th><th>Actions</th></tr></thead>
+          <thead><tr><th>Title</th><th>Media</th><th>Status</th><th>Actions</th></tr></thead>
           <tbody id="storyTable"></tbody>
         </table></div>
       </div>
@@ -432,11 +447,7 @@ tr:hover td{background:#FAFBFD;}
     <div class="panel" id="panel-partners">
       <div class="section-card">
         <div class="section-header"><h3>All Partners</h3><button class="btn-new" id="newPartnerBtn">+ Add Partner</button></div>
-        <div id="partnerGrid" class="partner-grid"></div>
-        <div class="table-scroll" style="margin-top:14px;"><table>
-          <thead><tr><th>Logo</th><th>Name</th><th>Status</th><th>Order</th><th>Actions</th></tr></thead>
-          <tbody id="partnerTable"></tbody>
-        </table></div>
+        <div id="partnerList" class="partner-list"></div>
       </div>
     </div>
 
@@ -733,16 +744,15 @@ tr:hover td{background:#FAFBFD;}
     <div class="modal-body">
       <div class="form-grid">
         <div class="form-group form-full">
-          <label>Company Name *</label>
+          <label>Company Name</label>
           <input type="text" id="pName" placeholder="e.g. Safaricom, KCB Group…">
         </div>
         <div class="form-group form-full">
-          <label>Logo *</label>
+          <label>Company Logo</label>
           <div class="image-upload-zone" id="partnerLogoZone">
             <input type="file" id="partnerLogoInput" accept="image/*">
             <div class="upload-icon">🏢</div>
-            <div class="upload-text">Drag & drop or <strong>click to upload</strong> logo</div>
-            <div class="upload-text" style="font-size:12px;margin-top:4px;">PNG preferred (transparent background)</div>
+            <div class="upload-text"><strong>Tap to upload</strong> the company logo</div>
             <div class="upload-preview" id="partnerLogoPreview" style="display:none;">
               <img id="partnerLogoPreviewImg" src="" alt="">
               <button class="upload-remove" id="partnerLogoRemove">×</button>
@@ -751,21 +761,18 @@ tr:hover td{background:#FAFBFD;}
           </div>
           <input type="hidden" id="pLogoUrl">
         </div>
-        <div class="form-group">
-          <label>Display Order</label>
-          <input type="number" id="pOrder" placeholder="1" value="0" min="0">
-        </div>
-        <div class="form-group">
-          <div class="toggle-row" style="margin-top:22px;">
+        <div class="form-group form-full">
+          <div class="toggle-row">
             <label class="toggle">
               <input type="checkbox" id="pActive" checked>
               <div class="toggle-track"></div>
               <div class="toggle-thumb"></div>
             </label>
-            <span class="toggle-label">Active (visible on site)</span>
+            <span class="toggle-label">Show on website</span>
           </div>
         </div>
       </div>
+      <input type="hidden" id="pOrder" value="0">
     </div>
     <div class="modal-footer">
       <button class="btn-cancel" id="partnerCancelBtn">Cancel</button>
@@ -914,11 +921,11 @@ function renderBlogTable(data){
   if(!data.length){tbody.innerHTML=`<tr class="empty-row"><td colspan="6">No blog posts yet. Create your first one!</td></tr>`;return;}
   tbody.innerHTML=data.map(b=>`
     <tr>
-      <td><strong>${esc(b.title)}</strong></td>
-      <td>${esc(b.category||'—')}</td>
-      <td>Hocan Holdings</td>
-      <td><span class="badge ${b.published?'published':'draft'}">${b.published?'Published':'Draft'}</span></td>
-      <td>${fmt(b.published_at||b.created_at)}</td>
+      <td data-label="Title"><strong>${esc(b.title)}</strong></td>
+      <td data-label="Category">${esc(b.category||'—')}</td>
+      <td data-label="Author">Hocan Holdings</td>
+      <td data-label="Status"><span class="badge ${b.published?'published':'draft'}">${b.published?'Published':'Draft'}</span></td>
+      <td data-label="Date">${fmt(b.published_at||b.created_at)}</td>
       <td><div class="action-btns">
         <button class="btn-edit" data-id="${b.id}" data-type="blog">Edit</button>
         <button class="btn-delete" data-id="${b.id}" data-type="blog">Delete</button>
@@ -985,9 +992,9 @@ function renderNewsletter(total,dailyUsed,dailyLimit){
 
   tbody.innerHTML=newsletterSubscribers.map(s=>`
     <tr>
-      <td>${esc(`${s.first_name||''} ${s.last_name||''}`.trim()||'—')}</td>
-      <td>${esc(s.email||'')}</td>
-      <td>${fmt(s.created_at)}</td>
+      <td data-label="Name">${esc(`${s.first_name||''} ${s.last_name||''}`.trim()||'—')}</td>
+      <td data-label="Email">${esc(s.email||'')}</td>
+      <td data-label="Subscribed">${fmt(s.created_at)}</td>
       <td><button class="btn-delete" data-news-del="${esc(s.id)}">Delete</button></td>
     </tr>
   `).join('');
@@ -1004,12 +1011,12 @@ function renderJobTable(data){
   if(!data.length){tbody.innerHTML=`<tr class="empty-row"><td colspan="7">No job listings yet. Create your first one!</td></tr>`;return;}
   tbody.innerHTML=data.map(j=>`
     <tr>
-      <td><strong>${esc(j.title)}</strong></td>
-      <td>${esc(j.location||'—')}</td>
-      <td>${esc(j.job_type||'—')}</td>
-      <td>${esc(j.industry||'—')}</td>
-      <td><span class="badge ${j.is_active?'active':'inactive'}">${j.is_active?'Active':'Inactive'}</span></td>
-      <td>${fmt(j.posted_at)}</td>
+      <td data-label="Title"><strong>${esc(j.title)}</strong></td>
+      <td data-label="Location">${esc(j.location||'—')}</td>
+      <td data-label="Type">${esc(j.job_type||'—')}</td>
+      <td data-label="Industry">${esc(j.industry||'—')}</td>
+      <td data-label="Status"><span class="badge ${j.is_active?'active':'inactive'}">${j.is_active?'Active':'Inactive'}</span></td>
+      <td data-label="Date">${fmt(j.posted_at)}</td>
       <td><div class="action-btns">
         <button class="btn-edit" data-id="${j.id}" data-type="job">Edit</button>
         <button class="btn-delete" data-id="${j.id}" data-type="job">Delete</button>
@@ -1067,13 +1074,13 @@ function renderApplicationGroups(){
   }
   tbody.innerHTML=groups.map(g=>`
     <tr>
-      <td><strong>${esc(g.role)}</strong></td>
-      <td>${g.apps.length}</td>
-      <td>${fmt(g.latest?new Date(g.latest).toISOString():null)}</td>
-      <td style="display:flex;gap:8px;flex-wrap:wrap;">
-        <button class="btn-view" data-view-role="${encodeURIComponent(g.role)}">View Applications</button>
+      <td data-label="Role"><strong>${esc(g.role)}</strong></td>
+      <td data-label="Applications">${g.apps.length}</td>
+      <td data-label="Latest">${fmt(g.latest?new Date(g.latest).toISOString():null)}</td>
+      <td><div class="action-btns" style="flex-wrap:wrap;">
+        <button class="btn-view" data-view-role="${encodeURIComponent(g.role)}">View</button>
         <button class="btn-delete" data-delete-role="${encodeURIComponent(g.role)}">Delete All</button>
-      </td>
+      </div></td>
     </tr>
   `).join('');
 }
@@ -1131,12 +1138,12 @@ function renderApplicationDetails(role){
     const expText=experiences.length?`<div class="app-inline-note">Experience: ${esc(experiences.join(' | '))}</div>`:'';
     return `
       <tr>
-        <td><strong>${esc(fullName)}</strong>${expText}</td>
-        <td>${esc(contact)}</td>
-        <td>${esc(location)}</td>
-        <td>${esc(education)}</td>
-        <td>${fmt(app.created_at)}</td>
-        <td>${cvButton}</td>
+        <td data-label="Name"><strong>${esc(fullName)}</strong>${expText}</td>
+        <td data-label="Contact">${esc(contact)}</td>
+        <td data-label="Location">${esc(location)}</td>
+        <td data-label="Education">${esc(education)}</td>
+        <td data-label="Submitted">${fmt(app.created_at)}</td>
+        <td data-label="CV">${cvButton}</td>
         <td><button class="btn-delete" data-delete-application="${esc(app.id)}" data-delete-public-id="${esc(app.cv_public_id||'')}">Delete</button></td>
       </tr>
     `;
@@ -1171,9 +1178,9 @@ function renderOverview(){
   document.getElementById('statStories').textContent=stories.filter(s=>s.published).length;
   document.getElementById('statPartners').textContent=partners.filter(p=>p.active).length;
   const bt=document.getElementById('overviewBlogTable');
-  bt.innerHTML=blogs.slice(0,5).map(b=>`<tr><td>${esc(b.title)}</td><td>${esc(b.category||'—')}</td><td><span class="badge ${b.published?'published':'draft'}">${b.published?'Published':'Draft'}</span></td><td>${fmt(b.published_at)}</td></tr>`).join('')||`<tr class="empty-row"><td colspan="4">No blogs yet</td></tr>`;
+  bt.innerHTML=blogs.slice(0,5).map(b=>`<tr><td data-label="Title">${esc(b.title)}</td><td data-label="Category">${esc(b.category||'—')}</td><td data-label="Status"><span class="badge ${b.published?'published':'draft'}">${b.published?'Published':'Draft'}</span></td><td data-label="Date">${fmt(b.published_at)}</td></tr>`).join('')||`<tr class="empty-row"><td colspan="4">No blogs yet</td></tr>`;
   const jt=document.getElementById('overviewJobTable');
-  jt.innerHTML=jobs.slice(0,5).map(j=>`<tr><td>${esc(j.title)}</td><td>${esc(j.location||'—')}</td><td>${esc(j.job_type||'—')}</td><td><span class="badge ${j.is_active?'active':'inactive'}">${j.is_active?'Active':'Inactive'}</span></td></tr>`).join('')||`<tr class="empty-row"><td colspan="4">No jobs yet</td></tr>`;
+  jt.innerHTML=jobs.slice(0,5).map(j=>`<tr><td data-label="Title">${esc(j.title)}</td><td data-label="Location">${esc(j.location||'—')}</td><td data-label="Type">${esc(j.job_type||'—')}</td><td data-label="Status"><span class="badge ${j.is_active?'active':'inactive'}">${j.is_active?'Active':'Inactive'}</span></td></tr>`).join('')||`<tr class="empty-row"><td colspan="4">No jobs yet</td></tr>`;
 }
 
 document.getElementById('overviewNewBlog').addEventListener('click',()=>{setPanel('blogs');openBlogModal();});
@@ -1623,10 +1630,9 @@ function renderStoryTable(){
     if(hasVideo) media.push('Video');
     if(imgCount) media.push(imgCount+' image'+(imgCount>1?'s':''));
     return `<tr>
-      <td><strong>${esc(s.title)}</strong></td>
-      <td>${media.length?media.join(', '):'<span style="color:var(--muted)">None</span>'}</td>
-      <td><span class="badge ${s.published?'published':'draft'}">${s.published?'Published':'Draft'}</span></td>
-      <td>${s.display_order??0}</td>
+      <td data-label="Title"><strong>${esc(s.title)}</strong></td>
+      <td data-label="Media">${media.length?media.join(', '):'<span style="color:var(--muted)">None</span>'}</td>
+      <td data-label="Status"><span class="badge ${s.published?'published':'draft'}">${s.published?'Published':'Draft'}</span></td>
       <td><div class="action-btns">
         <button class="btn-edit" data-story-edit="${s.id}">Edit</button>
         <button class="btn-delete" data-story-delete="${s.id}">Delete</button>
@@ -1789,18 +1795,21 @@ async function loadPartners(){
 }
 
 function renderPartnerTable(){
-  const tbody=document.getElementById('partnerTable');
-  if(!partners.length){tbody.innerHTML='<tr class="empty-row"><td colspan="5">No partners yet. Add your first one!</td></tr>';return;}
-  tbody.innerHTML=partners.map(p=>`<tr>
-    <td>${p.logo_url?`<img src="${esc(p.logo_url)}" style="max-height:36px;max-width:80px;object-fit:contain;" alt="">`:'—'}</td>
-    <td><strong>${esc(p.name)}</strong></td>
-    <td><span class="badge ${p.active?'active':'inactive'}">${p.active?'Active':'Inactive'}</span></td>
-    <td>${p.display_order??0}</td>
-    <td><div class="action-btns">
-      <button class="btn-edit" data-partner-edit="${p.id}">Edit</button>
-      <button class="btn-delete" data-partner-delete="${p.id}">Delete</button>
-    </div></td>
-  </tr>`).join('');
+  const container=document.getElementById('partnerList');
+  if(!partners.length){container.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);">No partners yet. Add your first one!</div>';return;}
+  container.innerHTML=partners.map(p=>`
+    <div class="partner-row">
+      <div class="partner-row-logo">${p.logo_url?`<img src="${esc(p.logo_url)}" alt="${esc(p.name)}">`:'<span style="color:var(--muted);font-size:12px;">No logo</span>'}</div>
+      <div class="partner-row-info">
+        <div class="partner-row-name">${esc(p.name)}</div>
+        ${p.active?'<span class="badge active">Visible</span>':'<span class="badge inactive">Hidden</span>'}
+      </div>
+      <div class="partner-row-actions">
+        <button class="btn-edit" data-partner-edit="${p.id}">Edit</button>
+        <button class="btn-delete" data-partner-delete="${p.id}">Remove</button>
+      </div>
+    </div>
+  `).join('');
 }
 
 function openPartnerModal(id=null){
