@@ -17,7 +17,7 @@
 
 Hocan Holdings builds the infrastructure behind East Africa's fastest growing businesses. Since 2015, the company has supported organizations across Kenya and the broader East African region with logistics and consulting solutions designed for scale.
 
-The company operates as a one-stop service provider to both local and international markets, with particular expertise in the Hospitality and Gaming industries. Hocan Holdings fills gaps in the service infrastructure across local and global markets, recognizing the challenges businesses face in sourcing efficient services.
+The company operates as a one-stop service provider to both local and international markets, with a particular speciality in the hospitality and services industry. Hocan Holdings fills gaps in the service infrastructure across local and global markets, recognizing the challenges businesses face in sourcing efficient services.
 
 ## Mission Statement
 
@@ -40,7 +40,7 @@ The company operates as a one-stop service provider to both local and internatio
 
 **URL**: https://hocanholdings.co.ke/hocan-hr-consulting.html
 
-Hocan HR Consulting is the workforce solutions arm of Hocan Holdings. It supports organizations with practical people strategies — from recruitment to long-term talent development. The division helps employers build strong teams and helps professionals access better career opportunities across East Africa.
+Hocan HR Consulting is the workforce solutions arm of Hocan Holdings. It supports organizations with practical people strategies — from recruitment to long-term talent development, with deep roots in the hospitality and services industry. The division helps employers build strong teams and helps professionals access better career opportunities across East Africa.
 
 ### Service 1.1: Talent Acquisition & Recruitment
 - **URL**: https://hocanholdings.co.ke/hr/talent-acquisition.html
@@ -108,8 +108,8 @@ Business consultancy services and strategic support across multiple domains:
 
 ## Industries & Sectors Served
 
-- Hospitality industry
-- Gaming industry
+- Hospitality industry (primary speciality — hotels, restaurants, resorts, catering, events)
+- Services industry (facility management, cleaning, security, customer-facing operations)
 - Corporate and enterprise organizations
 - Startups and early-stage companies
 - Government agencies
@@ -179,4 +179,4 @@ A: Visit the job board at https://hocanholdings.co.ke/jobs.html to browse curren
 A: Yes. Hocan Holdings offers a dedicated Startup HR Advisory service that provides strategic HR guidance for early-stage and growing startups.
 
 **Q: What industries does Hocan Holdings specialize in?**
-A: Hocan Holdings has particular expertise in the Hospitality and Gaming industries, but also serves corporate enterprises, startups, government agencies, and NGOs.
+A: Hocan Holdings specialises in the hospitality and services industry — hotels, restaurants, resorts, catering, events, and service-driven businesses. They also serve corporate enterprises, startups, government agencies, and NGOs.
