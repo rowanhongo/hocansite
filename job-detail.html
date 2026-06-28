@@ -415,7 +415,7 @@
           ].filter(Boolean).slice(0, 3);
 
           try {
-            await submitJobApplication({
+            const appData = {
               job_id: job.id || null,
               job_slug: job.slug || null,
               job_title: job.title || "Open Role",
@@ -431,7 +431,13 @@
               cv_url: cvUploadResult.url,
               cv_filename: cvUploadResult.filename,
               cv_public_id: cvUploadResult.path
-            });
+            };
+            await submitJobApplication(appData);
+            fetch("/.netlify/functions/notify-application", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(appData)
+            }).catch(function() {});
             applyForm.reset();
             cvUploadMsg.textContent = "";
             closeModal();
