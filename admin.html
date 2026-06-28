@@ -164,19 +164,128 @@ tr:hover td{background:#FAFBFD;}
 .app-link{color:#1d6f8a;text-decoration:none;}
 .app-link:hover{text-decoration:underline;}
 
+/* ── GALLERY GRID (Success Stories) ── */
+.gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-top:10px;}
+.gallery-item{position:relative;border-radius:10px;overflow:hidden;border:1.5px solid var(--border);background:#FAFBFD;aspect-ratio:1;}
+.gallery-item img{width:100%;height:100%;object-fit:cover;display:block;}
+.gallery-item .gallery-remove{position:absolute;top:4px;right:4px;background:#E53E3E;color:#fff;border:none;border-radius:50%;width:22px;height:22px;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;opacity:0;transition:opacity .2s;}
+.gallery-item:hover .gallery-remove{opacity:1;}
+.gallery-item .gallery-order{position:absolute;bottom:4px;left:4px;background:rgba(0,0,0,.55);color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;}
+
+/* ── VIDEO PREVIEW ── */
+.video-preview{margin-top:12px;border-radius:12px;overflow:hidden;position:relative;background:#000;}
+.video-preview video{width:100%;max-height:280px;display:block;}
+.video-preview .video-remove{position:absolute;top:8px;right:8px;background:#E53E3E;color:#fff;border:none;border-radius:50%;width:28px;height:28px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;}
+
+/* ── PARTNER LOGO GRID ── */
+.partner-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin-top:14px;}
+.partner-card{background:#FAFBFD;border:1.5px solid var(--border);border-radius:12px;padding:14px;display:flex;flex-direction:column;align-items:center;gap:10px;position:relative;}
+.partner-card img{max-height:60px;max-width:100%;object-fit:contain;}
+.partner-card .partner-name{font-size:13px;font-weight:600;color:var(--text);text-align:center;word-break:break-word;}
+.partner-card .partner-actions{display:flex;gap:6px;}
+.partner-card .badge{font-size:10px;position:absolute;top:6px;right:6px;}
+
 @media(max-width:860px){
-  .modal{max-width:100%;margin:0;}
-  .form-grid{grid-template-columns:1fr;}
-  .stats-row{grid-template-columns:1fr 1fr;}
-  .main{margin-left:0;padding:16px;}
-  .mobile-menu-btn{display:inline-flex;}
-  .top-bar{padding:14px 16px;gap:8px;}
-  .top-bar h2{font-size:18px;}
-  .top-bar .date{font-size:12px;}
+  /* Sidebar */
   .sidebar{display:flex;transform:translateX(-100%);transition:transform .25s ease;z-index:1200;box-shadow:12px 0 40px rgba(0,0,0,.35);}
   .sidebar.open{transform:translateX(0);}
   .mobile-sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:1100;}
   .mobile-sidebar-overlay.show{display:block;}
+
+  /* Main area */
+  .main{margin-left:0;padding:14px 10px;}
+  .mobile-menu-btn{display:inline-flex;}
+
+  /* Top bar */
+  .top-bar{padding:12px 14px;gap:6px;}
+  .top-bar h2{font-size:16px;flex:1;min-width:0;}
+  .top-bar .date{font-size:11px;display:none;}
+
+  /* Stats */
+  .stats-row{grid-template-columns:1fr 1fr !important;gap:10px;margin-bottom:14px;}
+  .stat-card{padding:14px 14px;border-radius:12px;}
+  .stat-val{font-size:28px;}
+  .stat-label{font-size:10px;letter-spacing:1px;}
+
+  /* Section cards */
+  .section-card{padding:14px 12px;border-radius:12px;margin-bottom:14px;}
+  .section-header{margin-bottom:12px;gap:8px;}
+  .section-header h3{font-size:14px;}
+  .btn-new{padding:8px 14px;font-size:12px;}
+
+  /* Search row */
+  .search-row{flex-direction:column;gap:8px;}
+  .search-row input{font-size:13px;padding:10px 12px;}
+  .search-row select{max-width:100% !important;font-size:13px;padding:10px 12px;border:1.5px solid var(--border);border-radius:9px;font-family:'DM Sans',sans-serif;}
+
+  /* Tables → horizontally scrollable via wrapper */
+  .table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -12px;padding:0 12px;}
+  table{min-width:520px;font-size:12px;white-space:nowrap;}
+  th{padding:8px 10px;font-size:10px;}
+  td{padding:10px 10px;}
+
+  /* Action buttons */
+  .action-btns{gap:4px;}
+  .btn-edit,.btn-delete,.btn-view{padding:5px 8px;font-size:11px;}
+
+  /* Modals */
+  .modal-overlay{padding:10px 6px;}
+  .modal{max-width:100%;margin:0;border-radius:16px;}
+  .modal-header{padding:16px 18px;}
+  .modal-header h3{font-size:15px;}
+  .modal-body{padding:18px 14px;}
+  .modal-footer{padding:14px 14px;}
+  .form-grid{grid-template-columns:1fr;gap:12px;}
+  .form-group input,.form-group select,.form-group textarea{font-size:14px;padding:10px 12px;}
+
+  /* Upload zones */
+  .image-upload-zone{padding:20px 14px;}
+  .upload-icon{font-size:26px;}
+  .upload-text{font-size:13px;}
+
+  /* Content builder */
+  .cb-toolbar{padding:8px 10px;gap:6px;}
+  .cb-btn{padding:5px 8px;font-size:11px;}
+
+  /* Gallery & partner grids */
+  .gallery-grid{grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px;}
+  .partner-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;}
+
+  /* Video preview */
+  .video-preview video{max-height:200px;}
+
+  /* Badges */
+  .badge{font-size:10px;padding:3px 8px;}
+
+  /* Toggle row */
+  .toggle-label{font-size:13px;}
+
+  /* Pagination row */
+  .btn-edit#applicationPrevBtn,.btn-edit#applicationNextBtn,
+  .btn-edit#newsletterPrevBtn,.btn-edit#newsletterNextBtn{padding:6px 10px;font-size:11px;}
+
+  /* Login */
+  .login-box{padding:32px 24px;width:92%;}
+  .login-box h2{font-size:20px;}
+  .login-box .desc{font-size:13px;}
+  .field input{padding:12px 14px;font-size:14px;}
+  .btn-primary{padding:13px;font-size:14px;}
+
+  /* Toast */
+  .toast{left:10px;right:10px;bottom:16px;font-size:13px;padding:10px 14px;border-radius:10px;}
+}
+
+/* Extra small screens (≤400px) */
+@media(max-width:400px){
+  .main{padding:10px 6px;}
+  .stats-row{grid-template-columns:1fr !important;gap:8px;}
+  .stat-card{flex-direction:row;align-items:center;justify-content:space-between;padding:12px 14px;}
+  .stat-val{font-size:24px;}
+  .section-card{padding:12px 10px;}
+  .modal-body{padding:14px 10px;}
+  .gallery-grid{grid-template-columns:repeat(auto-fill,minmax(75px,1fr));}
+  .partner-grid{grid-template-columns:1fr 1fr;gap:8px;}
+  .top-bar h2{font-size:15px;}
 }
 </style>
 </head>
@@ -211,6 +320,8 @@ tr:hover td{background:#FAFBFD;}
       <div class="nav-item" data-panel="blogs"><span class="icon">✍️</span> Blog Posts</div>
       <div class="nav-item" data-panel="jobs"><span class="icon">💼</span> Job Listings</div>
       <div class="nav-item" data-panel="applications"><span class="icon">🗂️</span> Applications</div>
+      <div class="nav-item" data-panel="stories"><span class="icon">🏆</span> Success Stories</div>
+      <div class="nav-item" data-panel="partners"><span class="icon">🤝</span> Partners</div>
       <div class="nav-item" data-panel="newsletter"><span class="icon">📧</span> Newsletter</div>
     </nav>
     <div class="sidebar-footer">
@@ -227,19 +338,23 @@ tr:hover td{background:#FAFBFD;}
 
     <!-- OVERVIEW -->
     <div class="panel active" id="panel-overview">
-      <div class="stats-row">
+      <div class="stats-row" style="grid-template-columns:repeat(3,1fr);">
         <div class="stat-card blue"><div class="stat-label">Total Blogs</div><div class="stat-val" id="statBlogs">–</div></div>
-        <div class="stat-card green"><div class="stat-label">Published</div><div class="stat-val" id="statPublished">–</div></div>
-        <div class="stat-card amber"><div class="stat-label">Drafts</div><div class="stat-val" id="statDrafts">–</div></div>
         <div class="stat-card rose"><div class="stat-label">Active Jobs</div><div class="stat-val" id="statJobs">–</div></div>
+        <div class="stat-card green"><div class="stat-label">Success Stories</div><div class="stat-val" id="statStories">–</div></div>
+      </div>
+      <div class="stats-row" style="grid-template-columns:repeat(3,1fr);">
+        <div class="stat-card green"><div class="stat-label">Published Blogs</div><div class="stat-val" id="statPublished">–</div></div>
+        <div class="stat-card amber"><div class="stat-label">Draft Blogs</div><div class="stat-val" id="statDrafts">–</div></div>
+        <div class="stat-card blue"><div class="stat-label">Partners</div><div class="stat-val" id="statPartners">–</div></div>
       </div>
       <div class="section-card">
         <div class="section-header"><h3>Recent Blog Posts</h3><button class="btn-new" id="overviewNewBlog">+ New Blog Post</button></div>
-        <table><thead><tr><th>Title</th><th>Category</th><th>Status</th><th>Date</th></tr></thead><tbody id="overviewBlogTable"></tbody></table>
+        <div class="table-scroll"><table><thead><tr><th>Title</th><th>Category</th><th>Status</th><th>Date</th></tr></thead><tbody id="overviewBlogTable"></tbody></table></div>
       </div>
       <div class="section-card">
         <div class="section-header"><h3>Recent Job Listings</h3><button class="btn-new" id="overviewNewJob">+ New Job</button></div>
-        <table><thead><tr><th>Title</th><th>Location</th><th>Type</th><th>Status</th></tr></thead><tbody id="overviewJobTable"></tbody></table>
+        <div class="table-scroll"><table><thead><tr><th>Title</th><th>Location</th><th>Type</th><th>Status</th></tr></thead><tbody id="overviewJobTable"></tbody></table></div>
       </div>
     </div>
 
@@ -248,7 +363,7 @@ tr:hover td{background:#FAFBFD;}
       <div class="section-card">
         <div class="section-header"><h3>All Blog Posts</h3><button class="btn-new" id="newBlogBtn">+ New Blog Post</button></div>
         <div class="search-row"><input type="text" id="blogSearch" placeholder="Search posts…"></div>
-        <table><thead><tr><th>Title</th><th>Category</th><th>Author</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody id="blogTable"></tbody></table>
+        <div class="table-scroll"><table><thead><tr><th>Title</th><th>Category</th><th>Author</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody id="blogTable"></tbody></table></div>
       </div>
     </div>
 
@@ -257,7 +372,7 @@ tr:hover td{background:#FAFBFD;}
       <div class="section-card">
         <div class="section-header"><h3>All Job Listings</h3><button class="btn-new" id="newJobBtn">+ New Job</button></div>
         <div class="search-row"><input type="text" id="jobSearch" placeholder="Search jobs…"></div>
-        <table><thead><tr><th>Title</th><th>Location</th><th>Type</th><th>Industry</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody id="jobTable"></tbody></table>
+        <div class="table-scroll"><table><thead><tr><th>Title</th><th>Location</th><th>Type</th><th>Industry</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody id="jobTable"></tbody></table></div>
       </div>
     </div>
 
@@ -278,20 +393,20 @@ tr:hover td{background:#FAFBFD;}
             <option value="count-asc">Lowest applications first</option>
           </select>
         </div>
-        <table>
+        <div class="table-scroll"><table>
           <thead><tr><th>Job Role</th><th>Applications</th><th>Latest</th><th>Actions</th></tr></thead>
           <tbody id="applicationGroupTable"></tbody>
-        </table>
+        </table></div>
       </div>
       <div class="section-card">
         <div class="section-header">
           <h3 id="applicationDetailTitle">Select a job role to view applications</h3>
         </div>
         <div class="app-inline-note" id="applicationDetailNote">Applications are shown per role, newest first.</div>
-        <table>
+        <div class="table-scroll"><table>
           <thead><tr><th>Candidate</th><th>Contact</th><th>Location</th><th>Education</th><th>Submitted</th><th>Links</th><th>Actions</th></tr></thead>
           <tbody id="applicationDetailTable"></tbody>
-        </table>
+        </table></div>
         <div style="margin-top:12px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
           <span id="applicationDetailRange" style="font-size:13px;color:var(--muted);">Showing 0-0</span>
           <div style="display:flex;gap:8px;">
@@ -299,6 +414,29 @@ tr:hover td{background:#FAFBFD;}
             <button class="btn-edit" id="applicationNextBtn">Next</button>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- SUCCESS STORIES -->
+    <div class="panel" id="panel-stories">
+      <div class="section-card">
+        <div class="section-header"><h3>All Success Stories</h3><button class="btn-new" id="newStoryBtn">+ New Story</button></div>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Title</th><th>Media</th><th>Status</th><th>Order</th><th>Actions</th></tr></thead>
+          <tbody id="storyTable"></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- PARTNERS -->
+    <div class="panel" id="panel-partners">
+      <div class="section-card">
+        <div class="section-header"><h3>All Partners</h3><button class="btn-new" id="newPartnerBtn">+ Add Partner</button></div>
+        <div id="partnerGrid" class="partner-grid"></div>
+        <div class="table-scroll" style="margin-top:14px;"><table>
+          <thead><tr><th>Logo</th><th>Name</th><th>Status</th><th>Order</th><th>Actions</th></tr></thead>
+          <tbody id="partnerTable"></tbody>
+        </table></div>
       </div>
     </div>
 
@@ -329,7 +467,7 @@ tr:hover td{background:#FAFBFD;}
             <button class="btn-new" id="nAddBtn" style="width:max-content;">+ Add Subscriber</button>
           </div>
         </div>
-        <table style="margin-top:16px;"><thead><tr><th>Name</th><th>Email</th><th>Subscribed</th><th>Actions</th></tr></thead><tbody id="newsletterTable"></tbody></table>
+        <div class="table-scroll" style="margin-top:16px;"><table><thead><tr><th>Name</th><th>Email</th><th>Subscribed</th><th>Actions</th></tr></thead><tbody id="newsletterTable"></tbody></table></div>
         <div style="margin-top:12px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
           <span id="newsletterRange" style="font-size:13px;color:var(--muted);">Showing 0-0</span>
           <div style="display:flex;gap:8px;">
@@ -519,13 +657,133 @@ tr:hover td{background:#FAFBFD;}
   </div>
 </div>
 
+<!-- SUCCESS STORY EDITOR MODAL -->
+<div class="modal-overlay" id="storyModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="storyModalTitle">New Success Story</h3>
+      <button class="modal-close" id="storyModalClose">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group form-full">
+          <label>Client / Title *</label>
+          <input type="text" id="sTitle" placeholder="e.g. Technoedge Limited">
+        </div>
+        <div class="form-group form-full">
+          <label>Description *</label>
+          <textarea id="sDescription" rows="4" placeholder="Describe the work done, results achieved…"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Display Order</label>
+          <input type="number" id="sOrder" placeholder="1" value="0" min="0">
+        </div>
+        <div class="form-group">
+          <div class="toggle-row" style="margin-top:22px;">
+            <label class="toggle">
+              <input type="checkbox" id="sPublished" checked>
+              <div class="toggle-track"></div>
+              <div class="toggle-thumb"></div>
+            </label>
+            <span class="toggle-label">Published</span>
+          </div>
+        </div>
+        <div class="form-group form-full">
+          <label>Video (one video max)</label>
+          <div class="image-upload-zone" id="storyVideoZone">
+            <input type="file" id="storyVideoInput" accept="video/mp4,video/webm,video/mov,video/quicktime">
+            <div class="upload-icon">🎬</div>
+            <div class="upload-text">Drag & drop or <strong>click to upload</strong> a video</div>
+            <div class="upload-text" style="font-size:12px;margin-top:4px;">MP4, WebM, MOV — max 100MB</div>
+            <div class="progress-bar-wrap" id="storyVideoProgressWrap" style="display:none;"><div class="progress-bar" id="storyVideoProgress"></div></div>
+          </div>
+          <div id="storyVideoPreview" class="video-preview" style="display:none;">
+            <video id="storyVideoEl" controls></video>
+            <button class="video-remove" id="storyVideoRemove">×</button>
+          </div>
+          <input type="hidden" id="sVideoUrl">
+        </div>
+        <div class="form-group form-full">
+          <label>Image Carousel</label>
+          <div class="image-upload-zone" id="storyImagesZone">
+            <input type="file" id="storyImagesInput" accept="image/*" multiple>
+            <div class="upload-icon">🖼️</div>
+            <div class="upload-text">Drag & drop or <strong>click to upload</strong> images</div>
+            <div class="upload-text" style="font-size:12px;margin-top:4px;">JPEG, PNG, WebP — select multiple</div>
+            <div class="progress-bar-wrap" id="storyImagesProgressWrap" style="display:none;"><div class="progress-bar" id="storyImagesProgress"></div></div>
+          </div>
+          <div id="storyGallery" class="gallery-grid"></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" id="storyCancelBtn">Cancel</button>
+      <button class="btn-save" id="storySaveBtn">Save Story</button>
+    </div>
+  </div>
+</div>
+
+<!-- PARTNER EDITOR MODAL -->
+<div class="modal-overlay" id="partnerModal">
+  <div class="modal" style="max-width:520px;">
+    <div class="modal-header">
+      <h3 id="partnerModalTitle">Add Partner</h3>
+      <button class="modal-close" id="partnerModalClose">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group form-full">
+          <label>Company Name *</label>
+          <input type="text" id="pName" placeholder="e.g. Safaricom, KCB Group…">
+        </div>
+        <div class="form-group form-full">
+          <label>Logo *</label>
+          <div class="image-upload-zone" id="partnerLogoZone">
+            <input type="file" id="partnerLogoInput" accept="image/*">
+            <div class="upload-icon">🏢</div>
+            <div class="upload-text">Drag & drop or <strong>click to upload</strong> logo</div>
+            <div class="upload-text" style="font-size:12px;margin-top:4px;">PNG preferred (transparent background)</div>
+            <div class="upload-preview" id="partnerLogoPreview" style="display:none;">
+              <img id="partnerLogoPreviewImg" src="" alt="">
+              <button class="upload-remove" id="partnerLogoRemove">×</button>
+            </div>
+            <div class="progress-bar-wrap" id="partnerLogoProgressWrap" style="display:none;"><div class="progress-bar" id="partnerLogoProgress"></div></div>
+          </div>
+          <input type="hidden" id="pLogoUrl">
+        </div>
+        <div class="form-group">
+          <label>Display Order</label>
+          <input type="number" id="pOrder" placeholder="1" value="0" min="0">
+        </div>
+        <div class="form-group">
+          <div class="toggle-row" style="margin-top:22px;">
+            <label class="toggle">
+              <input type="checkbox" id="pActive" checked>
+              <div class="toggle-track"></div>
+              <div class="toggle-thumb"></div>
+            </label>
+            <span class="toggle-label">Active (visible on site)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" id="partnerCancelBtn">Cancel</button>
+      <button class="btn-save" id="partnerSaveBtn">Save Partner</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script type="module">
 import {
   adminGetBlogs, adminGetBlog, adminSaveBlog, adminDeleteBlog,
-  adminGetJobs, adminGetJob, adminSaveJob, adminDeleteJob, adminGetApplications, adminDeleteApplication, adminDeleteApplicationsByJobTitle, getRuntimeConfig, deleteCvFromSupabase
+  adminGetJobs, adminGetJob, adminSaveJob, adminDeleteJob, adminGetApplications, adminDeleteApplication, adminDeleteApplicationsByJobTitle, getRuntimeConfig, deleteCvFromSupabase,
+  adminGetSuccessStories, adminGetSuccessStory, adminSaveSuccessStory, adminDeleteSuccessStory,
+  adminGetPartners, adminSavePartner, adminDeletePartner
 } from './js/supabase.js';
+import { uploadToCloudinary } from './js/cloudinary.js';
 
 // ── HELPERS ──────────────────────────────────────────────────────────────────
 
@@ -596,11 +854,11 @@ function toggleMobileSidebar(){
 function setPanel(name){
   navItems.forEach(n=>n.classList.toggle('active',n.dataset.panel===name));
   Object.entries(panels).forEach(([k,v])=>v.classList.toggle('active',k===name));
-  const titles={overview:'Overview',blogs:'Blog Posts',jobs:'Job Listings',applications:'Applications',newsletter:'Newsletter'};
+  const titles={overview:'Overview',blogs:'Blog Posts',jobs:'Job Listings',applications:'Applications',stories:'Success Stories',partners:'Partners',newsletter:'Newsletter'};
   document.getElementById('panelTitle').textContent=titles[name]||name;
-  if(name==='applications'){
-    loadApplications();
-  }
+  if(name==='applications') loadApplications();
+  if(name==='stories') loadStories();
+  if(name==='partners') loadPartners();
 }
 
 navItems.forEach(n=>n.addEventListener('click',()=>setPanel(n.dataset.panel)));
@@ -627,11 +885,16 @@ let newsletterPoller=null;
 let editingBlogId=null;
 let editingJobId=null;
 let cbBlocks=[];
+let stories=[];
+let partners=[];
+let editingStoryId=null;
+let editingPartnerId=null;
+let storyImages=[];
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 
 async function init(){
-  await Promise.all([loadBlogs(),loadJobs(),loadNewsletter()]);
+  await Promise.all([loadBlogs(),loadJobs(),loadNewsletter(),loadStories(),loadPartners()]);
   await loadApplications();
   renderOverview();
   if(!newsletterPoller){
@@ -905,6 +1168,8 @@ function renderOverview(){
   document.getElementById('statPublished').textContent=blogs.filter(b=>b.published).length;
   document.getElementById('statDrafts').textContent=blogs.filter(b=>!b.published).length;
   document.getElementById('statJobs').textContent=jobs.filter(j=>j.is_active).length;
+  document.getElementById('statStories').textContent=stories.filter(s=>s.published).length;
+  document.getElementById('statPartners').textContent=partners.filter(p=>p.active).length;
   const bt=document.getElementById('overviewBlogTable');
   bt.innerHTML=blogs.slice(0,5).map(b=>`<tr><td>${esc(b.title)}</td><td>${esc(b.category||'—')}</td><td><span class="badge ${b.published?'published':'draft'}">${b.published?'Published':'Draft'}</span></td><td>${fmt(b.published_at)}</td></tr>`).join('')||`<tr class="empty-row"><td colspan="4">No blogs yet</td></tr>`;
   const jt=document.getElementById('overviewJobTable');
@@ -993,17 +1258,17 @@ document.addEventListener('click',async e=>{
     document.body.removeChild(link);
     return;
   }
-  const editBtn=e.target.closest('.btn-edit');
-  const delBtn=e.target.closest('.btn-delete');
+  const editBtn=e.target.closest('.btn-edit[data-type]');
+  const delBtn=e.target.closest('.btn-delete[data-type]');
   if(editBtn){
     if(editBtn.dataset.type==='blog')openBlogModal(editBtn.dataset.id);
-    else openJobModal(editBtn.dataset.id);
+    else if(editBtn.dataset.type==='job')openJobModal(editBtn.dataset.id);
   }
   if(delBtn){
     if(!confirm('Delete this item? This cannot be undone.'))return;
     try{
       if(delBtn.dataset.type==='blog'){await adminDeleteBlog(delBtn.dataset.id);await loadBlogs();}
-      else{await adminDeleteJob(delBtn.dataset.id);await loadJobs();}
+      else if(delBtn.dataset.type==='job'){await adminDeleteJob(delBtn.dataset.id);await loadJobs();}
       renderOverview();
       showToast('Deleted successfully');
     }catch(e){showToast('Delete failed: '+e.message,'error');}
@@ -1336,9 +1601,305 @@ document.getElementById('nImageUpload').addEventListener('change',async e=>{
   e.target.value='';
 });
 
+// ── SUCCESS STORIES ──────────────────────────────────────────────────────────
+
+async function loadStories(){
+  try{
+    stories=await adminGetSuccessStories()||[];
+  }catch(err){
+    stories=[];
+    showToast('Could not load success stories: '+err.message,'error');
+  }
+  renderStoryTable();
+}
+
+function renderStoryTable(){
+  const tbody=document.getElementById('storyTable');
+  if(!stories.length){tbody.innerHTML='<tr class="empty-row"><td colspan="5">No success stories yet. Create your first one!</td></tr>';return;}
+  tbody.innerHTML=stories.map(s=>{
+    const hasVideo=!!s.video_url;
+    const imgCount=Array.isArray(s.images)?s.images.length:0;
+    const media=[];
+    if(hasVideo) media.push('Video');
+    if(imgCount) media.push(imgCount+' image'+(imgCount>1?'s':''));
+    return `<tr>
+      <td><strong>${esc(s.title)}</strong></td>
+      <td>${media.length?media.join(', '):'<span style="color:var(--muted)">None</span>'}</td>
+      <td><span class="badge ${s.published?'published':'draft'}">${s.published?'Published':'Draft'}</span></td>
+      <td>${s.display_order??0}</td>
+      <td><div class="action-btns">
+        <button class="btn-edit" data-story-edit="${s.id}">Edit</button>
+        <button class="btn-delete" data-story-delete="${s.id}">Delete</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+function openStoryModal(id=null){
+  editingStoryId=id;
+  storyImages=[];
+  document.getElementById('storyModalTitle').textContent=id?'Edit Success Story':'New Success Story';
+  document.getElementById('sTitle').value='';
+  document.getElementById('sDescription').value='';
+  document.getElementById('sOrder').value='0';
+  document.getElementById('sPublished').checked=true;
+  document.getElementById('sVideoUrl').value='';
+  document.getElementById('storyVideoPreview').style.display='none';
+  document.getElementById('storyVideoProgressWrap').style.display='none';
+  document.getElementById('storyImagesProgressWrap').style.display='none';
+  renderStoryGallery();
+  if(id){
+    adminGetSuccessStory(id).then(s=>{
+      if(!s)return;
+      document.getElementById('sTitle').value=s.title||'';
+      document.getElementById('sDescription').value=s.description||'';
+      document.getElementById('sOrder').value=s.display_order??0;
+      document.getElementById('sPublished').checked=!!s.published;
+      document.getElementById('sVideoUrl').value=s.video_url||'';
+      if(s.video_url){
+        document.getElementById('storyVideoEl').src=s.video_url;
+        document.getElementById('storyVideoPreview').style.display='block';
+      }
+      storyImages=Array.isArray(s.images)?[...s.images]:[];
+      renderStoryGallery();
+    });
+  }
+  document.getElementById('storyModal').classList.add('open');
+}
+
+function closeStoryModal(){document.getElementById('storyModal').classList.remove('open');}
+
+function renderStoryGallery(){
+  const container=document.getElementById('storyGallery');
+  if(!storyImages.length){container.innerHTML='';return;}
+  container.innerHTML=storyImages.map((url,i)=>`
+    <div class="gallery-item">
+      <img src="${esc(url)}" alt="Image ${i+1}">
+      <button class="gallery-remove" data-gallery-remove="${i}">×</button>
+      <span class="gallery-order">${i+1}</span>
+    </div>
+  `).join('');
+}
+
+document.getElementById('storyVideoInput').addEventListener('change',async e=>{
+  const file=e.target.files[0];if(!file)return;
+  const maxSize=100*1024*1024;
+  if(file.size>maxSize){showToast('Video too large. Maximum 100MB.','error');e.target.value='';return;}
+  const wrap=document.getElementById('storyVideoProgressWrap');
+  const bar=document.getElementById('storyVideoProgress');
+  wrap.style.display='block';bar.style.width='0%';
+  try{
+    const result=await uploadToCloudinary(file,{folder:'hocan/success-stories/videos',onProgress:p=>{bar.style.width=p+'%';}});
+    document.getElementById('sVideoUrl').value=result.url;
+    document.getElementById('storyVideoEl').src=result.url;
+    document.getElementById('storyVideoPreview').style.display='block';
+    wrap.style.display='none';
+    showToast('Video uploaded!');
+  }catch(err){wrap.style.display='none';showToast('Video upload failed: '+err.message,'error');}
+  e.target.value='';
+});
+
+document.getElementById('storyVideoRemove').addEventListener('click',()=>{
+  document.getElementById('sVideoUrl').value='';
+  document.getElementById('storyVideoEl').src='';
+  document.getElementById('storyVideoPreview').style.display='none';
+});
+
+document.getElementById('storyImagesInput').addEventListener('change',async e=>{
+  const files=Array.from(e.target.files||[]);if(!files.length)return;
+  const wrap=document.getElementById('storyImagesProgressWrap');
+  const bar=document.getElementById('storyImagesProgress');
+  wrap.style.display='block';
+  let done=0;
+  for(const file of files){
+    try{
+      bar.style.width=Math.round((done/files.length)*100)+'%';
+      const result=await uploadToCloudinary(file,{folder:'hocan/success-stories/images'});
+      storyImages.push(result.url);
+      done++;
+    }catch(err){showToast('Failed to upload '+file.name+': '+err.message,'error');done++;}
+  }
+  bar.style.width='100%';
+  setTimeout(()=>{wrap.style.display='none';},500);
+  renderStoryGallery();
+  showToast(done+' image'+(done>1?'s':'')+' uploaded');
+  e.target.value='';
+});
+
+document.getElementById('storyGallery').addEventListener('click',e=>{
+  const btn=e.target.closest('[data-gallery-remove]');
+  if(!btn)return;
+  storyImages.splice(+btn.dataset.galleryRemove,1);
+  renderStoryGallery();
+});
+
+document.getElementById('storySaveBtn').addEventListener('click',async()=>{
+  const btn=document.getElementById('storySaveBtn');
+  const title=document.getElementById('sTitle').value.trim();
+  const description=document.getElementById('sDescription').value.trim();
+  if(!title||!description){showToast('Title and description are required','error');return;}
+  btn.disabled=true;btn.textContent='Saving…';
+  const data={
+    title,
+    description,
+    video_url:document.getElementById('sVideoUrl').value||null,
+    images:storyImages.length?storyImages:null,
+    display_order:parseInt(document.getElementById('sOrder').value)||0,
+    published:document.getElementById('sPublished').checked
+  };
+  try{
+    await adminSaveSuccessStory(data,editingStoryId);
+    closeStoryModal();
+    await loadStories();
+    renderOverview();
+    showToast(editingStoryId?'Success story updated!':'Success story created!');
+  }catch(err){showToast('Save failed: '+err.message,'error');}
+  btn.disabled=false;btn.textContent='Save Story';
+});
+
+document.getElementById('storyModalClose').addEventListener('click',closeStoryModal);
+document.getElementById('storyCancelBtn').addEventListener('click',closeStoryModal);
+document.getElementById('newStoryBtn').addEventListener('click',()=>openStoryModal());
+
+document.addEventListener('click',async e=>{
+  const editBtn=e.target.closest('[data-story-edit]');
+  if(editBtn){openStoryModal(editBtn.dataset.storyEdit);return;}
+  const delBtn=e.target.closest('[data-story-delete]');
+  if(delBtn){
+    if(!confirm('Delete this success story? This cannot be undone.'))return;
+    try{
+      await adminDeleteSuccessStory(delBtn.dataset.storyDelete);
+      await loadStories();
+      renderOverview();
+      showToast('Success story deleted');
+    }catch(err){showToast('Delete failed: '+err.message,'error');}
+  }
+});
+
+// ── PARTNERS ─────────────────────────────────────────────────────────────────
+
+async function loadPartners(){
+  try{
+    partners=await adminGetPartners()||[];
+  }catch(err){
+    partners=[];
+    showToast('Could not load partners: '+err.message,'error');
+  }
+  renderPartnerTable();
+}
+
+function renderPartnerTable(){
+  const tbody=document.getElementById('partnerTable');
+  if(!partners.length){tbody.innerHTML='<tr class="empty-row"><td colspan="5">No partners yet. Add your first one!</td></tr>';return;}
+  tbody.innerHTML=partners.map(p=>`<tr>
+    <td>${p.logo_url?`<img src="${esc(p.logo_url)}" style="max-height:36px;max-width:80px;object-fit:contain;" alt="">`:'—'}</td>
+    <td><strong>${esc(p.name)}</strong></td>
+    <td><span class="badge ${p.active?'active':'inactive'}">${p.active?'Active':'Inactive'}</span></td>
+    <td>${p.display_order??0}</td>
+    <td><div class="action-btns">
+      <button class="btn-edit" data-partner-edit="${p.id}">Edit</button>
+      <button class="btn-delete" data-partner-delete="${p.id}">Delete</button>
+    </div></td>
+  </tr>`).join('');
+}
+
+function openPartnerModal(id=null){
+  editingPartnerId=id;
+  document.getElementById('partnerModalTitle').textContent=id?'Edit Partner':'Add Partner';
+  document.getElementById('pName').value='';
+  document.getElementById('pLogoUrl').value='';
+  document.getElementById('pOrder').value='0';
+  document.getElementById('pActive').checked=true;
+  document.getElementById('partnerLogoPreview').style.display='none';
+  document.getElementById('partnerLogoProgressWrap').style.display='none';
+  if(id){
+    const p=partners.find(x=>String(x.id)===String(id));
+    if(p){
+      document.getElementById('pName').value=p.name||'';
+      document.getElementById('pLogoUrl').value=p.logo_url||'';
+      document.getElementById('pOrder').value=p.display_order??0;
+      document.getElementById('pActive').checked=!!p.active;
+      if(p.logo_url){
+        document.getElementById('partnerLogoPreviewImg').src=p.logo_url;
+        document.getElementById('partnerLogoPreview').style.display='inline-block';
+      }
+    }
+  }
+  document.getElementById('partnerModal').classList.add('open');
+}
+
+function closePartnerModal(){document.getElementById('partnerModal').classList.remove('open');}
+
+document.getElementById('partnerLogoInput').addEventListener('change',async e=>{
+  const file=e.target.files[0];if(!file)return;
+  const wrap=document.getElementById('partnerLogoProgressWrap');
+  const bar=document.getElementById('partnerLogoProgress');
+  wrap.style.display='block';bar.style.width='0%';
+  try{
+    const result=await uploadToCloudinary(file,{folder:'hocan/partners',onProgress:p=>{bar.style.width=p+'%';}});
+    document.getElementById('pLogoUrl').value=result.url;
+    document.getElementById('partnerLogoPreviewImg').src=result.url;
+    document.getElementById('partnerLogoPreview').style.display='inline-block';
+    wrap.style.display='none';
+    showToast('Logo uploaded!');
+  }catch(err){wrap.style.display='none';showToast('Upload failed: '+err.message,'error');}
+  e.target.value='';
+});
+
+document.getElementById('partnerLogoRemove').addEventListener('click',e=>{
+  e.stopPropagation();
+  document.getElementById('pLogoUrl').value='';
+  document.getElementById('partnerLogoPreview').style.display='none';
+  document.getElementById('partnerLogoPreviewImg').src='';
+});
+
+document.getElementById('partnerSaveBtn').addEventListener('click',async()=>{
+  const btn=document.getElementById('partnerSaveBtn');
+  const name=document.getElementById('pName').value.trim();
+  const logo_url=document.getElementById('pLogoUrl').value.trim();
+  if(!name){showToast('Company name is required','error');return;}
+  if(!logo_url){showToast('Please upload a logo','error');return;}
+  btn.disabled=true;btn.textContent='Saving…';
+  const data={
+    name,
+    logo_url,
+    display_order:parseInt(document.getElementById('pOrder').value)||0,
+    active:document.getElementById('pActive').checked
+  };
+  try{
+    await adminSavePartner(data,editingPartnerId);
+    closePartnerModal();
+    await loadPartners();
+    renderOverview();
+    showToast(editingPartnerId?'Partner updated!':'Partner added!');
+  }catch(err){showToast('Save failed: '+err.message,'error');}
+  btn.disabled=false;btn.textContent='Save Partner';
+});
+
+document.getElementById('partnerModalClose').addEventListener('click',closePartnerModal);
+document.getElementById('partnerCancelBtn').addEventListener('click',closePartnerModal);
+document.getElementById('newPartnerBtn').addEventListener('click',()=>openPartnerModal());
+
+document.addEventListener('click',async e=>{
+  const editBtn=e.target.closest('[data-partner-edit]');
+  if(editBtn){openPartnerModal(editBtn.dataset.partnerEdit);return;}
+  const delBtn=e.target.closest('[data-partner-delete]');
+  if(delBtn){
+    if(!confirm('Delete this partner? This cannot be undone.'))return;
+    try{
+      await adminDeletePartner(delBtn.dataset.partnerDelete);
+      await loadPartners();
+      renderOverview();
+      showToast('Partner deleted');
+    }catch(err){showToast('Delete failed: '+err.message,'error');}
+  }
+});
+
 // Close modals on overlay click
 document.getElementById('blogModal').addEventListener('click',e=>{if(e.target===document.getElementById('blogModal'))closeBlogModal();});
 document.getElementById('jobModal').addEventListener('click',e=>{if(e.target===document.getElementById('jobModal'))closeJobModal();});
+document.getElementById('storyModal').addEventListener('click',e=>{if(e.target===document.getElementById('storyModal'))closeStoryModal();});
+document.getElementById('partnerModal').addEventListener('click',e=>{if(e.target===document.getElementById('partnerModal'))closePartnerModal();});
 </script>
 </body>
 </html>

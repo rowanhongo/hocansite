@@ -7,9 +7,13 @@ const RUNTIME_CONFIG_CACHE_KEY = "hocan_runtime_config_v1";
 const BLOGS_TABLE_CANDIDATES = ["blog_posts", "blogs"];
 const JOBS_TABLE_CANDIDATES = ["job_posts", "jobs"];
 const APPLICATIONS_TABLE_CANDIDATES = ["job_applications"];
+const SUCCESS_STORIES_TABLE_CANDIDATES = ["success_stories"];
+const PARTNERS_TABLE_CANDIDATES = ["partners"];
 let resolvedBlogsTable = null;
 let resolvedJobsTable = null;
 let resolvedApplicationsTable = null;
+let resolvedSuccessStoriesTable = null;
+let resolvedPartnersTable = null;
 
 async function getConfig() {
   if (cachedConfig) return cachedConfig;
@@ -408,4 +412,112 @@ export async function deleteCvFromSupabase(path) {
     .from('CV')
     .remove([path]);
   if (error) throw new Error(error.message);
+}
+
+// ── SUCCESS STORIES ─────────────────────────────────────────────────────────
+
+async function successStoryQuery() {
+  const supabase = await getClient();
+  if (!resolvedSuccessStoriesTable) resolvedSuccessStoriesTable = await resolveTable(SUCCESS_STORIES_TABLE_CANDIDATES);
+  return supabase.from(resolvedSuccessStoriesTable);
+}
+
+export async function getPublicSuccessStories() {
+  const query = await successStoryQuery();
+  const { data, error } = await query
+    .select("*")
+    .eq("published", true)
+    .order("display_order", { ascending: true })
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return data || [];
+}
+
+export async function adminGetSuccessStories() {
+  const query = await successStoryQuery();
+  const { data, error } = await query
+    .select("*")
+    .order("display_order", { ascending: true })
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return data || [];
+}
+
+export async function adminGetSuccessStory(id) {
+  const query = await successStoryQuery();
+  const { data, error } = await query
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
+  if (error) throw error;
+  return data || null;
+}
+
+export async function adminSaveSuccessStory(payload, id = null) {
+  const query = await successStoryQuery();
+  const clean = { ...payload, updated_at: new Date().toISOString() };
+  if (id) {
+    const { data, error } = await query.update(clean).eq("id", id).select("*").single();
+    if (error) throw error;
+    return data;
+  }
+  const { data, error } = await query.insert([{ ...clean, created_at: new Date().toISOString() }]).select("*").single();
+  if (error) throw error;
+  return data;
+}
+
+export async function adminDeleteSuccessStory(id) {
+  const query = await successStoryQuery();
+  const { error } = await query.delete().eq("id", id);
+  if (error) throw error;
+  return true;
+}
+
+// ── PARTNERS ────────────────────────────────────────────────────────────────
+
+async function partnerQuery() {
+  const supabase = await getClient();
+  if (!resolvedPartnersTable) resolvedPartnersTable = await resolveTable(PARTNERS_TABLE_CANDIDATES);
+  return supabase.from(resolvedPartnersTable);
+}
+
+export async function getPublicPartners() {
+  const query = await partnerQuery();
+  const { data, error } = await query
+    .select("*")
+    .eq("active", true)
+    .order("display_order", { ascending: true })
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return data || [];
+}
+
+export async function adminGetPartners() {
+  const query = await partnerQuery();
+  const { data, error } = await query
+    .select("*")
+    .order("display_order", { ascending: true })
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return data || [];
+}
+
+export async function adminSavePartner(payload, id = null) {
+  const query = await partnerQuery();
+  const clean = { ...payload, updated_at: new Date().toISOString() };
+  if (id) {
+    const { data, error } = await query.update(clean).eq("id", id).select("*").single();
+    if (error) throw error;
+    return data;
+  }
+  const { data, error } = await query.insert([{ ...clean, created_at: new Date().toISOString() }]).select("*").single();
+  if (error) throw error;
+  return data;
+}
+
+export async function adminDeletePartner(id) {
+  const query = await partnerQuery();
+  const { error } = await query.delete().eq("id", id);
+  if (error) throw error;
+  return true;
 }

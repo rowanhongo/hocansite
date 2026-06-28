@@ -13,18 +13,17 @@ export async function uploadToCloudinary(file, options = {}) {
     throw new Error("Cloudinary is not configured. Check Netlify env vars.");
   }
 
-  // Determine resource type based on file extension
   const fileName = file.name.toLowerCase();
   const isPdf = fileName.endsWith('.pdf');
   const isDocx = fileName.endsWith('.docx');
-  const isImage = fileName.match(/\.(jpg|jpeg|png)$/i);
+  const isImage = fileName.match(/\.(jpg|jpeg|png|webp|gif)$/i);
+  const isVideo = fileName.match(/\.(mp4|mov|webm|avi|mkv)$/i);
 
-  if (!isPdf && !isDocx && !isImage) {
-    throw new Error("Invalid file type. Please upload a PDF, DOCX, or image file.");
+  if (!isPdf && !isDocx && !isImage && !isVideo) {
+    throw new Error("Invalid file type. Please upload an image, video, PDF, or DOCX file.");
   }
 
-  // Use 'raw' for PDF/DOCX, 'image' for images
-  const resourceType = isPdf || isDocx ? 'raw' : 'image';
+  const resourceType = isVideo ? 'video' : (isPdf || isDocx ? 'raw' : 'image');
   const endpoint = `https://api.cloudinary.com/v1_1/${encodeURIComponent(cloudName)}/${resourceType}/upload`;
 
   const form = new FormData();
