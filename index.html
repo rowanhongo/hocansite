@@ -1316,8 +1316,9 @@
           img.onerror = function() { resolve(false); };
           img.src = src;
         });
-        if (!exists) break;
-        logos.push({ src: src, alt: "Partner " + i });
+        // Don't stop at the first gap — some scroll images may have been
+        // deleted, leaving non-contiguous filenames.
+        if (exists) logos.push({ src: src, alt: "Partner " + i });
       }
       return logos;
     }
