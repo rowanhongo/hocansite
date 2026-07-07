@@ -1307,20 +1307,24 @@
     }
 
     async function loadLogosFromLocal() {
-      var logos = [];
-      for (var i = 1; i <= 50; i++) {
-        var src = "./scroll" + i + ".png";
-        var exists = await new Promise(function(resolve) {
-          var img = new Image();
-          img.onload = function() { resolve(true); };
-          img.onerror = function() { resolve(false); };
-          img.src = src;
-        });
-        // Don't stop at the first gap — some scroll images may have been
-        // deleted, leaving non-contiguous filenames.
-        if (exists) logos.push({ src: src, alt: "Partner " + i });
+      var MAX = 20;
+      // Probe all candidates in parallel instead of one-at-a-time, so a full
+      // scan isn't blocked by each image load. Gaps are tolerated — some
+      // scroll images may have been deleted, leaving non-contiguous filenames.
+      var checks = [];
+      for (var i = 1; i <= MAX; i++) {
+        (function(i) {
+          var src = "./scroll" + i + ".png";
+          checks.push(new Promise(function(resolve) {
+            var img = new Image();
+            img.onload = function() { resolve({ src: src, alt: "Partner " + i }); };
+            img.onerror = function() { resolve(null); };
+            img.src = src;
+          }));
+        })(i);
       }
-      return logos;
+      var results = await Promise.all(checks);
+      return results.filter(Boolean);
     }
 
     async function getSupabaseConfig() {
