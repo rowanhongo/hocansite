@@ -73,8 +73,9 @@ function buildLogoUrl() {
   let base = env("URL", env("DEPLOY_PRIME_URL", "")).replace(/\/$/, "");
   // Ensure absolute https URL (some email clients drop relative/invalid URLs)
   if (base && !base.startsWith("http")) base = `https://${base}`;
-  if (base) return `${base}/Hocan%20Logo.png`;
-  return "Hocan%20Logo.png";
+  // Full wordmark logo — emails need the readable brand, not the bare icon.
+  if (base) return `${base}/assets/logo.png`;
+  return "assets/logo.png";
 }
 
 function baseUrl() {

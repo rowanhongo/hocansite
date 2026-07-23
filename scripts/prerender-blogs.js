@@ -106,7 +106,7 @@ function buildPage(post) {
   const description = truncate(post.excerpt || plain || `An article from Hocan Holdings.`, 155);
   const author = post.author || "Hocan Holdings";
   const published = isoDate(post);
-  const cover = post.cover_image_url || `${SITE}/assets/logo.png`;
+  const cover = post.cover_image_url || `${SITE}/assets/og-image.png`;
   const words = plain ? plain.split(/\s+/).length : 0;
 
   const ld = {
@@ -142,7 +142,9 @@ function buildPage(post) {
   <meta name="description" content="${escapeHtml(description)}">
   <meta name="author" content="${escapeHtml(author)}">
   <link rel="canonical" href="${escapeHtml(url)}">
-  <link rel="icon" type="image/png" href="/Hocan%20Logo.png">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" href="/assets/icon-512.png">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Hocan Holdings">
   <meta property="og:title" content="${escapeHtml(post.title || "")}">
