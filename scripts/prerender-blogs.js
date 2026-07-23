@@ -217,7 +217,11 @@ async function main() {
       console.warn(`prerender-blogs: skipping unsafe slug ${JSON.stringify(post.slug)}`);
       continue;
     }
-    fs.writeFileSync(path.join(outDir, `${post.slug}.html`), buildPage(post), "utf8");
+    // <slug>/index.html rather than <slug>.html so /blog/<slug> resolves to a real
+    // file without depending on Netlify's optional "Pretty URLs" post-processing.
+    const postDir = path.join(outDir, post.slug);
+    fs.mkdirSync(postDir, { recursive: true });
+    fs.writeFileSync(path.join(postDir, "index.html"), buildPage(post), "utf8");
   }
 
   writeSitemap(posts);

@@ -1,13 +1,10 @@
 [build]
 functions = "netlify/functions"
 
-# Serve the pre-rendered static post if the build produced one (crawlers get real HTML).
-[[redirects]]
-from = "/blog/:slug"
-to = "/blog/:slug.html"
-status = 200
-
-# Fallback for posts published since the last build — client-side render.
+# Pre-rendered posts are written by scripts/prerender-blogs.js to /blog/<slug>/index.html,
+# so /blog/<slug> resolves to that real file without relying on the Pretty URLs setting.
+# Static files take precedence over this non-forced rule, which is the fallback for
+# posts published since the last build (rendered client-side).
 [[redirects]]
 from = "/blog/*"
 to = "/blog-post.html"
