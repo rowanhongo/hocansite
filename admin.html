@@ -119,6 +119,33 @@ tr:hover td{background:#FAFBFD;}
 .toggle input:checked~.toggle-thumb{left:23px;}
 .toggle-label{font-size:14px;font-weight:500;}
 
+/* ── GUIDED STEPS (Blog editor) ── */
+.step-head{display:flex;gap:12px;align-items:flex-start;margin:22px 0 2px;padding-top:18px;border-top:1px solid var(--border);}
+.form-grid>.step-head:first-child{margin-top:0;padding-top:0;border-top:none;}
+.step-num{flex-shrink:0;width:26px;height:26px;border-radius:50%;background:var(--sky);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+.step-head h4{font-size:15px;font-weight:700;color:var(--text);margin:2px 0 2px;}
+.step-head p{font-size:13px;color:var(--muted);line-height:1.5;}
+.req{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--rose,#C47A5A);background:rgba(196,122,90,.1);padding:2px 7px;border-radius:20px;margin-left:6px;vertical-align:middle;}
+.hint{display:block;margin-top:5px;font-size:12px;color:var(--muted);line-height:1.45;}
+.advanced{border:1.5px solid var(--border);border-radius:10px;padding:0 12px;}
+.advanced summary{cursor:pointer;padding:10px 0;font-size:13px;font-weight:600;color:var(--muted);list-style:none;display:flex;align-items:center;gap:8px;}
+.advanced summary::before{content:'▸';font-size:11px;transition:.2s;}
+.advanced[open] summary::before{transform:rotate(90deg);}
+.advanced[open] summary{border-bottom:1px solid var(--border);margin-bottom:10px;}
+.advanced input{width:100%;margin-bottom:4px;}
+.advanced>small{padding-bottom:10px;}
+.slug-preview{font-weight:400;color:#A8B2BE;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.publish-row{background:#F8FAFC;border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;}
+.publish-row.is-live{background:rgba(93,186,126,.08);border-color:var(--green);}
+.cb-empty{text-align:center;padding:26px 20px;display:flex;flex-direction:column;align-items:center;gap:5px;}
+.cb-empty-icon{font-size:26px;}
+.cb-empty strong{font-size:14px;color:var(--text);}
+.cb-empty span{font-size:12.5px;color:var(--muted);max-width:330px;line-height:1.5;}
+.cb-toolbar-label{font-size:12px;font-weight:700;color:var(--muted);align-self:center;margin-right:2px;}
+.cb-next{display:flex;gap:6px;flex-wrap:wrap;align-items:center;padding:10px 2px 2px;border-top:1px dashed var(--border);margin-top:2px;}
+.cb-next-label{font-size:11.5px;font-weight:700;color:var(--muted);margin-right:2px;}
+.cb-next-btn{padding:5px 10px;font-size:11.5px;background:transparent;}
+
 /* ── CONTENT BUILDER (Blog) ── */
 .content-builder{border:1.5px solid var(--border);border-radius:12px;overflow:hidden;}
 .cb-toolbar{background:#F8FAFC;border-bottom:1px solid var(--border);padding:10px 14px;display:flex;gap:8px;flex-wrap:wrap;}
@@ -528,28 +555,57 @@ tr:hover td{background:#FAFBFD;}
     </div>
     <div class="modal-body">
       <div class="form-grid">
+        <div class="form-full step-head">
+          <span class="step-num">1</span>
+          <div>
+            <h4>What is this article about?</h4>
+            <p>The headline readers see first, and a one-line summary for the blog page.</p>
+          </div>
+        </div>
         <div class="form-group form-full">
-          <label>Title *</label>
-          <input type="text" id="bTitle" placeholder="Enter blog post title…">
+          <label>Headline <span class="req">Required</span></label>
+          <input type="text" id="bTitle" placeholder="e.g. Hiring in the new tax laws of 2026">
+          <small class="hint">Write it like you'd say it out loud. This becomes the page title on Google.</small>
+        </div>
+        <div class="form-group form-full">
+          <label>Short summary</label>
+          <textarea id="bExcerpt" rows="2" placeholder="e.g. Hiring has gotten harder this year — here's what changed and what to do about it."></textarea>
+          <small class="hint">One or two sentences. Shown on the blog listing and in Google results. <span id="bExcerptCount"></span></small>
         </div>
         <div class="form-group">
-          <label>Slug (URL) *</label>
-          <input type="text" id="bSlug" placeholder="my-blog-post">
+          <label>Topic</label>
+          <input type="text" id="bCategory" list="bCategoryList" placeholder="e.g. HR">
+          <datalist id="bCategoryList">
+            <option value="HR"></option>
+            <option value="Recruitment"></option>
+            <option value="Logistics"></option>
+            <option value="Business"></option>
+            <option value="Company News"></option>
+          </datalist>
+          <small class="hint">Optional — helps readers filter.</small>
         </div>
         <div class="form-group">
-          <label>Category</label>
-          <input type="text" id="bCategory" placeholder="HR, Logistics, Business…">
-        </div>
-        <div class="form-group">
-          <label>Author</label>
+          <label>Written by</label>
           <input type="text" id="bAuthor" placeholder="Hocan Holdings" value="Hocan Holdings">
+          <small class="hint">Optional — defaults to Hocan Holdings.</small>
         </div>
         <div class="form-group form-full">
-          <label>Excerpt / Summary</label>
-          <textarea id="bExcerpt" rows="2" placeholder="Short description shown on the blog listing page…"></textarea>
+          <details class="advanced">
+            <summary>Web address <span id="bSlugPreview" class="slug-preview"></span></summary>
+            <input type="text" id="bSlug" placeholder="my-blog-post">
+            <small class="hint">Filled in automatically from your headline. Only change this if you know why — editing it after publishing breaks existing links.</small>
+          </details>
+        </div>
+
+        <div class="form-full step-head">
+          <span class="step-num">2</span>
+          <div>
+            <h4>Add a cover picture</h4>
+            <p>Appears at the top of the article and when it's shared on WhatsApp or LinkedIn.</p>
+          </div>
         </div>
         <div class="form-group form-full">
-          <label>Cover Image</label>
+          <label>Cover image</label>
           <div class="image-upload-zone" id="coverUploadZone">
             <input type="file" id="coverFileInput" accept="image/*">
             <div class="upload-icon">🖼️</div>
@@ -563,30 +619,49 @@ tr:hover td{background:#FAFBFD;}
           </div>
           <input type="hidden" id="bCoverUrl">
         </div>
-        <div class="form-group form-full">
-          <label>Content Blocks</label>
-          <div class="content-builder" id="contentBuilder">
-            <div class="cb-toolbar">
-              <button class="cb-btn" data-add="paragraph">¶ Paragraph</button>
-              <button class="cb-btn" data-add="heading">H Heading</button>
-              <button class="cb-btn" data-add="subheading">h Subheading</button>
-              <button class="cb-btn" data-add="quote">❝ Quote</button>
-              <button class="cb-btn" data-add="list">• List</button>
-              <button class="cb-btn" data-add="image">🖼 Image</button>
-            </div>
-            <div class="cb-blocks" id="cbBlocks">
-              <div style="text-align:center;padding:24px;color:var(--muted);font-size:13px;">Click a button above to add content blocks</div>
-            </div>
+        <div class="form-full step-head">
+          <span class="step-num">3</span>
+          <div>
+            <h4>Write the article</h4>
+            <p>Add one piece at a time — a paragraph of text, a section heading, a picture. Use <strong>↑ ↓</strong> to reorder and <strong>×</strong> to delete.</p>
           </div>
         </div>
         <div class="form-group form-full">
-          <div class="toggle-row">
+          <div class="content-builder" id="contentBuilder">
+            <div class="cb-toolbar">
+              <span class="cb-toolbar-label">Add:</span>
+              <button class="cb-btn" data-add="paragraph" title="A normal block of writing">📝 Text</button>
+              <button class="cb-btn" data-add="heading" title="Starts a new section">📌 Section title</button>
+              <button class="cb-btn" data-add="subheading" title="A smaller title inside a section">📎 Smaller title</button>
+              <button class="cb-btn" data-add="list" title="A bulleted list">• Bullet list</button>
+              <button class="cb-btn" data-add="quote" title="Pull out a quote or key point">❝ Quote</button>
+              <button class="cb-btn" data-add="image" title="A picture inside the article">🖼 Picture</button>
+            </div>
+            <div class="cb-blocks" id="cbBlocks">
+              <div class="cb-empty">
+                <div class="cb-empty-icon">📝</div>
+                <strong>Start with a paragraph of text</strong>
+                <span>Click <b>📝 Text</b> above to write your first paragraph, then keep adding pieces until the article is done.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-full step-head">
+          <span class="step-num">4</span>
+          <div>
+            <h4>Publish</h4>
+            <p>Leave this off to save a draft only you can see. Turn it on when the article is ready for the public.</p>
+          </div>
+        </div>
+        <div class="form-group form-full">
+          <div class="toggle-row publish-row">
             <label class="toggle">
               <input type="checkbox" id="bPublished">
               <div class="toggle-track"></div>
               <div class="toggle-thumb"></div>
             </label>
-            <span class="toggle-label">Published (visible on site)</span>
+            <span class="toggle-label" id="bPublishedLabel">Draft — not visible on the website yet</span>
           </div>
         </div>
       </div>
@@ -890,6 +965,7 @@ let applicationDetailPage=1;
 const applicationDetailPerPage=10;
 let newsletterPoller=null;
 let editingBlogId=null;
+let editingBlogPublishedAt=null; // original publish date, preserved across edits
 let editingJobId=null;
 let cbBlocks=[];
 let stories=[];
@@ -1286,6 +1362,7 @@ document.addEventListener('click',async e=>{
 
 function openBlogModal(id=null){
   editingBlogId=id;
+  editingBlogPublishedAt=null;
   cbBlocks=[];
   document.getElementById('blogModalTitle').textContent=id?'Edit Blog Post':'New Blog Post';
   document.getElementById('bTitle').value='';
@@ -1298,6 +1375,7 @@ function openBlogModal(id=null){
   document.getElementById('coverPreview').style.display='none';
   document.getElementById('coverProgressWrap').style.display='none';
   renderCbBlocks();
+  refreshBlogHints();
   if(id){
     adminGetBlog(id).then(b=>{
       if(!b)return;
@@ -1307,6 +1385,7 @@ function openBlogModal(id=null){
       document.getElementById('bAuthor').value=b.author||'Hocan Holdings';
       document.getElementById('bExcerpt').value=b.excerpt||'';
       document.getElementById('bPublished').checked=!!b.published;
+      editingBlogPublishedAt=b.published_at||null;
       document.getElementById('bCoverUrl').value=b.cover_image_url||'';
       if(b.cover_image_url){
         document.getElementById('coverPreviewImg').src=b.cover_image_url;
@@ -1314,15 +1393,46 @@ function openBlogModal(id=null){
       }
       cbBlocks=Array.isArray(b.content)?b.content:[];
       renderCbBlocks();
+      refreshBlogHints();
     });
   }
   document.getElementById('blogModal').classList.add('open');
 }
 
 // Auto-slug from title
+function updateSlugPreview(){
+  const slug=document.getElementById('bSlug').value.trim();
+  const el=document.getElementById('bSlugPreview');
+  if(el)el.textContent=slug?`/blog/${slug}`:'';
+}
 document.getElementById('bTitle').addEventListener('input',e=>{
   if(!editingBlogId)document.getElementById('bSlug').value=slugify(e.target.value);
+  updateSlugPreview();
 });
+document.getElementById('bSlug').addEventListener('input',updateSlugPreview);
+
+// Keep the slug preview, excerpt counter and publish label in sync — used by the
+// live listeners below and when the modal opens with an existing post loaded.
+function refreshBlogHints(){
+  updateSlugPreview();
+
+  // Search engines cut excerpts off around 155 characters.
+  const n=(document.getElementById('bExcerpt').value||'').trim().length;
+  const count=document.getElementById('bExcerptCount');
+  if(count){
+    count.textContent=n?`${n}/155 characters${n>155?' — a bit long, it may get cut off':''}`:'';
+    count.style.color=n>155?'var(--amber)':'';
+  }
+
+  // Make the publish toggle say what it actually does.
+  const pub=document.getElementById('bPublished');
+  const label=document.getElementById('bPublishedLabel');
+  const row=pub.closest('.publish-row');
+  if(label)label.textContent=pub.checked?'Live — visible to everyone on the website':'Draft — not visible on the website yet';
+  if(row)row.classList.toggle('is-live',pub.checked);
+}
+document.getElementById('bExcerpt').addEventListener('input',refreshBlogHints);
+document.getElementById('bPublished').addEventListener('change',refreshBlogHints);
 
 // Cover upload
 document.getElementById('coverFileInput').addEventListener('change',async e=>{
@@ -1349,24 +1459,63 @@ document.getElementById('coverRemove').addEventListener('click',e=>{
 });
 
 // CONTENT BUILDER
+function newBlock(type){
+  if(type==='image')return{type:'image',url:'',caption:''};
+  if(type==='list')return{type:'list',items:['']};
+  return{type,text:''};
+}
+
+// Pull whatever is currently typed into cbBlocks before re-rendering,
+// otherwise adding a block wipes unsaved text (lists especially).
+function syncBlocksFromDom(){
+  const container=document.getElementById('cbBlocks');
+  if(!container)return;
+  cbBlocks.forEach((b,i)=>{
+    const ta=container.querySelector(`textarea[data-block="${i}"]`);
+    if(!ta)return;
+    if(b.type==='list')b.items=(ta.value||'').split('\n').map(l=>l.trim()).filter(Boolean);
+    else if(b.type!=='image')b.text=ta.value||'';
+  });
+}
+
+function addBlock(type){
+  syncBlocksFromDom();
+  cbBlocks.push(newBlock(type));
+  renderCbBlocks();
+  // Put the cursor straight into what was just added so writing continues.
+  const container=document.getElementById('cbBlocks');
+  const last=container?.querySelector(`textarea[data-block="${cbBlocks.length-1}"]`);
+  if(last){last.focus();last.scrollIntoView({block:'nearest',behavior:'smooth'});}
+}
+
 document.querySelector('.cb-toolbar').addEventListener('click',e=>{
   const btn=e.target.closest('.cb-btn');if(!btn)return;
-  const type=btn.dataset.add;
-  if(type==='image'){cbBlocks.push({type:'image',url:'',caption:''});}
-  else if(type==='list'){cbBlocks.push({type:'list',items:['']});}
-  else{cbBlocks.push({type,text:''});}
-  renderCbBlocks();
+  addBlock(btn.dataset.add);
 });
 
 function renderCbBlocks(){
   const container=document.getElementById('cbBlocks');
-  if(!cbBlocks.length){container.innerHTML=`<div style="text-align:center;padding:24px;color:var(--muted);font-size:13px;">Click a button above to add content blocks</div>`;return;}
-  container.innerHTML=cbBlocks.map((b,i)=>blockHtml(b,i)).join('');
+  if(!cbBlocks.length){container.innerHTML=`<div class="cb-empty"><div class="cb-empty-icon">📝</div><strong>Start with a paragraph of text</strong><span>Click <b>📝 Text</b> above to write your first paragraph, then keep adding pieces until the article is done.</span></div>`;return;}
+  // Repeat the add buttons under the last block so writing flows downward
+  // instead of forcing a trip back up to the toolbar after every piece.
+  container.innerHTML=cbBlocks.map((b,i)=>blockHtml(b,i)).join('')+
+    `<div class="cb-next"><span class="cb-next-label">Add next:</span>`+
+    [['paragraph','📝 Text'],['heading','📌 Section title'],['subheading','📎 Smaller title'],['list','• Bullet list'],['quote','❝ Quote'],['image','🖼 Picture']]
+      .map(([t,l])=>`<button type="button" class="cb-btn cb-next-btn" data-next="${t}">${l}</button>`).join('')+
+    `</div>`;
+  container.querySelectorAll('[data-next]').forEach(btn=>btn.addEventListener('click',()=>addBlock(btn.dataset.next)));
   // Attach events
-  container.querySelectorAll('[data-up]').forEach(btn=>btn.addEventListener('click',()=>{const i=+btn.dataset.up;if(i>0){[cbBlocks[i-1],cbBlocks[i]]=[cbBlocks[i],cbBlocks[i-1]];renderCbBlocks();}}));
-  container.querySelectorAll('[data-down]').forEach(btn=>btn.addEventListener('click',()=>{const i=+btn.dataset.down;if(i<cbBlocks.length-1){[cbBlocks[i],cbBlocks[i+1]]=[cbBlocks[i+1],cbBlocks[i]];renderCbBlocks();}}));
-  container.querySelectorAll('[data-remove]').forEach(btn=>btn.addEventListener('click',()=>{cbBlocks.splice(+btn.dataset.remove,1);renderCbBlocks();}));
-  container.querySelectorAll('textarea[data-block]').forEach(ta=>ta.addEventListener('input',e=>{const i=+ta.dataset.block;cbBlocks[i].text=e.target.value;ta.style.height='auto';ta.style.height=ta.scrollHeight+'px';}));
+  // Every handler that re-renders must first capture what is typed, or that text is lost.
+  container.querySelectorAll('[data-up]').forEach(btn=>btn.addEventListener('click',()=>{const i=+btn.dataset.up;if(i>0){syncBlocksFromDom();[cbBlocks[i-1],cbBlocks[i]]=[cbBlocks[i],cbBlocks[i-1]];renderCbBlocks();}}));
+  container.querySelectorAll('[data-down]').forEach(btn=>btn.addEventListener('click',()=>{const i=+btn.dataset.down;if(i<cbBlocks.length-1){syncBlocksFromDom();[cbBlocks[i],cbBlocks[i+1]]=[cbBlocks[i+1],cbBlocks[i]];renderCbBlocks();}}));
+  container.querySelectorAll('[data-remove]').forEach(btn=>btn.addEventListener('click',()=>{syncBlocksFromDom();cbBlocks.splice(+btn.dataset.remove,1);renderCbBlocks();}));
+  container.querySelectorAll('textarea[data-block]').forEach(ta=>ta.addEventListener('input',e=>{
+    const i=+ta.dataset.block;
+    // Lists store an array of items; everything else stores plain text.
+    if(cbBlocks[i].type==='list')cbBlocks[i].items=(e.target.value||'').split('\n').map(l=>l.trim()).filter(Boolean);
+    else cbBlocks[i].text=e.target.value;
+    ta.style.height='auto';ta.style.height=ta.scrollHeight+'px';
+  }));
   container.querySelectorAll('input[data-img-url]').forEach(inp=>inp.addEventListener('change',e=>{cbBlocks[+inp.dataset.imgUrl].url=e.target.value;}));
   container.querySelectorAll('input[data-img-cap]').forEach(inp=>inp.addEventListener('change',e=>{cbBlocks[+inp.dataset.imgCap].caption=e.target.value;}));
   // Image upload inside block
@@ -1377,6 +1526,7 @@ function renderCbBlocks(){
       try{
         showToast('Uploading image…');
         const result=await uploadToCloudinary(file,{folder:'hocan/blog-images'});
+        syncBlocksFromDom();
         cbBlocks[i].url=result.url;
         renderCbBlocks();
         showToast('Image uploaded!');
@@ -1387,7 +1537,7 @@ function renderCbBlocks(){
 }
 
 function blockHtml(b,i){
-  const typeLabel={paragraph:'Paragraph',heading:'Heading',subheading:'Subheading',quote:'Quote',list:'List',image:'Image'}[b.type]||b.type;
+  const typeLabel={paragraph:'📝 Text',heading:'📌 Section title',subheading:'📎 Smaller title',quote:'❝ Quote',list:'• Bullet list',image:'🖼 Picture'}[b.type]||b.type;
   const actions=`<div class="cb-block-actions"><button class="cb-block-btn" data-up="${i}" title="Move up">↑</button><button class="cb-block-btn" data-down="${i}" title="Move down">↓</button><button class="cb-block-btn" data-remove="${i}" title="Remove" style="color:#E53E3E;">×</button></div>`;
   let content='';
   if(b.type==='image'){
@@ -1412,17 +1562,14 @@ function blockHtml(b,i){
   return`<div class="cb-block"><div class="cb-block-header"><span class="cb-block-type">${typeLabel}</span>${actions}</div><div class="cb-block-content">${content}</div></div>`;
 }
 
-// Collect blocks from DOM before save
+// Collect blocks from DOM before save. syncBlocksFromDom is the single source of
+// truth for reading the editor; drop anything the author left completely empty.
 function collectBlocks(){
-  const container=document.getElementById('cbBlocks');
-  return cbBlocks.map((b,i)=>{
-    if(b.type==='image')return b;
-    if(b.type==='list'){
-      const ta=container.querySelector(`textarea[data-block="${i}"]`);
-      return{type:'list',items:(ta?.value||'').split('\n').map(l=>l.trim()).filter(Boolean)};
-    }
-    const ta=container.querySelector(`textarea[data-block="${i}"]`);
-    return{...b,text:ta?.value||b.text||''};
+  syncBlocksFromDom();
+  return cbBlocks.filter(b=>{
+    if(b.type==='image')return !!b.url;
+    if(b.type==='list')return (b.items||[]).length>0;
+    return !!(b.text||'').trim();
   });
 }
 
@@ -1430,8 +1577,12 @@ function collectBlocks(){
 document.getElementById('blogSaveBtn').addEventListener('click',async()=>{
   const btn=document.getElementById('blogSaveBtn');
   const title=document.getElementById('bTitle').value.trim();
-  const slug=document.getElementById('bSlug').value.trim();
-  if(!title||!slug){showToast('Title and slug are required','error');return;}
+  // The web address is derived from the headline, so recover it rather than
+  // blocking on a field the author was told not to worry about.
+  let slug=document.getElementById('bSlug').value.trim()||slugify(title);
+  if(!title){showToast('Please add a headline before saving','error');return;}
+  if(!slug){showToast('Please use letters or numbers in the headline','error');return;}
+  document.getElementById('bSlug').value=slug;
   btn.disabled=true;btn.textContent='Saving…';
   const published=document.getElementById('bPublished').checked;
   const data={
@@ -1442,7 +1593,9 @@ document.getElementById('blogSaveBtn').addEventListener('click',async()=>{
     cover_image_url:document.getElementById('bCoverUrl').value||null,
     content:collectBlocks(),
     published,
-    published_at:published?(new Date().toISOString()):null
+    // Stamp the publish date once. Re-saving an already-published post must not
+    // reset it, or the blog reorders itself and sitemap lastmod dates go wrong.
+    published_at:published?(editingBlogPublishedAt||new Date().toISOString()):null
   };
   try{
     await adminSaveBlog(data,editingBlogId);
