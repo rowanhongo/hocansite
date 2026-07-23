@@ -26,29 +26,30 @@
   }
   </script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
+  <link rel="stylesheet" href="../assets/theme.css">
+    <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: Inter, sans-serif; background: #f3f0f8; color: #1f1f2c; overflow-x: hidden; position: relative; }
     body::before { content: ""; position: fixed; inset: -40% -40%; pointer-events: none; z-index: -1; background: radial-gradient(circle at 25% 30%, rgba(169,216,237,0.45), transparent 45%), radial-gradient(circle at 75% 70%, rgba(243,222,217,0.4), transparent 45%); animation: pageGlow 12s ease-in-out infinite; }
     @keyframes pageGlow { 0%,100% { transform: translate(0,0) rotate(0deg); } 50% { transform: translate(18px,18px) rotate(170deg);} }
     .wrap { max-width: 920px; margin: 24px auto 50px; padding: 0 14px; }
-    .hero { background: linear-gradient(rgba(20, 62, 102, 0.72), rgba(20, 62, 102, 0.72)), url("../image%202.jpeg") center/cover no-repeat; color: #fff; border-radius: 16px; padding: 26px; box-shadow: 0 16px 36px rgba(39, 91, 137, 0.28); }
+    .hero { background: linear-gradient(rgba(20, 62, 102, 0.72), rgba(20, 62, 102, 0.72)), url("../image%202.jpeg") center/cover no-repeat; color: #fff; border-radius: 14px; padding: 26px; box-shadow: 0 16px 36px rgba(39, 91, 137, 0.28); }
     .hero h1 { font-size: 38px; line-height: 1.15; margin-bottom: 10px; }
     .hero p { font-size: 18px; line-height: 1.5; opacity: 0.95; }
     .actions { margin-top: 16px; display: flex; gap: 10px; flex-wrap: wrap; }
-    .btn { display: inline-block; border-radius: 10px; text-decoration: none; font-weight: 700; padding: 11px 18px; }
+    .btn { display: inline-block; border-radius: 8px; text-decoration: none; font-weight: 700; padding: 11px 18px; }
     .btn-back { background: #2563eb; color: #fff; }
     .btn-email { background: #C47A5A; color: #fff; }
     .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.55); display: none; align-items: center; justify-content: center; z-index: 2000; padding: 16px; }
     .modal-overlay.open { display: flex; }
-    .modal { width: min(430px, 100%); border-radius: 16px; background: #fff; padding: 20px; box-shadow: 0 20px 44px rgba(0, 0, 0, 0.25); }
+    .modal { width: min(430px, 100%); border-radius: 14px; background: #fff; padding: 20px; box-shadow: 0 20px 44px rgba(0, 0, 0, 0.25); }
     .modal h3 { margin-bottom: 8px; }
     .modal p { margin-bottom: 12px; color: #555; }
     .field { margin-bottom: 10px; }
     .field label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 14px; }
-    .field input { width: 100%; border: 1px solid #d1d5db; border-radius: 10px; padding: 10px 12px; font-family: inherit; }
+    .field input { width: 100%; border: 1px solid #d1d5db; border-radius: 8px; padding: 10px 12px; font-family: inherit; }
     .stats { margin-top: 16px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-    .stat { background: #ede7f7; border-radius: 12px; padding: 14px; text-align: center; }
+    .stat { background: #ede7f7; border-radius: 14px; padding: 14px; text-align: center; }
     .stat strong { display: block; color: #6f36c7; font-size: 28px; margin-bottom: 4px; }
     .card { margin-top: 16px; background: #fff; border-radius: 14px; padding: 20px; box-shadow: 0 8px 20px rgba(24, 21, 34, 0.07); }
     .card h2 { margin-bottom: 12px; font-size: 30px; }

@@ -47,13 +47,14 @@
   }
   </script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
+  <link rel="stylesheet" href="assets/theme.css">
+    <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: Inter, sans-serif; background: radial-gradient(circle at 10% 20%, #e0f2ff 0%, transparent 40%), radial-gradient(circle at 90% 80%, #ffd9cf 0%, transparent 40%), #f4f6f8; color: #333; overflow-x: hidden; position: relative; }
     body::before { content: ""; position: fixed; inset: -40% -40%; pointer-events: none; z-index: -1; background: radial-gradient(circle at 25% 30%, rgba(169,216,237,0.45), transparent 45%), radial-gradient(circle at 75% 70%, rgba(243,222,217,0.4), transparent 45%); animation: pageGlow 12s ease-in-out infinite; }
     @keyframes pageGlow { 0%,100% { transform: translate(0,0) rotate(0deg); } 50% { transform: translate(18px,18px) rotate(170deg);} }
     .container { width: 90%; max-width: 1200px; margin: 0 auto; padding-bottom: 80px; }
-    .glass { background: rgba(255,255,255,0.35); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.3); border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.08); }
+    .glass { background: rgba(255,255,255,0.35); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.08); }
     .topbar { margin-top: 20px; padding: 8px 20px; min-height: 36px; display: flex; justify-content: space-between; align-items: center; }
     .topbar-left { font-size: 13px; color: #666; font-weight: 500; }
     .topbar-socials { display: flex; gap: 12px; }
@@ -63,7 +64,7 @@
     .topbar-socials a[aria-label="YouTube"] { display: none; }
     .navbar { margin-top: 10px; padding: 18px 24px; }
     .nav-inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
-    .logo img { height: 102px; display: block; }
+    .logo img { height: 40px; display: block; }
     .links { display: flex; align-items: center; gap: 16px; flex-wrap: nowrap; }
     .links a { margin: 0; color: #444; font-weight: 500; text-decoration: none; white-space: nowrap; }
     .links a:hover { color: #C47A5A; }
@@ -71,16 +72,16 @@
     .hero-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 26px; align-items: center; }
     .hero h1 { font-size: 40px; margin-bottom: 12px; color: #1a1a1a; line-height: 1.2; }
     .hero p { color: #555; font-size: 17px; margin-bottom: 18px; line-height: 1.7; }
-    .hero-image img { width: 100%; border-radius: 18px; box-shadow: 0 10px 25px rgba(0,0,0,0.12); display: block; max-height: 360px; object-fit: cover; }
+    .hero-image img { width: 100%; border-radius: 14px; box-shadow: 0 10px 25px rgba(0,0,0,0.12); display: block; max-height: 360px; object-fit: cover; }
     .cta-row { display: flex; gap: 14px; flex-wrap: wrap; }
-    .btn { display: inline-block; background: #C47A5A; color: #fff; text-decoration: none; padding: 12px 22px; border-radius: 10px; font-weight: 600; border: none; cursor: pointer; }
+    .btn { display: inline-block; background: #C47A5A; color: #fff; text-decoration: none; padding: 12px 22px; border-radius: 8px; font-weight: 600; border: none; cursor: pointer; }
     .about { margin-top: 24px; padding: 30px; }
     .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: center; }
     .about h2 { font-size: 32px; color: #111827; margin-bottom: 10px; }
     .about p { line-height: 1.8; color: #4b5563; }
-    .about img { width: 100%; border-radius: 16px; display: block; max-height: 340px; object-fit: cover; }
+    .about img { width: 100%; border-radius: 14px; display: block; max-height: 340px; object-fit: cover; }
     .services { margin-top: 28px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
-    .service-card { padding: 24px; background: rgba(255,255,255,0.65); border-radius: 16px; border: 1px solid rgba(255,255,255,0.45); box-shadow: 0 8px 22px rgba(0,0,0,0.06); }
+    .service-card { padding: 24px; background: rgba(255,255,255,0.65); border-radius: 14px; border: 1px solid rgba(255,255,255,0.45); box-shadow: 0 8px 22px rgba(0,0,0,0.06); }
     .service-card h3 { margin-bottom: 10px; font-size: 20px; color: #1a1a1a; }
     .service-card p { margin-bottom: 14px; color: #555; }
     .service-links { display: flex; gap: 12px; flex-wrap: wrap; }
@@ -108,7 +109,7 @@
     .modal-overlay.open { display: flex; }
     .modal {
       width: min(460px, 100%);
-      border-radius: 16px;
+      border-radius: 14px;
       background: #fff;
       box-shadow: 0 20px 44px rgba(0, 0, 0, 0.25);
       padding: 22px;
@@ -117,7 +118,7 @@
     .modal p { color: #4b5563; margin-bottom: 14px; }
     .modal .field { margin-bottom: 12px; }
     .modal .field label { display: block; margin-bottom: 6px; font-size: 14px; font-weight: 600; }
-    .modal .field input { width: 100%; border: 1px solid #d1d5db; border-radius: 10px; padding: 11px 12px; font-family: inherit; }
+    .modal .field input { width: 100%; border: 1px solid #d1d5db; border-radius: 8px; padding: 11px 12px; font-family: inherit; }
     .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 8px; }
     .btn-secondary { background: #e5e7eb; color: #111827; }
     @media (max-width: 900px) {
@@ -148,7 +149,7 @@
         padding: 16px 14px;
       }
       .logo img {
-        height: 82px;
+        height: 40px;
       }
       .links {
         display: grid;

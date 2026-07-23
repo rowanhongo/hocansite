@@ -46,27 +46,28 @@
   }
   </script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
+  <link rel="stylesheet" href="assets/theme.css">
+    <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: Inter, sans-serif; background: radial-gradient(circle at 10% 20%, #e0f2ff 0%, transparent 40%), radial-gradient(circle at 90% 80%, #ffd9cf 0%, transparent 40%), #f4f6f8; color: #333; overflow-x: hidden; position: relative; }
     body::before { content: ""; position: fixed; inset: -40% -40%; pointer-events: none; z-index: -1; background: radial-gradient(circle at 25% 30%, rgba(169,216,237,0.45), transparent 45%), radial-gradient(circle at 75% 70%, rgba(243,222,217,0.4), transparent 45%); animation: pageGlow 12s ease-in-out infinite; }
     @keyframes pageGlow { 0%,100% { transform: translate(0,0) rotate(0deg); } 50% { transform: translate(18px,18px) rotate(170deg);} }
     .container { width: 90%; max-width: 1200px; margin: 0 auto; padding-bottom: 80px; }
-    .glass { background: rgba(255,255,255,0.35); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.3); border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.08); }
+    .glass { background: rgba(255,255,255,0.35); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.08); }
     .topbar { margin-top: 20px; padding: 8px 20px; min-height: 36px; display: flex; justify-content: space-between; align-items: center; }
     .topbar-left { font-size: 13px; color: #666; font-weight: 500; } .topbar-socials { display: flex; gap: 12px; } .topbar-socials a { color: #666; display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; text-decoration: none; } .topbar-socials svg { width: 16px; height: 16px; }
     .navbar { margin-top: 10px; padding: 18px 24px; } .nav-inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
-    .logo img { height: 102px; display: block; } .links a { margin: 0 10px; color: #444; font-weight: 500; text-decoration: none; } .links a:hover { color: #C47A5A; }
+    .logo img { height: 40px; display: block; } .links a { margin: 0 10px; color: #444; font-weight: 500; text-decoration: none; } .links a:hover { color: #C47A5A; }
     .hero { margin-top: 36px; padding: 40px; }
     .hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; align-items: start; }
     .hero h1 { font-size: 42px; margin-bottom: 12px; color: #1a1a1a; }
     .hero p { color: #555; margin-bottom: 18px; line-height: 1.6; }
     .hero-image img { width: 100%; border-radius: 20px; box-shadow: 0 16px 40px rgba(0,0,0,0.1); }
-    .btn { background: #C47A5A; color: #fff; padding: 12px 24px; border-radius: 10px; border: none; font-weight: 600; cursor: pointer; font-family: inherit; }
+    .btn { background: #C47A5A; color: #fff; padding: 12px 24px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; font-family: inherit; }
     .send-package-form { margin-top: 20px; } .send-form-title { font-size: 26px; margin-bottom: 8px; color: #1a1a1a; } .send-form-sub { margin-bottom: 18px; color: #555; }
     .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 16px; }
     .form-group { display: flex; flex-direction: column; gap: 6px; } .form-group-full { grid-column: 1 / -1; }
-    .form-group input { padding: 12px 14px; border: 1px solid rgba(0,0,0,0.12); border-radius: 10px; font-size: 15px; font-family: inherit; background: rgba(255,255,255,0.6); }
+    .form-group input { padding: 12px 14px; border: 1px solid rgba(0,0,0,0.12); border-radius: 8px; font-size: 15px; font-family: inherit; background: rgba(255,255,255,0.6); }
     .form-group label { font-size: 14px; font-weight: 600; } .req { color: #C47A5A; }
     .cta-row { display: flex; gap: 12px; flex-wrap: wrap; }
     .enterprise-panel { margin-top: 14px; background: rgba(255,255,255,0.72); border: 1px solid rgba(255,255,255,0.5); border-radius: 14px; padding: 16px; }
