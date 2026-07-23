@@ -1,0 +1,4 @@
+node_modules/
+
+# Generated at build time by scripts/prerender-blogs.js
+blog/

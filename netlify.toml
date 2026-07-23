@@ -1,6 +1,13 @@
 [build]
 functions = "netlify/functions"
 
+# Serve the pre-rendered static post if the build produced one (crawlers get real HTML).
+[[redirects]]
+from = "/blog/:slug"
+to = "/blog/:slug.html"
+status = 200
+
+# Fallback for posts published since the last build — client-side render.
 [[redirects]]
 from = "/blog/*"
 to = "/blog-post.html"
