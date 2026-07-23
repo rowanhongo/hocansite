@@ -48,7 +48,7 @@ async function renderBlogs() {
           <div class="blog-card-meta">${escapeHtml(formatDate(post?.published_at || post?.created_at))}</div>
           <div class="blog-card-title">${escapeHtml(post?.title || "")}</div>
           ${post?.excerpt ? `<div class="blog-card-excerpt">${escapeHtml(post.excerpt)}</div>` : ""}
-          <div class="blog-card-more">Read article &rarr;</div>
+          <div class="blog-card-more">Read article <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13M12 5l7 7-7 7"/></svg></div>
         </div>
       `;
 

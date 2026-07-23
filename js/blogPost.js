@@ -20,8 +20,13 @@ function getSlugFromPath() {
   const parts = path.split("/").filter(Boolean);
   if (!parts.length) return "";
   if (parts[0] !== "blog") return "";
-  const last = parts[parts.length - 1] || "";
-  return last.replace(/\.html$/i, "");
+  const last = (parts[parts.length - 1] || "").replace(/\.html$/i, "");
+  // The listing encodes the slug, so decode it back before looking it up.
+  try {
+    return decodeURIComponent(last);
+  } catch (_e) {
+    return last;
+  }
 }
 
 function renderContentBlocks(blocks) {
@@ -107,9 +112,11 @@ function setupShareActions() {
       await navigator.clipboard.writeText(window.location.href);
       copyBtn.classList.add("copied");
       copyBtn.textContent = "Copied";
+      copyBtn.setAttribute("aria-label", "Link copied");
       setTimeout(() => {
         copyBtn.classList.remove("copied");
         copyBtn.innerHTML = ICONS.link;
+        copyBtn.setAttribute("aria-label", "Copy link");
       }, 1600);
     } catch (_e) {
       /* clipboard unavailable — leave the icon as-is */
@@ -144,7 +151,7 @@ async function init() {
     const mins = readingTime(post?.content);
 
     root.innerHTML = `
-      <a class="article-back" href="/blogs.html">&larr; All articles</a>
+      <a class="article-back" href="/blogs.html"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H6M12 19l-7-7 7-7"/></svg> All articles</a>
       <article class="article">
         <header class="article-header">
           <div class="article-meta">${[date, mins].filter(Boolean).map(escapeHtml).join(" &middot; ")}</div>

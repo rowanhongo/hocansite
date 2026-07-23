@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Job Detail — Hocan Holdings</title>
   <meta name="description" content="View job details and apply for career opportunities at Hocan Holdings across Kenya and East Africa.">
-  <link rel="icon" type="image/png" href="Hocan%20Logo.png">
+  <link rel="icon" type="image/png" href="/Hocan%20Logo.png">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Hocan Holdings">
   <meta property="og:image" content="https://hocanholdings.co.ke/assets/logo.png">
@@ -181,7 +181,10 @@
     function getSlugFromPath() {
       const path = window.location.pathname || "";
       const parts = path.split("/").filter(Boolean);
-      if (parts[0] === "jobs" && parts.length > 1) return parts[parts.length - 1];
+      if (parts[0] === "jobs" && parts.length > 1) {
+        const last = parts[parts.length - 1];
+        try { return decodeURIComponent(last); } catch (_e) { return last; }
+      }
       return new URLSearchParams(window.location.search).get("slug") || "";
     }
 
