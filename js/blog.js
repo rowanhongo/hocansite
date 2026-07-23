@@ -47,7 +47,8 @@ async function renderBlogs() {
         <div class="blog-card-body">
           <div class="blog-card-meta">${escapeHtml(formatDate(post?.published_at || post?.created_at))}</div>
           <div class="blog-card-title">${escapeHtml(post?.title || "")}</div>
-          <div class="blog-card-excerpt">${escapeHtml(post?.excerpt || "")}</div>
+          ${post?.excerpt ? `<div class="blog-card-excerpt">${escapeHtml(post.excerpt)}</div>` : ""}
+          <div class="blog-card-more">Read article &rarr;</div>
         </div>
       `;
 
