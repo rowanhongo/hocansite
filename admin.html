@@ -169,6 +169,7 @@ tr:hover td{background:#FAFBFD;}
 .image-upload-zone{border:2px dashed var(--border);border-radius:14px;padding:28px;text-align:center;cursor:pointer;transition:all .2s;position:relative;}
 .image-upload-zone:hover,.image-upload-zone.drag{border-color:var(--sky);background:rgba(74,179,212,.04);}
 .image-upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;}
+.cb-image-drop.drag{background:rgba(74,179,212,.06);box-shadow:0 0 0 2px var(--sky);}
 .upload-icon{font-size:32px;margin-bottom:8px;}
 .upload-text{font-size:14px;color:var(--muted);}
 .upload-text strong{color:var(--sky);}
@@ -1544,7 +1545,7 @@ function blockHtml(b,i){
   const actions=`<div class="cb-block-actions"><button class="cb-block-btn" data-up="${i}" title="Move up">↑</button><button class="cb-block-btn" data-down="${i}" title="Move down">↓</button><button class="cb-block-btn" data-remove="${i}" title="Remove" style="color:#E53E3E;">×</button></div>`;
   let content='';
   if(b.type==='image'){
-    content=`<div style="display:flex;flex-direction:column;gap:8px;">
+    content=`<div class="cb-image-drop" style="display:flex;flex-direction:column;gap:8px;border-radius:10px;transition:background .15s,box-shadow .15s;">
       ${b.url?`<img src="${esc(b.url)}" style="max-height:120px;border-radius:8px;object-fit:cover;" alt="">`:``}
       <div style="display:flex;gap:8px;align-items:center;">
         <label style="cursor:pointer;background:var(--sky);color:#fff;padding:6px 12px;border-radius:8px;font-size:12px;font-weight:600;flex-shrink:0;">
@@ -2096,6 +2097,95 @@ document.addEventListener('click',async e=>{
     }catch(err){showToast('Delete failed: '+err.message,'error');}
   }
 });
+
+// ── DRAG & DROP + PASTE FOR UPLOAD ZONES ─────────────────────────────────────
+// Rather than reworking each upload handler, dropped/pasted files are pushed
+// into the zone's existing <input type=file> and a 'change' event is dispatched.
+// Every existing handler (validation, progress bars, multi-file, e.target.value
+// reset) then runs exactly as it does for a normal click-to-browse upload.
+function filesToInput(input,files){
+  const accept=(input.getAttribute('accept')||'').trim();
+  let list=Array.from(files||[]);
+  // Honour the input's accept attribute so a dropped PDF can't slip into an
+  // image-only zone. Patterns here are simple ("image/*", ".png") by design.
+  if(accept){
+    const rules=accept.split(',').map(r=>r.trim().toLowerCase()).filter(Boolean);
+    list=list.filter(f=>rules.some(rule=>{
+      if(rule.endsWith('/*'))return (f.type||'').toLowerCase().startsWith(rule.slice(0,-1));
+      if(rule.startsWith('.'))return (f.name||'').toLowerCase().endsWith(rule);
+      return (f.type||'').toLowerCase()===rule;
+    }));
+  }
+  if(!list.length)return false;
+  if(!input.multiple)list=list.slice(0,1);
+  const dt=new DataTransfer();
+  list.forEach(f=>dt.items.add(f));
+  input.files=dt.files;
+  input.dispatchEvent(new Event('change',{bubbles:true}));
+  return true;
+}
+
+function enableDropZone(zone){
+  if(!zone||zone.dataset.dropReady)return;
+  const input=zone.querySelector('input[type=file]');
+  if(!input)return;
+  zone.dataset.dropReady='1';
+
+  // dragenter/over must be cancelled or the browser navigates to the file.
+  ['dragenter','dragover'].forEach(evt=>zone.addEventListener(evt,e=>{
+    if(!Array.from(e.dataTransfer?.types||[]).includes('Files'))return;
+    e.preventDefault();e.stopPropagation();
+    e.dataTransfer.dropEffect='copy';
+    zone.classList.add('drag');
+  }));
+  ['dragleave','dragend'].forEach(evt=>zone.addEventListener(evt,e=>{
+    // Ignore bubbling from children, else the highlight flickers on hover.
+    if(evt==='dragleave'&&zone.contains(e.relatedTarget))return;
+    zone.classList.remove('drag');
+  }));
+  zone.addEventListener('drop',e=>{
+    if(!Array.from(e.dataTransfer?.types||[]).includes('Files'))return;
+    e.preventDefault();e.stopPropagation();
+    zone.classList.remove('drag');
+    const files=e.dataTransfer?.files;
+    if(!files||!files.length)return;
+    if(!filesToInput(input,files))showToast('That file type is not accepted here','error');
+  });
+}
+
+// Single document-level paste listener. Targets the upload zone inside the
+// currently open modal; falls back to a focused/hovered zone otherwise.
+const DROP_SELECTOR='.image-upload-zone,.cb-image-drop';
+let lastHoveredZone=null;
+document.addEventListener('mouseover',e=>{
+  const z=e.target.closest?.(DROP_SELECTOR);
+  if(z)lastHoveredZone=z;
+});
+document.addEventListener('paste',e=>{
+  const files=Array.from(e.clipboardData?.files||[]);
+  if(!files.length)return;
+  const el=document.activeElement;
+  // Never hijack a paste aimed at a text field — pasting a screenshot into the
+  // message body should stay the browser's business.
+  if(el&&(el.tagName==='INPUT'&&el.type!=='file'||el.tagName==='TEXTAREA'||el.isContentEditable))return;
+  const openModal=document.querySelector('.modal-overlay.open');
+  const scope=openModal||document;
+  let zone=null;
+  if(lastHoveredZone&&scope.contains(lastHoveredZone)&&lastHoveredZone.offsetParent!==null)zone=lastHoveredZone;
+  if(!zone)zone=Array.from(scope.querySelectorAll(DROP_SELECTOR)).find(z=>z.offsetParent!==null)||null;
+  if(!zone)return;
+  const input=zone.querySelector('input[type=file]');
+  if(!input)return;
+  e.preventDefault();
+  if(filesToInput(input,files))showToast('Pasted image — uploading…');
+});
+
+// Wire the static zones now; blog image blocks are re-rendered on every edit,
+// so an observer re-wires those as they reappear. enableDropZone is idempotent
+// (guarded by data-dropReady), so repeat calls are free.
+function refreshDropZones(){document.querySelectorAll(DROP_SELECTOR).forEach(enableDropZone);}
+refreshDropZones();
+new MutationObserver(refreshDropZones).observe(document.body,{childList:true,subtree:true});
 
 // Close modals on overlay click
 document.getElementById('blogModal').addEventListener('click',e=>{if(e.target===document.getElementById('blogModal'))closeBlogModal();});
