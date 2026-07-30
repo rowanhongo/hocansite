@@ -205,25 +205,154 @@ textarea:focus-visible {
 }
 .nav-menu a:hover { background: var(--surface-sunken); color: var(--brand); }
 
-/* ---- Mobile: wrap onto centred rows at a single shared breakpoint ------- */
-@media (max-width: 900px) {
-  .nav-inner { flex-direction: column; gap: 12px; }
+/* ---- Menu button — hidden on desktop, revealed below the breakpoint ----- */
+.nav-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  margin: -6px -6px -6px 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--text);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.nav-toggle:hover { background: rgba(20, 33, 61, .05); }
 
-  .nav-inner .links {
-    width: 100%;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px 18px;
+/* Three bars that morph into an X — cheaper and smoother than swapping icons. */
+.nav-toggle span {
+  position: relative;
+  display: block;
+  width: 19px;
+  height: 1.75px;
+  border-radius: 2px;
+  background: currentColor;
+  transition: transform .32s cubic-bezier(.4, 0, .2, 1), opacity .2s ease;
+}
+.nav-toggle span::before,
+.nav-toggle span::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 19px;
+  height: 1.75px;
+  border-radius: 2px;
+  background: currentColor;
+  transition: transform .32s cubic-bezier(.4, 0, .2, 1);
+}
+.nav-toggle span::before { top: -6px; }
+.nav-toggle span::after  { top: 6px; }
+
+.nav-toggle[aria-expanded="true"] span { transform: rotate(45deg); }
+.nav-toggle[aria-expanded="true"] span::before { transform: translateY(6px) rotate(-90deg); }
+.nav-toggle[aria-expanded="true"] span::after  { transform: translateY(-6px) rotate(-90deg); }
+
+/* Dimmer behind the drawer. */
+.nav-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 1400;
+  background: rgba(12, 20, 38, .38);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .3s ease, visibility 0s .3s;
+}
+body[data-nav-open="true"] .nav-scrim {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity .3s ease, visibility 0s 0s;
+}
+
+/* ---- Mobile: compact bar + slide-in drawer ----------------------------- */
+@media (max-width: 900px) {
+  .nav-toggle { display: inline-flex; }
+
+  .nav-inner {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
   }
 
-  /* The dropdown collapses to inline links — a tap-to-open panel is awkward
-     once the bar is already wrapping, and it would hide the services. nav.js
-     moves the panel back inside the nav at these widths. */
-  .nav-inner .links .nav-group { display: contents; }
-  .nav-inner .links .nav-group > button { display: none; }
+  /* The drawer is fixed to the viewport and lives at the end of <body>
+     (nav.js moves it there), so the navbar's transform/backdrop-filter can't
+     clip it — the same constraint that applies to the desktop dropdown. */
+  .nav-inner .links,
+  body > .links {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1500;
+    width: min(320px, 84vw);
+    margin: 0;
+    padding: 88px 26px 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    gap: 2px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    background: #fff;
+    box-shadow: -18px 0 44px rgba(20, 33, 61, .16);
+    transform: translateX(100%);
+    visibility: hidden;
+    transition: transform .34s cubic-bezier(.32, .72, 0, 1), visibility 0s .34s;
+  }
+  body[data-nav-open="true"] .links {
+    transform: translateX(0);
+    visibility: visible;
+    transition: transform .34s cubic-bezier(.32, .72, 0, 1), visibility 0s 0s;
+  }
+
+  /* text-decoration and background are reset explicitly: several pages style
+     bare `a` and `button` elements, and those rules leak into the drawer once
+     it is portalled out to <body>. */
+  .nav-inner .links a,
+  body > .links a {
+    padding: 13px 2px;
+    font-size: 16.5px;
+    font-weight: 500;
+    color: var(--text);
+    text-decoration: none;
+    background: none;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    border-radius: 0;
+  }
+  .links a[aria-current="page"] { color: var(--brand-strong); font-weight: 600; }
+
+  /* Services becomes a labelled section rather than a tap-to-open menu —
+     fewer taps to reach a page, and nothing is hidden behind a second level. */
+  .links .nav-group { display: contents; }
+  .links .nav-group > button {
+    display: block;
+    width: auto;
+    margin: 22px 0 6px;
+    padding: 0;
+    background: none !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    text-align: left;
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    pointer-events: none;
+  }
+  .links .nav-group > button::after { content: none; }
+
   .nav-menu {
-    /* !important because nav.js writes inline top/left for the desktop panel;
-       without it those would survive into the flattened mobile layout. */
     position: static !important;
     top: auto !important;
     left: auto !important;
@@ -232,6 +361,7 @@ textarea:focus-visible {
     padding: 0;
     background: none;
     border: 0;
+    border-radius: 0;
     box-shadow: none;
     opacity: 1;
     visibility: visible;
@@ -239,20 +369,17 @@ textarea:focus-visible {
   }
   .nav-menu::before { content: none; }
   .nav-menu a {
-    padding: 0;
+    padding: 13px 2px;
     border-radius: 0;
-    color: var(--text-secondary);
-    font-size: var(--text-sm);
+    color: var(--text);
+    font-size: 16.5px;
+    text-decoration: none;
+    background: none;
   }
-  .nav-menu a:hover { background: none; }
-}
+  .nav-menu a:hover { background: none; color: var(--brand); }
 
-@media (max-width: 560px) {
-  .nav-inner .links { gap: 9px 14px; }
-  /* Hold the type size steady at the smallest sizes — shrinking it here is
-     what made the bar look different on phones. */
-  .nav-inner .links a,
-  .nav-menu a { font-size: var(--text-sm); }
+  /* Stop the page behind the drawer from scrolling. */
+  body[data-nav-open="true"] { overflow: hidden; }
 }
 
 @media (prefers-reduced-motion: reduce) {

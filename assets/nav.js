@@ -169,12 +169,102 @@
   window.addEventListener('scroll', reposition, { passive: true });
   window.addEventListener('resize', reposition);
 
-  // Below the desktop breakpoint the panel must sit back inside the nav so the
-  // CSS can flatten it into inline links.
+  /* ---- Mobile drawer --------------------------------------------------- */
+
+  var links = document.querySelector('.nav-inner .links');
+  var navInner = document.querySelector('.nav-inner');
+  var toggle = null;
+  var scrim = null;
+  var linksHome = links ? links.parentNode : null;
+  var lastFocus = null;
+
+  if (links && navInner) {
+    toggle = document.createElement('button');
+    toggle.className = 'nav-toggle';
+    toggle.type = 'button';
+    toggle.setAttribute('aria-label', 'Open menu');
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.setAttribute('aria-controls', 'primary-nav');
+    toggle.appendChild(document.createElement('span'));
+    navInner.appendChild(toggle);
+
+    if (!links.id) links.id = 'primary-nav';
+
+    scrim = document.createElement('div');
+    scrim.className = 'nav-scrim';
+    scrim.hidden = false;
+    document.body.appendChild(scrim);
+  }
+
+  function drawerOpen() { return document.body.getAttribute('data-nav-open') === 'true'; }
+
+  function setDrawer(open) {
+    if (!links || !toggle) return;
+
+    if (open) {
+      // Same clipping constraint as the desktop dropdown: the navbar's
+      // transform/backdrop-filter would trap a fixed drawer, so move it out.
+      if (links.parentNode !== document.body) document.body.appendChild(links);
+      lastFocus = document.activeElement;
+    }
+
+    document.body.setAttribute('data-nav-open', open ? 'true' : 'false');
+    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+
+    if (open) {
+      var first = links.querySelector('a');
+      if (first) first.focus({ preventScroll: true });
+    } else if (lastFocus && typeof lastFocus.focus === 'function') {
+      lastFocus.focus({ preventScroll: true });
+      lastFocus = null;
+    }
+  }
+
+  if (toggle) {
+    toggle.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      setDrawer(!drawerOpen());
+    });
+  }
+  if (scrim) scrim.addEventListener('click', function () { setDrawer(false); });
+
+  // Navigating away should not leave the drawer open behind the new page.
+  if (links) {
+    links.addEventListener('click', function (e) {
+      if (e.target.closest('a') && !DESKTOP.matches) setDrawer(false);
+    });
+  }
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && drawerOpen()) { setDrawer(false); return; }
+
+    // Keep Tab inside the drawer while it's open.
+    if (e.key !== 'Tab' || !drawerOpen() || !links) return;
+    var focusables = links.querySelectorAll('a[href], button:not([disabled])');
+    var list = Array.prototype.filter.call(focusables, function (el) {
+      return el.offsetParent !== null && getComputedStyle(el).pointerEvents !== 'none';
+    });
+    if (!list.length) return;
+    var first = list[0];
+    var last = list[list.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
+
+  // Below the desktop breakpoint the dropdown panel sits back inside the nav so
+  // the CSS can render it as a labelled section of the drawer. Above it, the
+  // drawer is dismissed and the link list returns to the bar.
   function syncToWidth() {
-    if (DESKTOP.matches) return;
-    closeAll(null);
-    restoreAll();
+    if (DESKTOP.matches) {
+      setDrawer(false);
+      document.body.removeAttribute('data-nav-open');
+      if (links && linksHome && links.parentNode !== linksHome) linksHome.appendChild(links);
+    } else {
+      closeAll(null);
+      restoreAll();
+    }
   }
   if (DESKTOP.addEventListener) DESKTOP.addEventListener('change', syncToWidth);
   else if (DESKTOP.addListener) DESKTOP.addListener(syncToWidth);
