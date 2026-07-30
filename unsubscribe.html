@@ -7,6 +7,8 @@
   <link rel="icon" href="favicon.ico" sizes="any">
   <link rel="icon" type="image/png" href="assets/icon-512.png">
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="assets/theme.css">
     <style>
@@ -23,7 +25,7 @@
 </head>
 <body>
   <main class="wrap">
-    <img class="logo" src="assets/logo.png" alt="Hocan Holdings">
+    <picture><source srcset="assets/opt/logo.webp" type="image/webp"><img class="logo" src="assets/opt/logo.png" alt="Hocan Holdings" width="360" height="88" fetchpriority="high" decoding="async"></picture>
     <h1>Unsubscribe</h1>
     <p>If you no longer want to receive emails from Hocan Holdings, you can unsubscribe here.</p>
     <button class="btn" id="unsubBtn">Unsubscribe</button>

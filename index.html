@@ -110,6 +110,10 @@
     ]
   }
   </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preload" as="image" href="assets/opt/home-hero.webp" type="image/webp" fetchpriority="high">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/theme.css">
     <style>
@@ -1114,7 +1118,7 @@
       <nav class="navbar glass">
         <div class="nav-inner">
           <div class="logo">
-            <img src="assets/logo.png" alt="Hocan Holdings" width="164" height="40" />
+            <picture><source srcset="assets/opt/logo.webp" type="image/webp"><img src="assets/opt/logo.png" alt="Hocan Holdings" width="360" height="88" fetchpriority="high" decoding="async"></picture>
           </div>
           <div class="links">
         <a href="index.html" aria-current="page">Home</a>
@@ -1151,7 +1155,7 @@
             </div>
           </div>
           <div class="hero-image">
-            <img src="image%206.png" alt="Hocan Holdings office and facility" />
+            <picture><source srcset="assets/opt/home-hero.webp" type="image/webp"><img src="assets/opt/home-hero.jpg" alt="Hocan Holdings office and facility" width="1100" height="733" fetchpriority="high" decoding="async"></picture>
           </div>
         </section>
       </section>
@@ -1172,7 +1176,7 @@
       </section>
 
       <section class="employers-section" aria-label="For employers">
-        <img src="image%202.jpeg" alt="For employers recruitment support">
+        <picture><source srcset="assets/opt/home-secondary.webp" type="image/webp"><img src="assets/opt/home-secondary.jpg" alt="For employers recruitment support" width="1150" height="647" loading="lazy" decoding="async"></picture>
         <div>
           <h3>For Employers</h3>
           <p>Streamline your hiring by posting jobs with us.</p>
@@ -1256,7 +1260,9 @@
   </div>
 
   <script src="config.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <!-- defer: the partner carousel is below the fold, so this 40KB library must
+       not compete with the hero for bandwidth. initPartners waits for it. -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js" defer></script>
   <script>
     document.querySelectorAll("img").forEach(function (img, idx) {
       if (!img.hasAttribute("loading")) img.loading = idx < 2 ? "eager" : "lazy";
@@ -1298,25 +1304,19 @@
       container.appendChild(track);
     }
 
+    // The bundled partner logos are a known, fixed set. They used to be
+    // discovered by probing scroll1..scroll20, which cost 16 failed requests on
+    // every visit to find the four files that exist. Add a file here when you
+    // add one to the folder.
+    var BUNDLED_LOGOS = [
+      { src: "assets/opt/scroll2.webp", alt: "Partner 2" },
+      { src: "assets/opt/scroll3.webp", alt: "Partner 3" },
+      { src: "assets/opt/scroll4.webp", alt: "Partner 4" },
+      { src: "assets/opt/scroll5.webp", alt: "Partner 5" }
+    ];
+
     async function loadLogosFromLocal() {
-      var MAX = 20;
-      // Probe all candidates in parallel instead of one-at-a-time, so a full
-      // scan isn't blocked by each image load. Gaps are tolerated — some
-      // scroll images may have been deleted, leaving non-contiguous filenames.
-      var checks = [];
-      for (var i = 1; i <= MAX; i++) {
-        (function(i) {
-          var src = "./scroll" + i + ".png";
-          checks.push(new Promise(function(resolve) {
-            var img = new Image();
-            img.onload = function() { resolve({ src: src, alt: "Partner " + i }); };
-            img.onerror = function() { resolve(null); };
-            img.src = src;
-          }));
-        })(i);
-      }
-      var results = await Promise.all(checks);
-      return results.filter(Boolean);
+      return BUNDLED_LOGOS.slice();
     }
 
     async function getSupabaseConfig() {
@@ -1353,27 +1353,57 @@
       });
     }
 
+    // The Supabase library is deferred, so it may not have executed yet.
+    function whenSupabaseReady() {
+      if (window.supabase) return Promise.resolve(true);
+      return new Promise(function(resolve) {
+        var waited = 0;
+        var timer = setInterval(function() {
+          waited += 60;
+          if (window.supabase) { clearInterval(timer); resolve(true); }
+          else if (waited >= 4000) { clearInterval(timer); resolve(false); }
+        }, 60);
+      });
+    }
+
     async function initPartners() {
+      // Paint the bundled logos immediately so the carousel is never empty
+      // while the network round-trip is in flight.
+      var localLogos = await loadLogosFromLocal();
+      renderLogos(localLogos);
+
       var dbLogos = [];
       try {
+        var ready = await whenSupabaseReady();
+        if (!ready) return;
         var cfg = await getSupabaseConfig();
         if (!cfg.url || !cfg.key) throw new Error('no config');
         var sb = window.supabase.createClient(cfg.url, cfg.key);
-        var res = await sb.from('partners').select('*').eq('active', true).order('display_order', { ascending: true });
+        var res = await sb.from('partners')
+          .select('logo_url,name,display_order')
+          .eq('active', true)
+          .order('display_order', { ascending: true });
         if (!res.error && res.data && res.data.length) {
           dbLogos = res.data.map(function(p) { return { src: p.logo_url, alt: p.name || 'Partner' }; });
         }
       } catch (_e) {}
 
-      var localLogos = await loadLogosFromLocal();
-      var logos = dedupeLogos(dbLogos.concat(localLogos));
+      // Only repaint if the database actually added something.
+      if (!dbLogos.length) return;
+      renderLogos(dedupeLogos(dbLogos.concat(localLogos)));
+    }
+
+    function renderLogos(logos) {
       if (!logos.length) return;
       var split = splitLogos(logos);
       buildRow(split.row1, "row1");
       buildRow(split.row2, "row2");
     }
 
-    initPartners();
+    // Defer the carousel until the browser is idle — it is below the fold and
+    // must not compete with the hero for the main thread.
+    if ('requestIdleCallback' in window) requestIdleCallback(initPartners, { timeout: 2500 });
+    else setTimeout(initPartners, 200);
 
     /* ─── NAVBAR HIDE ON SCROLL ─── */
     (function () {

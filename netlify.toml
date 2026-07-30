@@ -20,3 +20,41 @@ force = true
 from = "/jobs/*"
 to = "/job-detail.html"
 status = 200
+
+# ---- Caching -----------------------------------------------------------------
+# HTML must revalidate so edits go live immediately; the assets it references are
+# content-addressed by path and safe to cache hard. must-revalidate means the
+# browser asks "changed?" and gets a cheap 304 when it hasn't.
+
+[[headers]]
+for = "/*.html"
+  [headers.values]
+  Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+for = "/"
+  [headers.values]
+  Cache-Control = "public, max-age=0, must-revalidate"
+
+# Optimised images are immutable: a new version gets a new filename.
+[[headers]]
+for = "/assets/opt/*"
+  [headers.values]
+  Cache-Control = "public, max-age=31536000, immutable"
+
+# Shared CSS/JS change in place, so a shorter window plus revalidation.
+[[headers]]
+for = "/assets/*"
+  [headers.values]
+  Cache-Control = "public, max-age=86400, must-revalidate"
+
+[[headers]]
+for = "/js/*"
+  [headers.values]
+  Cache-Control = "public, max-age=86400, must-revalidate"
+
+# Runtime config is per-deploy and must never be cached by the browser.
+[[headers]]
+for = "/.netlify/functions/get-config"
+  [headers.values]
+  Cache-Control = "no-store"

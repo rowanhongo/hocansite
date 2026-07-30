@@ -46,6 +46,9 @@
     }
   }
   </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="image" href="assets/opt/hr-hero.webp" type="image/webp" fetchpriority="high">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/theme.css">
     <style>
@@ -159,7 +162,7 @@
     </div>
     <nav class="navbar glass">
       <div class="nav-inner">
-        <a class="logo" href="index.html"><img src="assets/logo.png" alt="Hocan Holdings"></a>
+        <a class="logo" href="index.html"><picture><source srcset="assets/opt/logo.webp" type="image/webp"><img src="assets/opt/logo.png" alt="Hocan Holdings" width="360" height="88" fetchpriority="high" decoding="async"></picture></a>
         <div class="links">
         <a href="index.html">Home</a>
         <a href="about-us.html">About Us</a>
@@ -187,7 +190,7 @@
           </div>
         </div>
         <div class="hero-image">
-          <img src="image%205.png" alt="Hocan HR consulting hero image">
+          <picture><source srcset="assets/opt/hr-hero.webp" type="image/webp"><img src="assets/opt/hr-hero.jpg" alt="Hocan HR consulting hero image" width="1530" height="1020" fetchpriority="high" decoding="async"></picture>
         </div>
       </div>
     </section>
@@ -195,7 +198,7 @@
     <section class="about glass">
       <div class="about-grid">
         <div>
-          <img src="image%203.jpeg" alt="Why Hocan HR Consulting">
+          <picture><source srcset="assets/opt/hr-secondary.webp" type="image/webp"><img src="assets/opt/hr-secondary.jpg" alt="Why Hocan HR Consulting" width="1540" height="866" loading="lazy" decoding="async"></picture>
         </div>
         <div>
           <h2>Why Us</h2>

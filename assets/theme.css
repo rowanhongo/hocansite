@@ -66,6 +66,28 @@
 
 /* ---- Shared primitives ------------------------------------------------- */
 
+/* <picture> defaults to display:inline, so wrapping an existing <img> in one
+   silently changes layout: where the img was a flex/grid item, the wrapper
+   takes that role and shrink-wraps instead of filling its track, and inline
+   layout adds descender whitespace beneath it. Making the wrapper contents-box
+   transparent keeps the inner <img> behaving exactly as it did unwrapped. */
+picture {
+  display: block;
+  /* Never exceed the space the img was given; the img's own width rule wins. */
+  max-width: 100%;
+}
+picture > img { display: block; }
+
+/* Intrinsic width/height attributes were added to every logo so the browser can
+   reserve space before the image arrives. Most pages size the logo with only
+   `height`, which would let the new width attribute stretch it — pin width to
+   auto so the aspect ratio drives it, as it did before the attributes existed. */
+.logo img,
+img.logo,
+.login-logo img,
+.sidebar-brand img,
+.top-nav img { width: auto; }
+
 .u-container {
   width: min(var(--max-width), 92%);
   margin-inline: auto;

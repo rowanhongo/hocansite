@@ -1,0 +1,98 @@
+[
+  {
+    "src": "image 6.png",
+    "webp": "assets/opt/home-hero.webp",
+    "fallback": "assets/opt/home-hero.jpg",
+    "width": 1100,
+    "height": 733,
+    "hasAlpha": false
+  },
+  {
+    "src": "image 2.jpeg",
+    "webp": "assets/opt/home-secondary.webp",
+    "fallback": "assets/opt/home-secondary.jpg",
+    "width": 1150,
+    "height": 647,
+    "hasAlpha": false
+  },
+  {
+    "src": "image 5.png",
+    "webp": "assets/opt/hr-hero.webp",
+    "fallback": "assets/opt/hr-hero.jpg",
+    "width": 1530,
+    "height": 1020,
+    "hasAlpha": false
+  },
+  {
+    "src": "image 3.jpeg",
+    "webp": "assets/opt/hr-secondary.webp",
+    "fallback": "assets/opt/hr-secondary.jpg",
+    "width": 1540,
+    "height": 866,
+    "hasAlpha": false
+  },
+  {
+    "src": "image10.png",
+    "webp": "assets/opt/about-banner.webp",
+    "fallback": "assets/opt/about-banner.png",
+    "width": 933,
+    "height": 142,
+    "hasAlpha": true
+  },
+  {
+    "src": "assets/hero.png",
+    "webp": "assets/opt/logistics-hero.webp",
+    "fallback": "assets/opt/logistics-hero.jpg",
+    "width": 682,
+    "height": 1024,
+    "hasAlpha": false
+  },
+  {
+    "src": "assets/logo.png",
+    "webp": "assets/opt/logo.webp",
+    "fallback": "assets/opt/logo.png",
+    "width": 360,
+    "height": 88,
+    "hasAlpha": true
+  },
+  {
+    "src": "assets/logo-light.png",
+    "webp": "assets/opt/logo-light.webp",
+    "fallback": "assets/opt/logo-light.png",
+    "width": 360,
+    "height": 88,
+    "hasAlpha": true
+  },
+  {
+    "src": "scroll2.png",
+    "webp": "assets/opt/scroll2.webp",
+    "fallback": "assets/opt/scroll2.png",
+    "width": 163,
+    "height": 130,
+    "hasAlpha": true
+  },
+  {
+    "src": "scroll3.png",
+    "webp": "assets/opt/scroll3.webp",
+    "fallback": "assets/opt/scroll3.png",
+    "width": 186,
+    "height": 136,
+    "hasAlpha": true
+  },
+  {
+    "src": "scroll4.png",
+    "webp": "assets/opt/scroll4.webp",
+    "fallback": "assets/opt/scroll4.png",
+    "width": 220,
+    "height": 126,
+    "hasAlpha": true
+  },
+  {
+    "src": "scroll5.png",
+    "webp": "assets/opt/scroll5.webp",
+    "fallback": "assets/opt/scroll5.png",
+    "width": 211,
+    "height": 112,
+    "hasAlpha": true
+  }
+]

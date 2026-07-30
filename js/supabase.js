@@ -68,25 +68,72 @@ async function getClient() {
   return cachedClient;
 }
 
-async function resolveTable(candidates) {
-  const supabase = await getClient();
-  for (const table of candidates) {
-    const { error } = await supabase.from(table).select("id").limit(1);
-    if (!error) return table;
+const TABLE_CACHE_KEY = "hocan_resolved_tables_v1";
+
+function readTableCache() {
+  try {
+    return JSON.parse(localStorage.getItem(TABLE_CACHE_KEY)) || {};
+  } catch (_e) {
+    return {};
   }
-  throw new Error(`No valid table found. Tried: ${candidates.join(", ")}`);
+}
+
+function writeTableCache(key, table) {
+  try {
+    const cache = readTableCache();
+    cache[key] = table;
+    localStorage.setItem(TABLE_CACHE_KEY, JSON.stringify(cache));
+  } catch (_e) {
+    // storage unavailable (private mode) — resolution still works, just uncached
+  }
+}
+
+/* Resolve a table name from its candidates.
+
+   A single-candidate list needs no network call at all. For genuinely
+   ambiguous names the result is persisted to localStorage, so the probe costs
+   one request ever rather than one on every page load — it used to add a full
+   round-trip before any content could be fetched.
+
+   Candidates are probed in parallel; the first working one in priority order
+   wins, so a slow miss can't hold up a fast hit. */
+async function resolveTable(candidates, cacheKey) {
+  if (candidates.length === 1) return candidates[0];
+
+  const key = cacheKey || candidates.join("|");
+  const cached = readTableCache()[key];
+  if (cached && candidates.includes(cached)) return cached;
+
+  const supabase = await getClient();
+  const probes = candidates.map((table) =>
+    supabase
+      .from(table)
+      .select("id", { head: true, count: "exact" })
+      .limit(1)
+      .then(({ error }) => (error ? null : table))
+      .catch(() => null)
+  );
+
+  const results = await Promise.all(probes);
+  const found = candidates.find((t) => results.includes(t));
+  if (!found) {
+    throw new Error(`No valid table found. Tried: ${candidates.join(", ")}`);
+  }
+
+  writeTableCache(key, found);
+  return found;
 }
 
 async function blogQuery() {
   const supabase = await getClient();
-  if (!resolvedBlogsTable) resolvedBlogsTable = await resolveTable(BLOGS_TABLE_CANDIDATES);
+  if (!resolvedBlogsTable) resolvedBlogsTable = await resolveTable(BLOGS_TABLE_CANDIDATES, "blogs");
   const table = resolvedBlogsTable;
   return supabase.from(table);
 }
 
 async function jobQuery() {
   const supabase = await getClient();
-  if (!resolvedJobsTable) resolvedJobsTable = await resolveTable(JOBS_TABLE_CANDIDATES);
+  if (!resolvedJobsTable) resolvedJobsTable = await resolveTable(JOBS_TABLE_CANDIDATES, "jobs");
   const table = resolvedJobsTable;
   return supabase.from(table);
 }
@@ -94,7 +141,7 @@ async function jobQuery() {
 async function applicationQuery() {
   const supabase = await getClient();
   if (!resolvedApplicationsTable) {
-    resolvedApplicationsTable = await resolveTable(APPLICATIONS_TABLE_CANDIDATES);
+    resolvedApplicationsTable = await resolveTable(APPLICATIONS_TABLE_CANDIDATES, "applications");
   }
   const table = resolvedApplicationsTable;
   return supabase.from(table);
@@ -418,7 +465,7 @@ export async function deleteCvFromSupabase(path) {
 
 async function successStoryQuery() {
   const supabase = await getClient();
-  if (!resolvedSuccessStoriesTable) resolvedSuccessStoriesTable = await resolveTable(SUCCESS_STORIES_TABLE_CANDIDATES);
+  if (!resolvedSuccessStoriesTable) resolvedSuccessStoriesTable = await resolveTable(SUCCESS_STORIES_TABLE_CANDIDATES, "stories");
   return supabase.from(resolvedSuccessStoriesTable);
 }
 
@@ -477,7 +524,7 @@ export async function adminDeleteSuccessStory(id) {
 
 async function partnerQuery() {
   const supabase = await getClient();
-  if (!resolvedPartnersTable) resolvedPartnersTable = await resolveTable(PARTNERS_TABLE_CANDIDATES);
+  if (!resolvedPartnersTable) resolvedPartnersTable = await resolveTable(PARTNERS_TABLE_CANDIDATES, "partners");
   return supabase.from(resolvedPartnersTable);
 }
 
