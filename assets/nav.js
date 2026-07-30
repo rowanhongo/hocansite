@@ -9,10 +9,32 @@
     return Array.prototype.slice.call(document.querySelectorAll('[data-nav-group]'));
   }
 
+  // The panel is position:fixed to escape the navbar's backdrop-filter clip,
+  // so its coordinates have to be derived from the button each time it opens.
+  function place(group) {
+    var btn = group.querySelector('button');
+    var menu = group.querySelector('.nav-menu');
+    if (!btn || !menu || !DESKTOP.matches) return;
+
+    var r = btn.getBoundingClientRect();
+    menu.style.top = (r.bottom + 10) + 'px';
+
+    // Measure before positioning horizontally, then keep the panel inside the
+    // viewport rather than letting it run off the right edge.
+    var width = menu.offsetWidth;
+    var left = r.left;
+    var margin = 12;
+    if (left + width > window.innerWidth - margin) {
+      left = Math.max(margin, window.innerWidth - width - margin);
+    }
+    menu.style.left = left + 'px';
+  }
+
   function setOpen(group, open) {
     group.setAttribute('data-open', open ? 'true' : 'false');
     var btn = group.querySelector('button');
     if (btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (open) place(group);
   }
 
   function closeAll(except) {
@@ -64,9 +86,28 @@
     if (btn) btn.focus();
   });
 
+  // A fixed panel doesn't travel with the button, so re-anchor it while open.
+  // index.html's navbar is sticky and slides away on scroll — following it
+  // keeps the two from drifting apart.
+  function reposition() {
+    var open = document.querySelector('[data-nav-group][data-open="true"]');
+    if (open) place(open);
+  }
+  window.addEventListener('scroll', reposition, { passive: true });
+  window.addEventListener('resize', reposition);
+
   // Leaving desktop width flattens the menu in CSS; drop any open state so it
   // doesn't linger when the viewport comes back.
-  var onChange = function () { if (!DESKTOP.matches) closeAll(null); };
+  var onChange = function () {
+    if (DESKTOP.matches) return;
+    closeAll(null);
+    // Clear the inline coordinates, or they'd override the static layout the
+    // mobile stylesheet switches the panel to.
+    groups().forEach(function (g) {
+      var menu = g.querySelector('.nav-menu');
+      if (menu) { menu.style.top = ''; menu.style.left = ''; }
+    });
+  };
   if (DESKTOP.addEventListener) DESKTOP.addEventListener('change', onChange);
   else if (DESKTOP.addListener) DESKTOP.addListener(onChange);
 })();
