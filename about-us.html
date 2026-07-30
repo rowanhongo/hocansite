@@ -50,9 +50,7 @@
     .navbar { margin-top: 10px; padding: 18px 24px; }
     .nav-inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
     .logo img { height: 40px; display: block; }
-    .links { display: flex; align-items: center; gap: 18px; flex-wrap: nowrap; }
-    .links a { color: #444; font-weight: 500; text-decoration: none; white-space: nowrap; }
-    .links a:hover { color: #C47A5A; }
+
     .hero { margin-top: 20px; padding: 30px; display: grid; grid-template-columns: 1.1fr 1fr; gap: 24px; align-items: center; }
     .hero h1 { font-size: 38px; margin-bottom: 10px; color: #111827; }
     .hero p { color: #4b5563; line-height: 1.7; }
@@ -67,7 +65,7 @@
     .values-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 20px; }
     .value-card { background: rgba(255,255,255,0.7); border-radius: 14px; padding: 20px; border: 1px solid rgba(255,255,255,0.45); }
     .value-card h4 { margin-bottom: 8px; color: #111827; }
-    @media (max-width: 900px) { .hero, .values-grid { grid-template-columns: 1fr; } .nav-inner { flex-direction: column; } .links { flex-wrap: wrap; justify-content: center; } }
+    @media (max-width: 900px) { .hero, .values-grid { grid-template-columns: 1fr; } .nav-inner { flex-direction: column; } }
   
     /* Social icons without a real profile URL yet are hidden rather than
        linking to "#", which would open a blank tab. Set the href and the
@@ -91,8 +89,19 @@
       <div class="nav-inner">
         <a class="logo" href="index.html"><img src="assets/logo.png" alt="Hocan Holdings"></a>
         <div class="links">
-          <a href="index.html">Home</a><a href="about-us.html">About Us</a><a href="hocan-hr-consulting.html">Hocan HR Consulting</a><a href="hocan-logistics.html">Hocan Logistics</a><a href="blogs.html">Blogs</a><a href="contact.html">Contact Us</a>
+        <a href="index.html">Home</a>
+        <a href="about-us.html" aria-current="page">About Us</a>
+        <a href="success-stories.html">Explore Our Work</a>
+        <div class="nav-group" data-nav-group>
+          <button type="button" aria-expanded="false" aria-haspopup="true">Services</button>
+          <div class="nav-menu">
+            <a href="hocan-hr-consulting.html">Hocan HR Consulting</a>
+            <a href="hocan-logistics.html">Hocan Logistics</a>
+          </div>
         </div>
+        <a href="blogs.html">Blogs</a>
+        <a href="contact.html">Contact Us</a>
+      </div>
       </div>
     </nav>
     <section class="hero glass">
@@ -146,5 +155,6 @@
       visionPanel.hidden = false; missionPanel.hidden = true;
     });
   </script>
+  <script src="assets/nav.js" defer></script>
 </body>
 </html>

@@ -82,6 +82,161 @@ textarea:focus-visible {
   border-radius: 4px;
 }
 
+/* ---- Primary navigation ------------------------------------------------
+   One definition for every page. Each page's own <style> block loads after
+   this file, so these rules are scoped to `.nav-inner .links` (0,2,1) to
+   outrank the bare `.links a` (0,1,1) declarations left in those blocks —
+   that divergence is what made the bar change size from page to page.
+   Positioning (sticky / hide-on-scroll) is deliberately NOT set here; it
+   stays whatever each page already does.
+   ------------------------------------------------------------------------ */
+
+.nav-inner .links {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: nowrap;
+}
+
+.nav-inner .links a {
+  margin: 0;
+  padding: 0;
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.4;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color .2s;
+}
+
+.nav-inner .links a:hover,
+.nav-inner .links a:focus-visible { color: var(--brand); }
+
+/* Current page — set via aria-current="page" on the anchor. */
+.nav-inner .links a[aria-current="page"] { color: var(--brand-strong); font-weight: 600; }
+
+/* ---- Services dropdown ---- */
+.nav-inner .links .nav-group { position: relative; display: inline-flex; }
+
+.nav-inner .links .nav-group > button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.4;
+  white-space: nowrap;
+  transition: color .2s;
+}
+.nav-inner .links .nav-group > button:hover { color: var(--brand); }
+.nav-inner .links .nav-group > button::after {
+  content: "";
+  width: 6px; height: 6px;
+  border-right: 1.6px solid currentColor;
+  border-bottom: 1.6px solid currentColor;
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform .2s;
+}
+.nav-inner .links .nav-group > button[aria-expanded="true"]::after {
+  transform: translateY(1px) rotate(225deg);
+}
+
+.nav-inner .links .nav-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  min-width: 210px;
+  padding: 6px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg);
+  /* Animated rather than display:none so the open/close reads smoothly and
+     the panel stays focusable for keyboard users while open. */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition: opacity .18s ease, transform .18s ease, visibility 0s .18s;
+}
+.nav-inner .links .nav-group[data-open="true"] .nav-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  transition: opacity .18s ease, transform .18s ease, visibility 0s 0s;
+}
+/* Hover bridge — keeps the pointer from falling through the 10px gap. */
+.nav-inner .links .nav-menu::before {
+  content: "";
+  position: absolute;
+  inset: -10px 0 100% 0;
+}
+.nav-inner .links .nav-menu a {
+  padding: 9px 12px;
+  border-radius: 6px;
+  color: var(--text);
+  white-space: nowrap;
+}
+.nav-inner .links .nav-menu a:hover { background: var(--surface-sunken); color: var(--brand); }
+
+/* ---- Mobile: wrap onto centred rows at a single shared breakpoint ------- */
+@media (max-width: 900px) {
+  .nav-inner { flex-direction: column; gap: 12px; }
+
+  .nav-inner .links {
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px 18px;
+  }
+
+  /* The dropdown collapses to inline links — a tap-to-open panel is awkward
+     once the bar is already wrapping, and it would hide the services. */
+  .nav-inner .links .nav-group { display: contents; }
+  .nav-inner .links .nav-group > button { display: none; }
+  .nav-inner .links .nav-menu {
+    position: static;
+    display: contents;
+    min-width: 0;
+    padding: 0;
+    background: none;
+    border: 0;
+    box-shadow: none;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+  }
+  .nav-inner .links .nav-menu::before { content: none; }
+  .nav-inner .links .nav-menu a {
+    padding: 0;
+    border-radius: 0;
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+  }
+  .nav-inner .links .nav-menu a:hover { background: none; }
+}
+
+@media (max-width: 560px) {
+  .nav-inner .links { gap: 9px 14px; }
+  /* Hold the type size steady at the smallest sizes — shrinking it here is
+     what made the bar look different on phones. */
+  .nav-inner .links a,
+  .nav-inner .links .nav-menu a { font-size: var(--text-sm); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: .01ms !important;
