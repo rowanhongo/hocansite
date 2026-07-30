@@ -152,12 +152,12 @@ textarea:focus-visible {
   transform: translateY(1px) rotate(225deg);
 }
 
-.nav-inner .links .nav-menu {
-  /* Fixed, not absolute: the navbar carries `backdrop-filter` (.glass), which
-     per spec makes it a containing block for descendants AND clips them to its
-     border-radius — an absolutely-positioned panel gets sliced off at the
-     rounded edge no matter how high its z-index. Fixed positioning escapes
-     that clip; nav.js sets top/left from the button's rect. */
+/* The panel is selected WITHOUT a `.nav-inner .links` prefix: nav.js moves it
+   to <body> while open, so it stops being a descendant of the nav. The navbar
+   sets `transform` and `.glass` sets `backdrop-filter` — either makes it the
+   containing block for fixed/absolute children and clips them to its rounded
+   edge, which is why the panel has to leave the subtree entirely. */
+.nav-menu {
   position: fixed;
   top: 0;
   left: 0;
@@ -177,7 +177,7 @@ textarea:focus-visible {
   transform: translateY(-4px);
   transition: opacity .18s ease, transform .18s ease, visibility 0s .18s;
 }
-.nav-inner .links .nav-group[data-open="true"] .nav-menu {
+.nav-menu[data-open="true"] {
   opacity: 1;
   visibility: visible;
   transform: translateY(0);
@@ -185,7 +185,7 @@ textarea:focus-visible {
 }
 /* Hover bridge — spans the 10px gap so the pointer can travel from the button
    to the panel without the menu closing underneath it. */
-.nav-inner .links .nav-menu::before {
+.nav-menu::before {
   content: "";
   position: absolute;
   left: 0;
@@ -193,13 +193,17 @@ textarea:focus-visible {
   bottom: 100%;
   height: 12px;
 }
-.nav-inner .links .nav-menu a {
+.nav-menu a {
   padding: 9px 12px;
   border-radius: 6px;
   color: var(--text);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  text-decoration: none;
   white-space: nowrap;
 }
-.nav-inner .links .nav-menu a:hover { background: var(--surface-sunken); color: var(--brand); }
+.nav-menu a:hover { background: var(--surface-sunken); color: var(--brand); }
 
 /* ---- Mobile: wrap onto centred rows at a single shared breakpoint ------- */
 @media (max-width: 900px) {
@@ -213,10 +217,11 @@ textarea:focus-visible {
   }
 
   /* The dropdown collapses to inline links — a tap-to-open panel is awkward
-     once the bar is already wrapping, and it would hide the services. */
+     once the bar is already wrapping, and it would hide the services. nav.js
+     moves the panel back inside the nav at these widths. */
   .nav-inner .links .nav-group { display: contents; }
   .nav-inner .links .nav-group > button { display: none; }
-  .nav-inner .links .nav-menu {
+  .nav-menu {
     /* !important because nav.js writes inline top/left for the desktop panel;
        without it those would survive into the flattened mobile layout. */
     position: static !important;
@@ -232,14 +237,14 @@ textarea:focus-visible {
     visibility: visible;
     transform: none;
   }
-  .nav-inner .links .nav-menu::before { content: none; }
-  .nav-inner .links .nav-menu a {
+  .nav-menu::before { content: none; }
+  .nav-menu a {
     padding: 0;
     border-radius: 0;
     color: var(--text-secondary);
     font-size: var(--text-sm);
   }
-  .nav-inner .links .nav-menu a:hover { background: none; }
+  .nav-menu a:hover { background: none; }
 }
 
 @media (max-width: 560px) {
@@ -247,7 +252,7 @@ textarea:focus-visible {
   /* Hold the type size steady at the smallest sizes — shrinking it here is
      what made the bar look different on phones. */
   .nav-inner .links a,
-  .nav-inner .links .nav-menu a { font-size: var(--text-sm); }
+  .nav-menu a { font-size: var(--text-sm); }
 }
 
 @media (prefers-reduced-motion: reduce) {

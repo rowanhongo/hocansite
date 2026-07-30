@@ -1,7 +1,13 @@
 /* Hocan Holdings — primary nav dropdown.
    Shared by every page so the Services menu behaves identically everywhere.
-   Below 900px the CSS flattens the menu into inline links, so this script
-   stays out of the way at those widths. */
+
+   The panel is moved out to <body> while open ("portalled") rather than being
+   positioned inside the navbar. The navbar sets `transform: translateZ(0)` and
+   `.glass` sets `backdrop-filter`; either one makes that element the containing
+   block for fixed/absolute descendants AND clips them to its border-radius, so
+   a nested panel is cut off at the rounded edge no matter its z-index. Only
+   reparenting escapes both. Below 900px the CSS flattens the menu into inline
+   links, so the panel stays in place and this script does nothing. */
 (function () {
   var DESKTOP = window.matchMedia('(min-width: 901px)');
 
@@ -9,18 +15,42 @@
     return Array.prototype.slice.call(document.querySelectorAll('[data-nav-group]'));
   }
 
-  // The panel is position:fixed to escape the navbar's backdrop-filter clip,
-  // so its coordinates have to be derived from the button each time it opens.
+  // Remember where each panel started so it can be put back for mobile.
+  var homes = [];
+  groups().forEach(function (group) {
+    var menu = group.querySelector('.nav-menu');
+    if (menu) homes.push({ group: group, menu: menu });
+  });
+
+  function portal(group) {
+    var menu = group.querySelector('.nav-menu');
+    if (menu && menu.parentNode !== document.body) document.body.appendChild(menu);
+    return menu || document.querySelector('.nav-menu[data-owner="' + group.id + '"]');
+  }
+
+  function menuOf(group) {
+    // Once portalled the panel is no longer a descendant, so look it up by the
+    // marker written in setOpen.
+    return group._menu || group.querySelector('.nav-menu');
+  }
+
+  function restoreAll() {
+    homes.forEach(function (h) {
+      if (h.menu.parentNode !== h.group) h.group.appendChild(h.menu);
+      h.menu.style.top = '';
+      h.menu.style.left = '';
+      h.menu.style.width = '';
+    });
+  }
+
   function place(group) {
     var btn = group.querySelector('button');
-    var menu = group.querySelector('.nav-menu');
+    var menu = menuOf(group);
     if (!btn || !menu || !DESKTOP.matches) return;
 
     var r = btn.getBoundingClientRect();
     menu.style.top = (r.bottom + 10) + 'px';
 
-    // Measure before positioning horizontally, then keep the panel inside the
-    // viewport rather than letting it run off the right edge.
     var width = menu.offsetWidth;
     var left = r.left;
     var margin = 12;
@@ -31,9 +61,23 @@
   }
 
   function setOpen(group, open) {
+    var menu = menuOf(group);
+    if (!menu) return;
+
+    if (open && DESKTOP.matches) {
+      // Move to <body> first, then measure and position.
+      if (menu.parentNode !== document.body) document.body.appendChild(menu);
+      group._menu = menu;
+    }
+
     group.setAttribute('data-open', open ? 'true' : 'false');
+    // The panel is detached from the group, so it carries its own open flag for
+    // the CSS to key off.
+    menu.setAttribute('data-open', open ? 'true' : 'false');
+
     var btn = group.querySelector('button');
     if (btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+
     if (open) place(group);
   }
 
@@ -44,37 +88,67 @@
   groups().forEach(function (group) {
     var btn = group.querySelector('button');
     if (!btn) return;
+    group._menu = group.querySelector('.nav-menu');
 
-    // Pointer: open on hover, which is what people expect of a menu bar.
-    group.addEventListener('mouseenter', function () {
+    // Hover opens the menu, as expected of a menu bar. Because the panel is
+    // portalled away, hover has to be tracked on both the group and the panel.
+    var hoverTimer = null;
+    function open() {
       if (!DESKTOP.matches) return;
+      clearTimeout(hoverTimer);
       closeAll(group);
       setOpen(group, true);
-    });
-    group.addEventListener('mouseleave', function () {
+    }
+    function closeSoon() {
       if (!DESKTOP.matches) return;
-      setOpen(group, false);
-    });
+      // Short grace period so moving the pointer from the button to the panel
+      // across the 10px gap doesn't close it.
+      clearTimeout(hoverTimer);
+      hoverTimer = setTimeout(function () { setOpen(group, false); }, 180);
+    }
+
+    group.addEventListener('mouseenter', open);
+    group.addEventListener('mouseleave', closeSoon);
+
+    var menu = group._menu;
+    if (menu) {
+      menu.addEventListener('mouseenter', function () {
+        if (!DESKTOP.matches) return;
+        clearTimeout(hoverTimer);
+      });
+      menu.addEventListener('mouseleave', closeSoon);
+      menu.addEventListener('focusout', function (e) {
+        if (!DESKTOP.matches) return;
+        if (!menu.contains(e.relatedTarget) && !group.contains(e.relatedTarget)) {
+          setOpen(group, false);
+        }
+      });
+    }
 
     // Click/keyboard toggle, so the menu is reachable without a pointer.
     btn.addEventListener('click', function (e) {
       if (!DESKTOP.matches) return;
       e.preventDefault();
       e.stopPropagation();
-      var open = group.getAttribute('data-open') === 'true';
+      clearTimeout(hoverTimer);
+      var isOpen = group.getAttribute('data-open') === 'true';
       closeAll(group);
-      setOpen(group, !open);
+      setOpen(group, !isOpen);
     });
 
-    // Let focus move through the menu, but close once it leaves entirely.
     group.addEventListener('focusout', function (e) {
       if (!DESKTOP.matches) return;
-      if (!group.contains(e.relatedTarget)) setOpen(group, false);
+      var m = menuOf(group);
+      if (!group.contains(e.relatedTarget) && !(m && m.contains(e.relatedTarget))) {
+        setOpen(group, false);
+      }
     });
   });
 
   document.addEventListener('click', function (e) {
-    if (!e.target.closest || !e.target.closest('[data-nav-group]')) closeAll(null);
+    if (!e.target.closest) return;
+    if (e.target.closest('[data-nav-group]') || e.target.closest('.nav-menu')) return;
+    closeAll(null);
   });
 
   document.addEventListener('keydown', function (e) {
@@ -86,9 +160,8 @@
     if (btn) btn.focus();
   });
 
-  // A fixed panel doesn't travel with the button, so re-anchor it while open.
-  // index.html's navbar is sticky and slides away on scroll — following it
-  // keeps the two from drifting apart.
+  // A portalled panel doesn't travel with the button, so re-anchor it while
+  // open — index.html's navbar is sticky and slides away on scroll.
   function reposition() {
     var open = document.querySelector('[data-nav-group][data-open="true"]');
     if (open) place(open);
@@ -96,18 +169,14 @@
   window.addEventListener('scroll', reposition, { passive: true });
   window.addEventListener('resize', reposition);
 
-  // Leaving desktop width flattens the menu in CSS; drop any open state so it
-  // doesn't linger when the viewport comes back.
-  var onChange = function () {
+  // Below the desktop breakpoint the panel must sit back inside the nav so the
+  // CSS can flatten it into inline links.
+  function syncToWidth() {
     if (DESKTOP.matches) return;
     closeAll(null);
-    // Clear the inline coordinates, or they'd override the static layout the
-    // mobile stylesheet switches the panel to.
-    groups().forEach(function (g) {
-      var menu = g.querySelector('.nav-menu');
-      if (menu) { menu.style.top = ''; menu.style.left = ''; }
-    });
-  };
-  if (DESKTOP.addEventListener) DESKTOP.addEventListener('change', onChange);
-  else if (DESKTOP.addListener) DESKTOP.addListener(onChange);
+    restoreAll();
+  }
+  if (DESKTOP.addEventListener) DESKTOP.addEventListener('change', syncToWidth);
+  else if (DESKTOP.addListener) DESKTOP.addListener(syncToWidth);
+  syncToWidth();
 })();
