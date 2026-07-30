@@ -476,7 +476,7 @@ tr:hover td{background:#FAFBFD;}
     <!-- PARTNERS -->
     <div class="panel" id="panel-partners">
       <div class="section-card">
-        <div class="section-header"><h3>All Partners</h3><button class="btn-new" id="newPartnerBtn">+ Add Partner</button></div>
+        <div class="section-header"><h3>All Partners</h3><div style="display:flex;gap:8px;"><button class="btn-edit" id="importPartnerBtn" title="Upload the site's built-in scroll*.png logos to Cloudinary and add them here">Import built-in logos</button><button class="btn-new" id="newPartnerBtn">+ Add Partner</button></div></div>
         <div id="partnerList" class="partner-list"></div>
       </div>
     </div>
@@ -2039,6 +2039,43 @@ document.getElementById('partnerSaveBtn').addEventListener('click',async()=>{
     showToast(editingPartnerId?'Partner updated!':'Partner added!');
   }catch(err){showToast('Save failed: '+err.message,'error');}
   btn.disabled=false;btn.textContent='Save Partner';
+});
+
+// One-time migration: the marquee on index.html falls back to scroll*.png files
+// bundled with the site. Pull those into Cloudinary + the partners table so the
+// carousel has a single source of truth. Safe to re-run — already-imported
+// files are skipped by name.
+document.getElementById('importPartnerBtn').addEventListener('click',async()=>{
+  const btn=document.getElementById('importPartnerBtn');
+  const existing=new Set(partners.map(p=>(p.name||'').trim().toLowerCase()));
+  btn.disabled=true;btn.textContent='Importing…';
+  let added=0,skipped=0,failed=0;
+  try{
+    for(let i=1;i<=20;i++){
+      const file='scroll'+i+'.png';
+      const label='Partner '+i;
+      if(existing.has(label.toLowerCase())){skipped++;continue;}
+      let blob;
+      try{
+        const res=await fetch('./'+file);
+        if(!res.ok)continue;            // file doesn't exist — gap in numbering
+        blob=await res.blob();
+        if(!blob.size||!/image/.test(blob.type))continue;
+      }catch(_e){continue;}
+      try{
+        btn.textContent='Importing '+file+'…';
+        const upload=await uploadToCloudinary(new File([blob],file,{type:blob.type}),{folder:'hocan/partners'});
+        await adminSavePartner({name:label,logo_url:upload.url,display_order:i,active:true});
+        added++;
+      }catch(err){failed++;}
+    }
+    await loadPartners();
+    renderOverview();
+    if(added)showToast('Imported '+added+' logo'+(added===1?'':'s')+(skipped?' ('+skipped+' already present)':'')+(failed?' — '+failed+' failed':''));
+    else if(skipped)showToast('All built-in logos are already imported');
+    else showToast('No built-in logos found to import','error');
+  }catch(err){showToast('Import failed: '+err.message,'error');}
+  btn.disabled=false;btn.textContent='Import built-in logos';
 });
 
 document.getElementById('partnerModalClose').addEventListener('click',closePartnerModal);

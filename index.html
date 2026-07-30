@@ -1357,20 +1357,43 @@
       } catch (_e) { return { url: '', key: '' }; }
     }
 
+    // Merge DB partners with the bundled scroll*.png logos rather than letting
+    // either side replace the other. Adding a single partner in the admin used
+    // to blank out every local logo; now both sets show until the local files
+    // have been migrated into Cloudinary/Supabase, at which point the dedupe
+    // below keeps them from appearing twice.
+    function dedupeLogos(logos) {
+      var seenSrc = {};
+      var seenName = {};
+      return logos.filter(function(logo) {
+        if (!logo || !logo.src) return false;
+        var src = String(logo.src).split('?')[0];
+        // The admin's "Import built-in logos" action copies scroll*.png into
+        // Cloudinary under the same "Partner N" label the local probe uses, so
+        // matching on the label is what actually collapses the duplicate pair —
+        // the Cloudinary URL no longer resembles the original filename.
+        var name = String(logo.alt || '').trim().toLowerCase();
+        if (seenSrc[src] || (name && seenName[name])) return false;
+        seenSrc[src] = true;
+        if (name) seenName[name] = true;
+        return true;
+      });
+    }
+
     async function initPartners() {
-      var logos = [];
+      var dbLogos = [];
       try {
         var cfg = await getSupabaseConfig();
         if (!cfg.url || !cfg.key) throw new Error('no config');
         var sb = window.supabase.createClient(cfg.url, cfg.key);
         var res = await sb.from('partners').select('*').eq('active', true).order('display_order', { ascending: true });
         if (!res.error && res.data && res.data.length) {
-          logos = res.data.map(function(p) { return { src: p.logo_url, alt: p.name || 'Partner' }; });
+          dbLogos = res.data.map(function(p) { return { src: p.logo_url, alt: p.name || 'Partner' }; });
         }
       } catch (_e) {}
-      if (!logos.length) {
-        logos = await loadLogosFromLocal();
-      }
+
+      var localLogos = await loadLogosFromLocal();
+      var logos = dedupeLogos(dbLogos.concat(localLogos));
       if (!logos.length) return;
       var split = splitLogos(logos);
       buildRow(split.row1, "row1");
