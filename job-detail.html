@@ -97,22 +97,24 @@
 </head>
 <body>
   <main class="container">
+    <!-- This page is served at /jobs/<slug>, so every path here must be absolute.
+         Relative paths would resolve against the job directory and 404. -->
     <nav class="navbar glass">
       <div class="nav-inner">
-        <a class="logo" href="index.html"><picture><source srcset="assets/opt/logo.webp" type="image/webp"><img src="assets/opt/logo.png" alt="Hocan Holdings" width="360" height="88" fetchpriority="high" decoding="async"></picture></a>
+        <a class="logo" href="/index.html"><picture><source srcset="/assets/opt/logo.webp" type="image/webp"><img src="/assets/opt/logo.png" alt="Hocan Holdings" width="360" height="88" fetchpriority="high" decoding="async"></picture></a>
         <div class="links">
-        <a href="index.html">Home</a>
-        <a href="about-us.html">About Us</a>
-        <a href="success-stories.html">Explore Our Work</a>
+        <a href="/index.html">Home</a>
+        <a href="/about-us.html">About Us</a>
+        <a href="/success-stories.html">Explore Our Work</a>
         <div class="nav-group" data-nav-group>
           <button type="button" aria-expanded="false" aria-haspopup="true">Services</button>
           <div class="nav-menu">
-            <a href="hocan-hr-consulting.html">Hocan HR Consulting</a>
-            <a href="hocan-logistics.html">Hocan Logistics</a>
+            <a href="/hocan-hr-consulting.html">Hocan HR Consulting</a>
+            <a href="/hocan-logistics.html">Hocan Logistics</a>
           </div>
         </div>
-        <a href="blogs.html">Blogs</a>
-        <a href="contact.html">Contact Us</a>
+        <a href="/blogs.html">Blogs</a>
+        <a href="/contact.html">Contact Us</a>
       </div>
       </div>
     </nav>
@@ -489,6 +491,6 @@
       }
     })();
   </script>
-  <script src="assets/nav.js" defer></script>
+  <script src="/assets/nav.js" defer></script>
 </body>
 </html>
