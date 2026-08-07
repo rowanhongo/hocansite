@@ -204,8 +204,9 @@
   function looksLikeHtml(s) { return /<(p|h3|ul|ol|li|br|b|strong|i|em|blockquote)\b/i.test(s || ''); }
 
   // Bold a *marked* run. Applied per line, so the run may not span a newline.
+  // The markers must hug their content, so "3 * 4 * 5" stays as multiplication.
   function markupInline(escaped) {
-    return escaped.replace(/\*([^*\n]+)\*/g, '<strong>$1</strong>');
+    return escaped.replace(/\*(\S[^*\n]*?)\*/g, '<strong>$1</strong>');
   }
 
   function plainTextToHtml(text) {
@@ -229,26 +230,93 @@
       }).join('');
   }
 
-  // Convert *marked* runs inside already-HTML descriptions. Walks text nodes only,
-  // so tags and attributes are never touched. Skips text already inside a bold tag.
+  // Convert *marked* runs inside already-HTML descriptions.
+  //
+  // A run can straddle element boundaries — the editor turns "*Cafe Wadani*" into
+  // "*Cafe <strong>Wadani</strong>*", putting the two asterisks in different text
+  // nodes. Matching per node therefore misses the pair and leaves both visible.
+  // Instead, collect the block's text nodes, pair the asterisks across that whole
+  // sequence, and delete the two marker characters wherever they landed. Text
+  // already inside a bold tag keeps its emphasis, so only the markers disappear.
   function boldAsterisksInHtml(html) {
     const holder = document.createElement('div');
     holder.innerHTML = html;
+
+    // Group every text node by the block it belongs to, so a run is only paired
+    // within one paragraph — never bridging from one paragraph into the next.
+    const BLOCK = 'p,h3,li,blockquote';
+    const groups = new Map();
     const walker = document.createTreeWalker(holder, NodeFilter.SHOW_TEXT);
-    const targets = [];
     for (let n = walker.nextNode(); n; n = walker.nextNode()) {
-      if (n.nodeValue.includes('*') && !n.parentElement.closest('b,strong')) targets.push(n);
+      const owner = n.parentElement.closest(BLOCK) || holder;
+      if (!groups.has(owner)) groups.set(owner, []);
+      groups.get(owner).push(n);
     }
-    targets.forEach(node => {
-      const marked = markupInline(esc(node.nodeValue));
-      if (!/<strong>/.test(marked)) return;
-      const frag = document.createElement('span');
-      frag.innerHTML = marked;
-      node.parentNode.replaceChild(frag, node);
-      while (frag.firstChild) frag.parentNode.insertBefore(frag.firstChild, frag);
-      frag.remove();
-    });
+    groups.forEach(nodes => stripMarkersIn(nodes));
     return holder.innerHTML;
+
+    function stripMarkersIn(nodes) {
+      // Flatten the block so a marker can be judged by its true neighbours, even
+      // when the adjacent character lives in a different text node.
+      const flat = nodes.map(n => n.nodeValue).join('');
+      const offset = [];
+      let run = 0;
+      nodes.forEach((n, i) => { offset[i] = run; run += n.nodeValue.length; });
+
+      // An opener must be followed by content, a closer preceded by it — the
+      // Markdown rule. It keeps "3 * 4 * 5" (spaces both sides) as literal
+      // multiplication instead of silently eating the numbers.
+      const marks = [];
+      nodes.forEach((node, i) => {
+        const text = node.nodeValue;
+        for (let c = 0; c < text.length; c++) {
+          if (text[c] !== '*') continue;
+          const at = offset[i] + c;
+          const prev = flat[at - 1] || '';
+          const next = flat[at + 1] || '';
+          const canOpen = next && !/\s/.test(next);
+          const canClose = prev && !/\s/.test(prev);
+          if (canOpen || canClose) marks.push({ i, c, canOpen, canClose });
+        }
+      });
+      if (marks.length < 2) return;
+
+      // Pair each opener with the next valid closer; unmatched markers stay put.
+      const doomed = [];
+      for (let a = 0; a < marks.length; a++) {
+        if (!marks[a].canOpen) continue;
+        for (let b = a + 1; b < marks.length; b++) {
+          if (!marks[b].canClose) continue;
+          doomed.push(marks[a], marks[b]);
+          a = b;
+          break;
+        }
+      }
+      if (!doomed.length) return;
+
+      // Wrap the spanned text in <strong> only when the run sits in one node and
+      // isn't already emphasised; otherwise just drop the marker characters.
+      for (let k = doomed.length - 2; k >= 0; k -= 2) {
+        const open = doomed[k], close = doomed[k + 1];
+        const node = nodes[open.i];
+        if (open.i === close.i && !node.parentElement.closest('b,strong')) {
+          const t = node.nodeValue;
+          const inner = t.slice(open.c + 1, close.c);
+          if (!inner.trim()) continue;
+          const after = node.splitText(close.c + 1);
+          const mid = node.splitText(open.c);
+          const strong = document.createElement('strong');
+          strong.textContent = inner;
+          mid.parentNode.replaceChild(strong, mid);
+          void after;
+        } else {
+          // Split run: remove the later marker first so earlier offsets hold.
+          const cNode = nodes[close.i], oNode = nodes[open.i];
+          cNode.nodeValue = cNode.nodeValue.slice(0, close.c) + cNode.nodeValue.slice(close.c + 1);
+          oNode.nodeValue = oNode.nodeValue.slice(0, open.c) + oNode.nodeValue.slice(open.c + 1);
+        }
+      }
+    }
   }
 
   function descriptionHtml(desc) {

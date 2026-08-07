@@ -1879,7 +1879,8 @@ function looksLikeHtml(s){return /<(p|h3|ul|ol|li|br|b|strong|i|em|blockquote)\b
 // Kept in step with the same function in success-stories.html.
 function plainTextToHtml(text){
   const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  const inline=s=>s.replace(/\*([^*\n]+)\*/g,'<strong>$1</strong>');  // *Result* → bold
+  // Markers must hug their content, so "3 * 4 * 5" stays as multiplication.
+  const inline=s=>s.replace(/\*(\S[^*\n]*?)\*/g,'<strong>$1</strong>');  // *Result* → bold
   const src=String(text||'').replace(/\r\n?/g,'\n');
   // Blank lines are the preferred paragraph separator; when the author never used
   // one, fall back to single newlines so the text still breaks into paragraphs.
