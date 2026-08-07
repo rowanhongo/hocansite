@@ -163,16 +163,25 @@ ${fs.readFileSync(path.join(root, "blog-post.html"), "utf8").match(/<style>[\s\S
 </head>
 <body>
   <main class="container">
-    <header class="top-nav">
-      <a href="/index.html"><img src="/assets/logo.png" alt="Hocan Holdings"></a>
-      <nav>
+    <nav class="navbar glass">
+      <div class="nav-inner">
+        <a class="logo" href="/index.html"><picture><source srcset="/assets/opt/logo.webp" type="image/webp"><img src="/assets/opt/logo.png" alt="Hocan Holdings" width="360" height="88" fetchpriority="high" decoding="async"></picture></a>
+        <div class="links">
         <a href="/index.html">Home</a>
         <a href="/about-us.html">About Us</a>
-        <a href="/hocan-hr-consulting.html">Services</a>
-        <a href="/blogs.html" class="active">Blogs</a>
+        <a href="/success-stories.html">Explore Our Work</a>
+        <div class="nav-group" data-nav-group>
+          <button type="button" aria-expanded="false" aria-haspopup="true">Services</button>
+          <div class="nav-menu">
+            <a href="/hocan-hr-consulting.html">Hocan HR Consulting</a>
+            <a href="/hocan-logistics.html">Hocan Logistics</a>
+          </div>
+        </div>
+        <a href="/blogs.html" aria-current="page">Blogs</a>
         <a href="/contact.html">Contact Us</a>
-      </nav>
-    </header>
+      </div>
+      </div>
+    </nav>
 
     <!-- Pre-rendered for crawlers. js/blogPost.js re-renders this from live data on load. -->
     <div id="blog-post">
@@ -198,6 +207,7 @@ ${fs.readFileSync(path.join(root, "blog-post.html"), "utf8").match(/<style>[\s\S
 ${fs.readFileSync(path.join(root, "blog-post.html"), "utf8").match(/<footer class="site-footer">[\s\S]*?<\/footer>/)[0].replace(/^/gm, "    ")}
   </main>
   <script type="module" src="/js/blogPost.js"></script>
+  <script src="/assets/nav.js" defer></script>
 </body>
 </html>
 `;

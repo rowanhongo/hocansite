@@ -59,10 +59,34 @@
     .jobs-loading, .jobs-empty { background: #fff; border: 1px solid #e5e7eb; border-radius: 14px; padding: 18px; color: #4b5563; grid-column: 1/-1; }
     @media (max-width: 1060px) { .job-list { grid-template-columns: 1fr 1fr; } .filters { grid-template-columns: 1fr 1fr; } }
     @media (max-width: 680px) { .job-list { grid-template-columns: 1fr; } .section-head h2 { font-size: 40px; } .hero p { font-size: 16px; } .filters { grid-template-columns: 1fr; } }
+  
+    /* ── Shared site navigation (matches about-us.html / contact.html) ── */
+    .navbar { margin-top: 10px; padding: 18px 24px; }
+    .nav-inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+    .logo img { height: 40px; display: block; }
   </style>
 </head>
 <body>
   <main class="container">
+    <nav class="navbar glass">
+      <div class="nav-inner">
+        <a class="logo" href="index.html"><picture><source srcset="assets/opt/logo.webp" type="image/webp"><img src="assets/opt/logo.png" alt="Hocan Holdings" width="360" height="88" fetchpriority="high" decoding="async"></picture></a>
+        <div class="links">
+        <a href="index.html">Home</a>
+        <a href="about-us.html">About Us</a>
+        <a href="success-stories.html">Explore Our Work</a>
+        <div class="nav-group" data-nav-group>
+          <button type="button" aria-expanded="false" aria-haspopup="true">Services</button>
+          <div class="nav-menu">
+            <a href="hocan-hr-consulting.html">Hocan HR Consulting</a>
+            <a href="hocan-logistics.html">Hocan Logistics</a>
+          </div>
+        </div>
+        <a href="blogs.html">Blogs</a>
+        <a href="contact.html">Contact Us</a>
+      </div>
+      </div>
+    </nav>
     <a class="back" href="hocan-hr-consulting.html">&larr; Back to HR Consulting</a>
     <section class="hero">
       <h1>Find Your<br>Perfect Role</h1>
@@ -84,5 +108,6 @@
     <section class="empty" id="jobEmpty" hidden>No active vacancies right now. Please check back soon.</section>
   </main>
   <script type="module" src="js/jobs.js"></script>
+  <script src="assets/nav.js" defer></script>
 </body>
 </html>

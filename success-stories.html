@@ -120,10 +120,34 @@
     @media (prefers-reduced-motion: reduce) {
       .story, .story-more span, .carousel-track { transition: none; }
     }
+  
+    /* ── Shared site navigation (matches about-us.html / contact.html) ── */
+    .navbar { margin-top: 10px; padding: 18px 24px; }
+    .nav-inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+    .logo img { height: 40px; display: block; }
   </style>
 </head>
 <body>
   <main class="container">
+    <nav class="navbar glass">
+      <div class="nav-inner">
+        <a class="logo" href="index.html"><picture><source srcset="assets/opt/logo.webp" type="image/webp"><img src="assets/opt/logo.png" alt="Hocan Holdings" width="360" height="88" fetchpriority="high" decoding="async"></picture></a>
+        <div class="links">
+        <a href="index.html">Home</a>
+        <a href="about-us.html">About Us</a>
+        <a href="success-stories.html" aria-current="page">Explore Our Work</a>
+        <div class="nav-group" data-nav-group>
+          <button type="button" aria-expanded="false" aria-haspopup="true">Services</button>
+          <div class="nav-menu">
+            <a href="hocan-hr-consulting.html">Hocan HR Consulting</a>
+            <a href="hocan-logistics.html">Hocan Logistics</a>
+          </div>
+        </div>
+        <a href="blogs.html">Blogs</a>
+        <a href="contact.html">Contact Us</a>
+      </div>
+      </div>
+    </nav>
     <section class="hero glass">
       <h1>Success Stories</h1>
       <p>See how Hocan Holdings has helped businesses improve hiring operations and workforce outcomes across Kenya and East Africa.</p>
@@ -179,35 +203,78 @@
 
   function looksLikeHtml(s) { return /<(p|h3|ul|ol|li|br|b|strong|i|em|blockquote)\b/i.test(s || ''); }
 
+  // Bold a *marked* run. Applied per line, so the run may not span a newline.
+  function markupInline(escaped) {
+    return escaped.replace(/\*([^*\n]+)\*/g, '<strong>$1</strong>');
+  }
+
   function plainTextToHtml(text) {
-    return String(text || '')
-      .split(/\n\s*\n+/)
+    const src = String(text || '').replace(/\r\n?/g, '\n');
+    // Prefer blank lines as the paragraph separator. When the author never used
+    // one (common when text is pasted), fall back to single newlines so the
+    // result is still paragraphs rather than one fused block.
+    const blocks = /\n\s*\n/.test(src) ? src.split(/\n\s*\n+/) : src.split(/\n/);
+
+    return blocks
       .map(b => b.trim())
       .filter(Boolean)
       .map(block => {
-        let html = esc(block).replace(/\n/g, '<br>');
-        html = html.replace(/\*([^*\n]+)\*/g, '<strong>$1</strong>');
         const plain = block.replace(/\*/g, '').trim();
-        if (!block.includes('\n') && plain.length < 70 && !/[.:,;!?]$/.test(plain)) {
+        // A short standalone line with no closing punctuation reads as a heading.
+        if (!block.includes('\n') && plain.length < 70 && !/[.:,;!?]$/.test(plain) && !/^[•\-–—✔✅]/.test(plain)) {
           return `<h3>${esc(plain)}</h3>`;
         }
+        const html = block.split('\n').map(line => markupInline(esc(line))).join('<br>');
         return `<p>${html}</p>`;
       }).join('');
   }
 
+  // Convert *marked* runs inside already-HTML descriptions. Walks text nodes only,
+  // so tags and attributes are never touched. Skips text already inside a bold tag.
+  function boldAsterisksInHtml(html) {
+    const holder = document.createElement('div');
+    holder.innerHTML = html;
+    const walker = document.createTreeWalker(holder, NodeFilter.SHOW_TEXT);
+    const targets = [];
+    for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+      if (n.nodeValue.includes('*') && !n.parentElement.closest('b,strong')) targets.push(n);
+    }
+    targets.forEach(node => {
+      const marked = markupInline(esc(node.nodeValue));
+      if (!/<strong>/.test(marked)) return;
+      const frag = document.createElement('span');
+      frag.innerHTML = marked;
+      node.parentNode.replaceChild(frag, node);
+      while (frag.firstChild) frag.parentNode.insertBefore(frag.firstChild, frag);
+      frag.remove();
+    });
+    return holder.innerHTML;
+  }
+
   function descriptionHtml(desc) {
-    return looksLikeHtml(desc) ? sanitizeHtml(desc) : plainTextToHtml(desc);
+    if (!looksLikeHtml(desc)) return plainTextToHtml(desc);
+    const clean = sanitizeHtml(desc);
+    return clean.includes('*') ? boldAsterisksInHtml(clean) : clean;
   }
 
   // Plain-text excerpt for the card, derived from whichever format was stored.
+  // textContent alone would fuse blocks together ("…PROMISESJust two months ago"),
+  // because there is no whitespace between </h3> and <p>. Insert the breaks first.
   function excerpt(desc, max = 180) {
     const holder = document.createElement('div');
-    holder.innerHTML = descriptionHtml(desc);
-    const text = (holder.textContent || '').replace(/\s+/g, ' ').trim();
+    holder.innerHTML = descriptionHtml(desc)
+      .replace(/<br\s*\/?>/gi, ' ')
+      .replace(/<\/(p|h3|li|blockquote|ul|ol)>/gi, '$& ');
+
+    let text = (holder.textContent || '').replace(/\s+/g, ' ').trim();
+    // Tidy punctuation left dangling by the joins, and drop leading list marks.
+    text = text.replace(/\s+([.,;:!?])/g, '$1').replace(/^[•\-–—✔✅]\s*/, '');
     if (text.length <= max) return text;
+
     const cut = text.slice(0, max);
     const at = cut.lastIndexOf(' ');
-    return (at > 80 ? cut.slice(0, at) : cut) + '…';
+    // Trim a trailing partial word, then any punctuation the cut left hanging.
+    return (at > max * 0.5 ? cut.slice(0, at) : cut).replace(/[\s.,;:!?•\-–—]+$/, '') + '…';
   }
 
   function buildCarousel(images, id) {
@@ -358,6 +425,7 @@
   });
 
   load();
-  </script>
+</script>
+  <script src="assets/nav.js" defer></script>
 </body>
 </html>

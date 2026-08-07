@@ -88,10 +88,34 @@
     }
     @media (max-width: 900px) { .content { grid-template-columns: 1fr; } }
     @media (max-width: 760px) { .apply-grid { grid-template-columns: 1fr; } .phone-row { grid-template-columns: 1fr; } }
+  
+    /* ── Shared site navigation (matches about-us.html / contact.html) ── */
+    .navbar { margin-top: 10px; padding: 18px 24px; }
+    .nav-inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+    .logo img { height: 40px; display: block; }
   </style>
 </head>
 <body>
   <main class="container">
+    <nav class="navbar glass">
+      <div class="nav-inner">
+        <a class="logo" href="index.html"><picture><source srcset="assets/opt/logo.webp" type="image/webp"><img src="assets/opt/logo.png" alt="Hocan Holdings" width="360" height="88" fetchpriority="high" decoding="async"></picture></a>
+        <div class="links">
+        <a href="index.html">Home</a>
+        <a href="about-us.html">About Us</a>
+        <a href="success-stories.html">Explore Our Work</a>
+        <div class="nav-group" data-nav-group>
+          <button type="button" aria-expanded="false" aria-haspopup="true">Services</button>
+          <div class="nav-menu">
+            <a href="hocan-hr-consulting.html">Hocan HR Consulting</a>
+            <a href="hocan-logistics.html">Hocan Logistics</a>
+          </div>
+        </div>
+        <a href="blogs.html">Blogs</a>
+        <a href="contact.html">Contact Us</a>
+      </div>
+      </div>
+    </nav>
     <a class="back" href="/jobs.html">&larr; Back to jobs</a>
     <div class="crumbs">Job listing &nbsp;›&nbsp; Job details</div>
     <section class="hero" id="jobHero"></section>
@@ -465,5 +489,6 @@
       }
     })();
   </script>
+  <script src="assets/nav.js" defer></script>
 </body>
 </html>

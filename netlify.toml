@@ -1,5 +1,10 @@
 [build]
 functions = "netlify/functions"
+# Without this, the prerender below never runs: /blog/<slug> falls through to the
+# bare blog-post.html shell, whose <title> and OG tags are generic — so shared
+# links preview as "Blog Post — Hocan Holdings" instead of the article. The
+# script degrades to a no-op (exit 0) when SUPABASE_* env vars are unset.
+command = "npm run build"
 
 # Pre-rendered posts are written by scripts/prerender-blogs.js to /blog/<slug>/index.html,
 # so /blog/<slug> resolves to that real file without relying on the Pretty URLs setting.
