@@ -168,6 +168,32 @@ tr:hover td{background:#FAFBFD;}
 .cb-block-content textarea{width:100%;border:none;background:transparent;font-family:'DM Sans',sans-serif;font-size:14px;line-height:1.6;resize:vertical;outline:none;min-height:60px;color:var(--text);}
 .cb-block-content input{width:100%;border:none;background:transparent;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;color:var(--text);}
 
+/* ── RICH TEXT EDITOR (Success stories) ── */
+.rte{border:1.5px solid var(--border);border-radius:10px;overflow:hidden;background:#fff;transition:border .2s;}
+.rte:focus-within{border-color:var(--sky);}
+.rte-toolbar{background:#F8FAFC;border-bottom:1px solid var(--border);padding:7px 9px;display:flex;gap:4px;flex-wrap:wrap;align-items:center;position:sticky;top:0;z-index:3;}
+.rte-tool{background:#fff;border:1.5px solid var(--border);border-radius:6px;min-width:32px;height:30px;padding:0 8px;font-size:13px;font-family:'DM Sans',sans-serif;font-weight:600;color:var(--text);cursor:pointer;transition:.15s;display:inline-flex;align-items:center;justify-content:center;}
+.rte-tool:hover{border-color:var(--sky);color:var(--sky);}
+.rte-tool.active{background:var(--sky);border-color:var(--sky);color:#fff;}
+.rte-tool b{font-weight:800;}
+.rte-tool i{font-style:italic;font-family:Georgia,serif;}
+.rte-sep{width:1px;height:20px;background:var(--border);margin:0 3px;}
+.rte-body{padding:14px 16px;min-height:220px;max-height:420px;overflow-y:auto;font-family:'DM Sans',sans-serif;font-size:14.5px;line-height:1.75;color:var(--text);outline:none;}
+.rte-body:empty::before{content:attr(data-placeholder);color:#A8B2BE;}
+.rte-body>*:first-child{margin-top:0;}
+.rte-body p{margin:0 0 1em;}
+.rte-body h3{font-size:17px;font-weight:700;margin:1.4em 0 .5em;color:var(--text);line-height:1.35;}
+.rte-body ul,.rte-body ol{margin:0 0 1em;padding-left:1.4em;}
+.rte-body li{margin-bottom:.35em;}
+.rte-body blockquote{margin:0 0 1em;padding:2px 0 2px 14px;border-left:3px solid var(--sky);color:var(--muted);font-style:italic;}
+.rte-body b,.rte-body strong{font-weight:700;}
+.rte-bubble{position:absolute;z-index:900;display:none;gap:3px;background:var(--dark);border-radius:8px;padding:5px;box-shadow:0 8px 24px rgba(0,0,0,.24);}
+.rte-bubble.show{display:flex;}
+.rte-bubble button{background:none;border:none;color:rgba(255,255,255,.8);min-width:28px;height:26px;padding:0 7px;border-radius:5px;font-size:12.5px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:.15s;}
+.rte-bubble button:hover{background:rgba(255,255,255,.16);color:#fff;}
+.rte-bubble button.active{background:var(--sky);color:#fff;}
+.rte-bubble button i{font-style:italic;font-family:Georgia,serif;}
+
 /* ── IMAGE UPLOAD ── */
 .image-upload-zone{border:2px dashed var(--border);border-radius:14px;padding:28px;text-align:center;cursor:pointer;transition:all .2s;position:relative;}
 .image-upload-zone:hover,.image-upload-zone.drag{border-color:var(--sky);background:rgba(74,179,212,.04);}
@@ -764,8 +790,23 @@ tr:hover td{background:#FAFBFD;}
           <input type="text" id="sTitle" placeholder="e.g. Technoedge Limited">
         </div>
         <div class="form-group form-full">
-          <label>Description *</label>
-          <textarea id="sDescription" rows="4" placeholder="Describe the work done, results achieved…"></textarea>
+          <label>Description <span class="req">Required</span></label>
+          <div class="rte" id="sRte">
+            <div class="rte-toolbar">
+              <button type="button" class="rte-tool" data-cmd="bold" title="Bold (Ctrl+B)"><b>B</b></button>
+              <button type="button" class="rte-tool" data-cmd="italic" title="Italic (Ctrl+I)"><i>I</i></button>
+              <span class="rte-sep"></span>
+              <button type="button" class="rte-tool" data-block="h3" title="Section heading">Heading</button>
+              <button type="button" class="rte-tool" data-block="p" title="Normal paragraph">Text</button>
+              <span class="rte-sep"></span>
+              <button type="button" class="rte-tool" data-cmd="insertUnorderedList" title="Bullet list">• List</button>
+              <button type="button" class="rte-tool" data-block="blockquote" title="Pull quote">❝ Quote</button>
+              <span class="rte-sep"></span>
+              <button type="button" class="rte-tool" data-cmd="removeFormat" title="Clear formatting">Clear</button>
+            </div>
+            <div class="rte-body" id="sDescription" contenteditable="true" data-placeholder="Describe the work done and the results achieved. Press Enter for a new paragraph — use Heading to break the story into sections."></div>
+          </div>
+          <small class="hint">Press <strong>Enter</strong> to start a new paragraph — paragraph breaks now show up on the website. Select any text to format it, or use the buttons above.</small>
         </div>
         <div class="form-group">
           <label>Display Order</label>
@@ -814,6 +855,16 @@ tr:hover td{background:#FAFBFD;}
       <button class="btn-save" id="storySaveBtn">Save Story</button>
     </div>
   </div>
+</div>
+
+<!-- FLOATING FORMAT BAR (appears on text selection in the story description) -->
+<div class="rte-bubble" id="rteBubble">
+  <button type="button" data-cmd="bold" title="Bold"><b>B</b></button>
+  <button type="button" data-cmd="italic" title="Italic"><i>I</i></button>
+  <button type="button" data-block="h3" title="Heading">H</button>
+  <button type="button" data-cmd="insertUnorderedList" title="Bullet list">•</button>
+  <button type="button" data-block="blockquote" title="Quote">❝</button>
+  <button type="button" data-cmd="removeFormat" title="Clear formatting">✕</button>
 </div>
 
 <!-- PARTNER EDITOR MODAL -->
@@ -1801,12 +1852,161 @@ function renderStoryTable(){
   }).join('');
 }
 
+/* ── RICH TEXT EDITOR for the story description ──
+   Stores HTML. Old stories were saved as plain text, so we upgrade those on load:
+   blank lines become paragraphs, *wrapped* text becomes bold. */
+const RTE_ALLOWED={P:1,BR:1,B:1,STRONG:1,I:1,EM:1,U:1,H3:1,UL:1,OL:1,LI:1,BLOCKQUOTE:1};
+
+function rteSanitize(html){
+  const doc=document.createElement('div');
+  doc.innerHTML=html;
+  doc.querySelectorAll('script,style').forEach(n=>n.remove());
+  doc.querySelectorAll('*').forEach(node=>{
+    if(!RTE_ALLOWED[node.tagName]){
+      // Unwrap unknown tags (divs, spans, pasted Word markup) but keep their text.
+      while(node.firstChild)node.parentNode.insertBefore(node.firstChild,node);
+      node.remove();
+      return;
+    }
+    [...node.attributes].forEach(a=>node.removeAttribute(a.name));
+  });
+  return doc.innerHTML.trim();
+}
+
+function looksLikeHtml(s){return /<(p|h3|ul|ol|li|br|b|strong|i|em|blockquote)\b/i.test(s||'');}
+
+// Converts a legacy plain-text description into paragraphs/headings.
+function plainTextToHtml(text){
+  const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return String(text||'')
+    .split(/\n\s*\n+/)                       // blank line = new paragraph
+    .map(block=>block.trim())
+    .filter(Boolean)
+    .map(block=>{
+      let html=esc(block).replace(/\n/g,'<br>');
+      html=html.replace(/\*([^*\n]+)\*/g,'<strong>$1</strong>');   // *Result* → bold
+      // A short standalone line with no closing punctuation reads as a heading.
+      const plain=block.replace(/\*/g,'').trim();
+      if(!block.includes('\n')&&plain.length<70&&!/[.:,;!?]$/.test(plain)){
+        return `<h3>${plain.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</h3>`;
+      }
+      return `<p>${html}</p>`;
+    }).join('');
+}
+
+function rteSetContent(html){
+  const body=document.getElementById('sDescription');
+  body.innerHTML=html||'';
+  if(!body.textContent.trim()&&!body.querySelector('img'))body.innerHTML='';
+}
+
+function rteGetContent(){
+  const body=document.getElementById('sDescription');
+  if(!body.textContent.trim())return '';
+  return rteSanitize(body.innerHTML);
+}
+
+function rteApplyBlock(tag){
+  const body=document.getElementById('sDescription');
+  body.focus();
+  // Toggle back to a plain paragraph if the block is already that type.
+  const sel=window.getSelection();
+  let node=sel.anchorNode;
+  while(node&&node!==body&&node.nodeType!==1)node=node.parentNode;
+  while(node&&node!==body&&!/^(P|H3|BLOCKQUOTE|LI)$/.test(node.tagName))node=node.parentNode;
+  const current=node&&node!==body?node.tagName:'';
+  const target=(current===tag.toUpperCase())?'P':tag;
+  document.execCommand('formatBlock',false,target.toLowerCase());
+  rteSyncToolbar();
+}
+
+function rteSyncToolbar(){
+  const body=document.getElementById('sDescription');
+  const inEditor=body.contains(window.getSelection().anchorNode);
+  document.querySelectorAll('#sRte .rte-tool, #rteBubble button').forEach(btn=>{
+    let on=false;
+    if(inEditor){
+      try{
+        if(btn.dataset.cmd&&btn.dataset.cmd!=='removeFormat')on=document.queryCommandState(btn.dataset.cmd);
+        else if(btn.dataset.block){
+          let n=window.getSelection().anchorNode;
+          while(n&&n!==body){
+            if(n.nodeType===1&&n.tagName===btn.dataset.block.toUpperCase()){on=true;break;}
+            n=n.parentNode;
+          }
+        }
+      }catch(e){}
+    }
+    btn.classList.toggle('active',on);
+  });
+}
+
+function rteExec(btn){
+  const body=document.getElementById('sDescription');
+  body.focus();
+  if(btn.dataset.block)rteApplyBlock(btn.dataset.block);
+  else{document.execCommand(btn.dataset.cmd,false,null);rteSyncToolbar();}
+}
+
+document.querySelectorAll('#sRte .rte-tool').forEach(btn=>{
+  // mousedown so the editor never loses its selection to the button.
+  btn.addEventListener('mousedown',e=>{e.preventDefault();rteExec(btn);});
+});
+
+document.querySelectorAll('#rteBubble button').forEach(btn=>{
+  btn.addEventListener('mousedown',e=>{e.preventDefault();rteExec(btn);});
+});
+
+(function initRte(){
+  const body=document.getElementById('sDescription');
+  const bubble=document.getElementById('rteBubble');
+
+  // Paste as clean text/markup rather than styled Word or web HTML.
+  body.addEventListener('paste',e=>{
+    e.preventDefault();
+    const html=e.clipboardData.getData('text/html');
+    const text=e.clipboardData.getData('text/plain');
+    const clean=html?rteSanitize(html):plainTextToHtml(text);
+    document.execCommand('insertHTML',false,clean);
+  });
+
+  body.addEventListener('keydown',e=>{
+    if(!(e.ctrlKey||e.metaKey))return;
+    const k=e.key.toLowerCase();
+    if(k==='b'||k==='i'){e.preventDefault();document.execCommand(k==='b'?'bold':'italic');rteSyncToolbar();}
+  });
+
+  function positionBubble(){
+    const sel=window.getSelection();
+    if(!sel.rangeCount||sel.isCollapsed||!body.contains(sel.anchorNode)){bubble.classList.remove('show');return;}
+    const rect=sel.getRangeAt(0).getBoundingClientRect();
+    if(!rect.width&&!rect.height){bubble.classList.remove('show');return;}
+    bubble.classList.add('show');
+    const top=rect.top+window.scrollY-bubble.offsetHeight-8;
+    let left=rect.left+window.scrollX+rect.width/2-bubble.offsetWidth/2;
+    left=Math.max(8,Math.min(left,window.innerWidth-bubble.offsetWidth-8));
+    bubble.style.top=(top<window.scrollY?rect.bottom+window.scrollY+8:top)+'px';
+    bubble.style.left=left+'px';
+    rteSyncToolbar();
+  }
+
+  document.addEventListener('selectionchange',()=>{
+    if(!document.getElementById('storyModal').classList.contains('open'))return;
+    positionBubble();
+    rteSyncToolbar();
+  });
+  body.addEventListener('blur',()=>setTimeout(()=>{
+    if(!bubble.matches(':hover'))bubble.classList.remove('show');
+  },120));
+  window.addEventListener('scroll',()=>bubble.classList.remove('show'),true);
+})();
+
 function openStoryModal(id=null){
   editingStoryId=id;
   storyImages=[];
   document.getElementById('storyModalTitle').textContent=id?'Edit Success Story':'New Success Story';
   document.getElementById('sTitle').value='';
-  document.getElementById('sDescription').value='';
+  rteSetContent('');
   document.getElementById('sOrder').value='0';
   document.getElementById('sPublished').checked=true;
   document.getElementById('sVideoUrl').value='';
@@ -1818,7 +2018,8 @@ function openStoryModal(id=null){
     adminGetSuccessStory(id).then(s=>{
       if(!s)return;
       document.getElementById('sTitle').value=s.title||'';
-      document.getElementById('sDescription').value=s.description||'';
+      const desc=s.description||'';
+      rteSetContent(looksLikeHtml(desc)?rteSanitize(desc):plainTextToHtml(desc));
       document.getElementById('sOrder').value=s.display_order??0;
       document.getElementById('sPublished').checked=!!s.published;
       document.getElementById('sVideoUrl').value=s.video_url||'';
@@ -1902,7 +2103,7 @@ document.getElementById('storyGallery').addEventListener('click',e=>{
 document.getElementById('storySaveBtn').addEventListener('click',async()=>{
   const btn=document.getElementById('storySaveBtn');
   const title=document.getElementById('sTitle').value.trim();
-  const description=document.getElementById('sDescription').value.trim();
+  const description=rteGetContent();
   if(!title||!description){showToast('Title and description are required','error');return;}
   btn.disabled=true;btn.textContent='Saving…';
   const data={

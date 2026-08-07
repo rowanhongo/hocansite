@@ -39,44 +39,86 @@
     .hero p { color: #4b5563; line-height: 1.7; }
     .back-btn { display: inline-block; margin-top: 14px; background: #C47A5A; color: #fff; text-decoration: none; border-radius: 8px; padding: 10px 18px; font-weight: 600; transition: transform 0.2s, box-shadow 0.2s; }
     .back-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.12); }
-    .stories { display: grid; gap: 18px; }
-    .story { padding: 24px; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+    /* ── STORY CARDS: media beside the text, not buried under it ── */
+    .stories { display: grid; gap: 20px; }
+    .story { padding: 0; cursor: pointer; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; display: grid; grid-template-columns: 300px 1fr; align-items: stretch; }
     .story:hover { transform: translateY(-2px); box-shadow: 0 18px 40px rgba(0,0,0,0.12); }
-    .story h2 { margin-bottom: 10px; color: #111827; font-size: 22px; }
-    .story p { color: #4b5563; line-height: 1.7; }
+    .story:focus-visible { outline: 3px solid #C47A5A; outline-offset: 3px; }
+    .story.no-media { grid-template-columns: 1fr; }
+    .story-thumb { position: relative; background: #e9edf1; min-height: 210px; overflow: hidden; }
+    .story-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .story-thumb .badge-media { position: absolute; left: 12px; bottom: 12px; background: rgba(0,0,0,0.62); color: #fff; font-size: 12px; font-weight: 600; padding: 5px 10px; border-radius: 20px; backdrop-filter: blur(4px); display: flex; align-items: center; gap: 5px; }
+    .story-body { padding: 24px; display: flex; flex-direction: column; justify-content: center; }
+    .story h2 { margin-bottom: 8px; color: #111827; font-size: 22px; line-height: 1.3; }
+    .story-excerpt { color: #4b5563; line-height: 1.7; font-size: 15px; }
+    .story-more { margin-top: 14px; font-weight: 600; color: #C47A5A; font-size: 14.5px; display: inline-flex; align-items: center; gap: 6px; }
+    .story:hover .story-more { gap: 10px; }
+    .story-more span { transition: transform 0.2s; }
 
-    .story-media { margin-top: 16px; border-radius: 14px; overflow: hidden; }
-    .story-media video { width: 100%; max-height: 400px; display: block; background: #000; border-radius: 14px; }
-
-    .carousel { position: relative; overflow: hidden; border-radius: 14px; background: #f0f0f0; }
+    /* ── CAROUSEL: contain, never crop ── */
+    .carousel { position: relative; border-radius: 14px; background: #10131a; overflow: hidden; }
+    .carousel-viewport { overflow: hidden; }
     .carousel-track { display: flex; transition: transform 0.4s ease; }
-    .carousel-track img { width: 100%; flex-shrink: 0; object-fit: cover; max-height: 400px; display: block; }
-    .carousel-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: #fff; border: none; width: 40px; height: 40px; border-radius: 50%; font-size: 20px; cursor: pointer; z-index: 2; transition: background 0.2s; }
-    .carousel-btn:hover { background: rgba(0,0,0,0.75); }
+    .carousel-slide { width: 100%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; aspect-ratio: 16 / 10; }
+    .carousel-slide img { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; display: block; }
+    .carousel-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.55); color: #fff; border: none; width: 42px; height: 42px; border-radius: 50%; font-size: 22px; cursor: pointer; z-index: 2; transition: background 0.2s; display: flex; align-items: center; justify-content: center; }
+    .carousel-btn:hover { background: rgba(0,0,0,0.8); }
     .carousel-btn.prev { left: 10px; }
     .carousel-btn.next { right: 10px; }
-    .carousel-dots { text-align: center; padding: 10px 0; display: flex; justify-content: center; gap: 6px; }
-    .carousel-dot { width: 8px; height: 8px; border-radius: 50%; background: #ccc; border: none; cursor: pointer; padding: 0; transition: background 0.2s; }
-    .carousel-dot.active { background: #C47A5A; }
+    .carousel-count { position: absolute; right: 12px; top: 12px; background: rgba(0,0,0,0.6); color: #fff; font-size: 12.5px; font-weight: 600; padding: 4px 10px; border-radius: 20px; z-index: 2; }
+    .carousel-dots { display: flex; justify-content: center; gap: 6px; padding: 10px 0 12px; }
+    .carousel-dot { width: 8px; height: 8px; border-radius: 50%; background: #ccc; border: none; cursor: pointer; padding: 0; transition: background 0.2s, width 0.2s; }
+    .carousel-dot.active { background: #C47A5A; width: 20px; border-radius: 4px; }
 
+    /* ── DETAIL MODAL ── */
     .story-detail-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 500; display: none; align-items: flex-start; justify-content: center; overflow-y: auto; padding: 40px 20px; }
     .story-detail-overlay.open { display: flex; }
-    .story-detail { background: #fff; border-radius: 20px; width: 100%; max-width: 800px; overflow: hidden; box-shadow: 0 24px 80px rgba(0,0,0,0.2); }
-    .story-detail-header { background: #1A1A2E; padding: 20px 28px; display: flex; justify-content: space-between; align-items: center; }
+    .story-detail { background: #fff; border-radius: 20px; width: 100%; max-width: 820px; overflow: hidden; box-shadow: 0 24px 80px rgba(0,0,0,0.2); }
+    .story-detail-header { background: #1A1A2E; padding: 20px 28px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 4; }
     .story-detail-header h2 { color: #fff; font-size: 20px; }
-    .story-detail-close { background: none; border: none; color: rgba(255,255,255,0.6); font-size: 26px; cursor: pointer; transition: color 0.2s; }
+    .story-detail-close { background: none; border: none; color: rgba(255,255,255,0.6); font-size: 26px; cursor: pointer; transition: color 0.2s; line-height: 1; }
     .story-detail-close:hover { color: #fff; }
-    .story-detail-body { padding: 28px; }
-    .story-detail-body p { color: #4b5563; line-height: 1.7; font-size: 16px; margin-bottom: 20px; }
-    .story-detail-body video { width: 100%; border-radius: 14px; margin-bottom: 16px; }
-    .story-detail-body .carousel { margin-bottom: 16px; }
+
+    /* Media sits at the TOP of the detail view, above the write-up. */
+    .story-detail-media { background: #10131a; }
+    .story-detail-media video { width: 100%; max-height: 60vh; display: block; background: #000; }
+    .story-detail-media .carousel { border-radius: 0; }
+    .story-detail-media .carousel-slide { aspect-ratio: 16 / 9; max-height: 60vh; }
+    .story-detail-media .carousel-dots { background: #10131a; }
+
+    .story-detail-body { padding: 30px 34px 34px; }
+
+    /* Readable long-form typography for the story write-up. */
+    .story-prose { color: #374151; font-size: 16.5px; line-height: 1.8; max-width: 68ch; }
+    .story-prose > *:first-child { margin-top: 0; }
+    .story-prose p { margin: 0 0 1.15em; }
+    .story-prose h3 { font-size: 20px; line-height: 1.35; color: #111827; margin: 1.8em 0 .6em; font-weight: 700; }
+    .story-prose h3:first-child { margin-top: 0; }
+    .story-prose ul, .story-prose ol { margin: 0 0 1.15em; padding-left: 1.3em; }
+    .story-prose li { margin-bottom: .45em; }
+    .story-prose blockquote { margin: 1.5em 0; padding: 4px 0 4px 18px; border-left: 3px solid #C47A5A; font-style: italic; color: #4b5563; }
+    .story-prose strong { color: #111827; font-weight: 700; }
+    .story-prose a { color: #C47A5A; }
 
     .loading { text-align: center; padding: 60px; color: #888; font-size: 16px; }
     .empty { text-align: center; padding: 60px; color: #888; }
 
+    @media (max-width: 820px) {
+      /* On phones the card stacks — image on top, text below. */
+      .story { grid-template-columns: 1fr; }
+      .story-thumb { min-height: 0; aspect-ratio: 16 / 9; }
+    }
     @media (max-width: 768px) {
       .hero h1 { font-size: 28px; }
-      .story-detail { max-width: 100%; margin: 0; }
+      .story-detail-overlay { padding: 0; }
+      .story-detail { max-width: 100%; margin: 0; border-radius: 0; min-height: 100vh; }
+      .story-detail-body { padding: 22px 18px 30px; }
+      .story-prose { font-size: 16px; }
+      .story-prose h3 { font-size: 18px; }
+      .carousel-btn { width: 36px; height: 36px; font-size: 19px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .story, .story-more span, .carousel-track { transition: none; }
     }
   </style>
 </head>
@@ -92,13 +134,13 @@
     </section>
   </main>
 
-  <div class="story-detail-overlay" id="detailOverlay">
+  <div class="story-detail-overlay" id="detailOverlay" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
     <div class="story-detail">
       <div class="story-detail-header">
         <h2 id="detailTitle"></h2>
-        <button class="story-detail-close" id="detailClose">×</button>
+        <button class="story-detail-close" id="detailClose" aria-label="Close story">×</button>
       </div>
-      <div class="story-detail-body" id="detailBody"></div>
+      <div id="detailBody"></div>
     </div>
   </div>
 
@@ -109,71 +151,172 @@
   function esc(s){ return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
   let allStories = [];
+  let lastFocused = null;
+
+  // ── Description rendering ──────────────────────────────────────────────
+  // Descriptions are authored as HTML in the admin. Older ones are plain text,
+  // so those get converted: blank lines become paragraphs, *text* becomes bold.
+  const ALLOWED = {P:1,BR:1,B:1,STRONG:1,I:1,EM:1,U:1,H3:1,UL:1,OL:1,LI:1,BLOCKQUOTE:1,A:1};
+
+  function sanitizeHtml(html) {
+    const holder = document.createElement('div');
+    holder.innerHTML = html;
+    holder.querySelectorAll('script,style,iframe,object,embed').forEach(n => n.remove());
+    holder.querySelectorAll('*').forEach(node => {
+      if (!ALLOWED[node.tagName]) {
+        while (node.firstChild) node.parentNode.insertBefore(node.firstChild, node);
+        node.remove();
+        return;
+      }
+      [...node.attributes].forEach(attr => {
+        const keepLink = node.tagName === 'A' && attr.name === 'href' && /^(https?:|mailto:|\/)/i.test(attr.value.trim());
+        if (!keepLink) node.removeAttribute(attr.name);
+      });
+      if (node.tagName === 'A') { node.setAttribute('rel','noopener noreferrer'); node.setAttribute('target','_blank'); }
+    });
+    return holder.innerHTML;
+  }
+
+  function looksLikeHtml(s) { return /<(p|h3|ul|ol|li|br|b|strong|i|em|blockquote)\b/i.test(s || ''); }
+
+  function plainTextToHtml(text) {
+    return String(text || '')
+      .split(/\n\s*\n+/)
+      .map(b => b.trim())
+      .filter(Boolean)
+      .map(block => {
+        let html = esc(block).replace(/\n/g, '<br>');
+        html = html.replace(/\*([^*\n]+)\*/g, '<strong>$1</strong>');
+        const plain = block.replace(/\*/g, '').trim();
+        if (!block.includes('\n') && plain.length < 70 && !/[.:,;!?]$/.test(plain)) {
+          return `<h3>${esc(plain)}</h3>`;
+        }
+        return `<p>${html}</p>`;
+      }).join('');
+  }
+
+  function descriptionHtml(desc) {
+    return looksLikeHtml(desc) ? sanitizeHtml(desc) : plainTextToHtml(desc);
+  }
+
+  // Plain-text excerpt for the card, derived from whichever format was stored.
+  function excerpt(desc, max = 180) {
+    const holder = document.createElement('div');
+    holder.innerHTML = descriptionHtml(desc);
+    const text = (holder.textContent || '').replace(/\s+/g, ' ').trim();
+    if (text.length <= max) return text;
+    const cut = text.slice(0, max);
+    const at = cut.lastIndexOf(' ');
+    return (at > 80 ? cut.slice(0, at) : cut) + '…';
+  }
 
   function buildCarousel(images, id) {
     if (!images || images.length === 0) return '';
-    if (images.length === 1) return `<div class="story-media"><img src="${esc(images[0])}" alt="Story image" style="width:100%;border-radius:14px;max-height:400px;object-fit:cover;display:block;"></div>`;
-    const imgs = images.map(u => `<img src="${esc(u)}" alt="Story image" loading="lazy">`).join('');
-    const dots = images.map((_, i) => `<button class="carousel-dot${i===0?' active':''}" data-carousel="${id}" data-slide="${i}"></button>`).join('');
+    const slides = images.map((u, i) =>
+      `<div class="carousel-slide"><img src="${esc(u)}" alt="Project image ${i+1}" loading="${i === 0 ? 'eager' : 'lazy'}"></div>`
+    ).join('');
+    if (images.length === 1) {
+      return `<div class="carousel"><div class="carousel-viewport"><div class="carousel-track">${slides}</div></div></div>`;
+    }
+    const dots = images.map((_, i) => `<button class="carousel-dot${i===0?' active':''}" data-slide="${i}" aria-label="Go to image ${i+1}"></button>`).join('');
     return `<div class="carousel" data-carousel-id="${id}">
-      <div class="carousel-track">${imgs}</div>
-      <button class="carousel-btn prev" data-carousel="${id}" data-dir="-1">‹</button>
-      <button class="carousel-btn next" data-carousel="${id}" data-dir="1">›</button>
+      <div class="carousel-viewport"><div class="carousel-track">${slides}</div></div>
+      <span class="carousel-count"><span class="carousel-current">1</span> / ${images.length}</span>
+      <button class="carousel-btn prev" data-dir="-1" aria-label="Previous image">‹</button>
+      <button class="carousel-btn next" data-dir="1" aria-label="Next image">›</button>
       <div class="carousel-dots">${dots}</div>
     </div>`;
   }
 
+  // The card is a compact teaser: one thumbnail + title + excerpt.
+  // The full video and carousel live in the detail view, at the top.
   function renderStoryCard(story, index) {
-    const hasVideo = !!story.video_url;
     const images = Array.isArray(story.images) ? story.images : [];
-    let mediaHtml = '';
-    if (hasVideo) {
-      mediaHtml += `<div class="story-media"><video src="${esc(story.video_url)}" controls preload="metadata"></video></div>`;
+    const hasVideo = !!story.video_url;
+    const thumb = images[0];
+    let thumbHtml = '';
+    if (thumb) {
+      const badge = hasVideo ? '<span class="badge-media">▶ Video</span>'
+        : images.length > 1 ? `<span class="badge-media">🖼 ${images.length} photos</span>` : '';
+      thumbHtml = `<div class="story-thumb"><img src="${esc(thumb)}" alt="${esc(story.title)}" loading="lazy">${badge}</div>`;
+    } else if (hasVideo) {
+      thumbHtml = `<div class="story-thumb"><video src="${esc(story.video_url)}#t=0.5" preload="metadata" muted playsinline style="width:100%;height:100%;object-fit:cover;"></video><span class="badge-media">▶ Video</span></div>`;
     }
-    if (images.length) {
-      mediaHtml += buildCarousel(images, 'card-' + index);
-    }
-    return `<article class="story glass" data-story-index="${index}">
-      <h2>${esc(story.title)}</h2>
-      <p>${esc(story.description).substring(0, 200)}${story.description && story.description.length > 200 ? '…' : ''}</p>
-      ${mediaHtml}
+    return `<article class="story glass${thumbHtml ? '' : ' no-media'}" data-story-index="${index}" tabindex="0" role="button" aria-label="Read the ${esc(story.title)} story">
+      ${thumbHtml}
+      <div class="story-body">
+        <h2>${esc(story.title)}</h2>
+        <p class="story-excerpt">${esc(excerpt(story.description))}</p>
+        <span class="story-more">Read the full story <span>→</span></span>
+      </div>
     </article>`;
   }
 
   function openDetail(story) {
     const overlay = document.getElementById('detailOverlay');
+    lastFocused = document.activeElement;
     document.getElementById('detailTitle').textContent = story.title || '';
     const body = document.getElementById('detailBody');
-    let html = `<p>${esc(story.description)}</p>`;
-    if (story.video_url) {
-      html += `<video src="${esc(story.video_url)}" controls preload="metadata"></video>`;
-    }
+
     const images = Array.isArray(story.images) ? story.images : [];
-    if (images.length) {
-      html += buildCarousel(images, 'detail');
+    let media = '';
+    if (story.video_url) {
+      media += `<video src="${esc(story.video_url)}" controls preload="metadata"></video>`;
     }
-    body.innerHTML = html;
+    if (images.length) {
+      media += buildCarousel(images, 'detail');
+    }
+
+    body.innerHTML =
+      (media ? `<div class="story-detail-media">${media}</div>` : '') +
+      `<div class="story-detail-body"><div class="story-prose">${descriptionHtml(story.description)}</div></div>`;
+
     overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
     initCarousels(body);
+    document.getElementById('detailClose').focus();
+  }
+
+  function closeDetail() {
+    const overlay = document.getElementById('detailOverlay');
+    overlay.classList.remove('open');
+    document.body.style.overflow = '';
+    overlay.querySelectorAll('video').forEach(v => v.pause());
+    document.getElementById('detailBody').innerHTML = '';
+    if (lastFocused) lastFocused.focus();
   }
 
   function initCarousels(container) {
     container.querySelectorAll('.carousel').forEach(carousel => {
       const track = carousel.querySelector('.carousel-track');
-      const imgs = track.querySelectorAll('img');
-      if (imgs.length <= 1) return;
+      const slides = track.querySelectorAll('.carousel-slide');
+      if (slides.length <= 1) return;
+      const counter = carousel.querySelector('.carousel-current');
       let current = 0;
+
       function goTo(idx) {
-        current = ((idx % imgs.length) + imgs.length) % imgs.length;
+        current = ((idx % slides.length) + slides.length) % slides.length;
         track.style.transform = `translateX(-${current * 100}%)`;
         carousel.querySelectorAll('.carousel-dot').forEach((d, i) => d.classList.toggle('active', i === current));
+        if (counter) counter.textContent = current + 1;
       }
+
       carousel.querySelectorAll('.carousel-btn').forEach(btn => {
         btn.addEventListener('click', e => { e.stopPropagation(); goTo(current + parseInt(btn.dataset.dir)); });
       });
       carousel.querySelectorAll('.carousel-dot').forEach(dot => {
         dot.addEventListener('click', e => { e.stopPropagation(); goTo(parseInt(dot.dataset.slide)); });
       });
+
+      // Swipe on touch devices.
+      let startX = null;
+      carousel.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, { passive: true });
+      carousel.addEventListener('touchend', e => {
+        if (startX === null) return;
+        const dx = e.changedTouches[0].clientX - startX;
+        if (Math.abs(dx) > 45) goTo(current + (dx < 0 ? 1 : -1));
+        startX = null;
+      }, { passive: true });
     });
   }
 
@@ -186,12 +329,18 @@
         return;
       }
       container.innerHTML = allStories.map((s, i) => renderStoryCard(s, i)).join('');
-      initCarousels(container);
 
       container.addEventListener('click', e => {
         const card = e.target.closest('[data-story-index]');
         if (!card) return;
-        if (e.target.closest('video') || e.target.closest('.carousel-btn') || e.target.closest('.carousel-dot')) return;
+        const idx = parseInt(card.dataset.storyIndex);
+        if (allStories[idx]) openDetail(allStories[idx]);
+      });
+      container.addEventListener('keydown', e => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        const card = e.target.closest('[data-story-index]');
+        if (!card) return;
+        e.preventDefault();
         const idx = parseInt(card.dataset.storyIndex);
         if (allStories[idx]) openDetail(allStories[idx]);
       });
@@ -200,13 +349,12 @@
     }
   }
 
-  document.getElementById('detailClose').addEventListener('click', () => {
-    document.getElementById('detailOverlay').classList.remove('open');
-  });
+  document.getElementById('detailClose').addEventListener('click', closeDetail);
   document.getElementById('detailOverlay').addEventListener('click', e => {
-    if (e.target === document.getElementById('detailOverlay')) {
-      document.getElementById('detailOverlay').classList.remove('open');
-    }
+    if (e.target === document.getElementById('detailOverlay')) closeDetail();
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && document.getElementById('detailOverlay').classList.contains('open')) closeDetail();
   });
 
   load();

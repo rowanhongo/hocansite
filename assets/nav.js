@@ -85,6 +85,31 @@
     groups().forEach(function (g) { if (g !== except) setOpen(g, false); });
   }
 
+  /* Mobile accordion. The panel animates against a measured height rather than
+     a guessed one, so adding services can never clip the list. */
+  function setMobileSection(group, open) {
+    var menu = menuOf(group);
+    if (!menu) return;
+
+    if (open) {
+      // scrollHeight is the natural height while max-height still clamps it.
+      menu.style.setProperty('--nav-menu-h', menu.scrollHeight + 'px');
+    }
+    group.setAttribute('data-open', open ? 'true' : 'false');
+    var btn = group.querySelector('button');
+    if (btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+
+  /* The sheet hangs below the header, so it needs the header's real height —
+     which differs per page and changes as the logo font loads. */
+  function syncSheetTop() {
+    if (DESKTOP.matches) return;
+    var nav = document.querySelector('.navbar');
+    if (!nav) return;
+    var r = nav.getBoundingClientRect();
+    document.documentElement.style.setProperty('--nav-sheet-top', Math.round(r.bottom) + 'px');
+  }
+
   groups().forEach(function (group) {
     var btn = group.querySelector('button');
     if (!btn) return;
@@ -126,12 +151,18 @@
     }
 
     // Click/keyboard toggle, so the menu is reachable without a pointer.
+    // On mobile this is the accordion inside the drawer sheet.
     btn.addEventListener('click', function (e) {
-      if (!DESKTOP.matches) return;
       e.preventDefault();
       e.stopPropagation();
       clearTimeout(hoverTimer);
       var isOpen = group.getAttribute('data-open') === 'true';
+
+      if (!DESKTOP.matches) {
+        setMobileSection(group, !isOpen);
+        return;
+      }
+
       closeAll(group);
       setOpen(group, !isOpen);
     });
@@ -166,8 +197,14 @@
     var open = document.querySelector('[data-nav-group][data-open="true"]');
     if (open) place(open);
   }
-  window.addEventListener('scroll', reposition, { passive: true });
-  window.addEventListener('resize', reposition);
+  window.addEventListener('scroll', function () {
+    reposition();
+    if (drawerOpen()) syncSheetTop();
+  }, { passive: true });
+  window.addEventListener('resize', function () {
+    reposition();
+    if (drawerOpen()) syncSheetTop();
+  });
 
   /* ---- Mobile drawer --------------------------------------------------- */
 
@@ -206,6 +243,7 @@
       // transform/backdrop-filter would trap a fixed drawer, so move it out.
       if (links.parentNode !== document.body) document.body.appendChild(links);
       lastFocus = document.activeElement;
+      syncSheetTop();
     }
 
     document.body.setAttribute('data-nav-open', open ? 'true' : 'false');
@@ -215,9 +253,13 @@
     if (open) {
       var first = links.querySelector('a');
       if (first) first.focus({ preventScroll: true });
-    } else if (lastFocus && typeof lastFocus.focus === 'function') {
-      lastFocus.focus({ preventScroll: true });
-      lastFocus = null;
+    } else {
+      // Collapse any expanded section so the sheet reopens in a clean state.
+      groups().forEach(function (g) { setMobileSection(g, false); });
+      if (lastFocus && typeof lastFocus.focus === 'function') {
+        lastFocus.focus({ preventScroll: true });
+        lastFocus = null;
+      }
     }
   }
 

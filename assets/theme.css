@@ -291,6 +291,22 @@ body[data-nav-open="true"] .nav-scrim {
   transition: opacity .3s ease, visibility 0s 0s;
 }
 
+/* The sheet hangs below the header, so the header must sit ABOVE the scrim —
+   otherwise the dimmer covers the close button and the menu can't be shut.
+   Only z-index is touched (never `position`, which would break index.html's
+   sticky navbar), and only while the sheet is open. */
+@media (max-width: 900px) {
+  body[data-nav-open="true"] .navbar {
+    /* z-index needs a positioned box. index.html's navbar is already sticky;
+       `sticky` here is a no-op for the others at their scroll origin but makes
+       the stacking context apply, without the layout shift `relative` on a
+       static element would avoid anyway. */
+    position: sticky;
+    top: 0;
+    z-index: 1600;
+  }
+}
+
 /* ---- Mobile: compact bar + slide-in drawer ----------------------------- */
 @media (max-width: 900px) {
   .nav-toggle { display: inline-flex; }
@@ -302,102 +318,148 @@ body[data-nav-open="true"] .nav-scrim {
     gap: 16px;
   }
 
-  /* The drawer is fixed to the viewport and lives at the end of <body>
-     (nav.js moves it there), so the navbar's transform/backdrop-filter can't
-     clip it — the same constraint that applies to the desktop dropdown. */
+  /* Full-width sheet that drops from under the header, rather than a side
+     panel — the logo and close button stay visible above it. It is fixed to
+     the viewport and lives at the end of <body> (nav.js moves it there), so
+     the navbar's transform/backdrop-filter can't clip it. nav.js sets
+     --nav-sheet-top from the header's real height. */
   .nav-inner .links,
   body > .links {
     position: fixed;
-    top: 0;
+    top: var(--nav-sheet-top, 64px);
+    left: 0;
     right: 0;
     bottom: 0;
     z-index: 1500;
-    width: min(320px, 84vw);
+    width: 100%;
     margin: 0;
-    padding: 88px 26px 32px;
+    padding: 8px 0 32px;
     display: flex;
     flex-direction: column;
     align-items: stretch;
     justify-content: flex-start;
     flex-wrap: nowrap;
-    gap: 2px;
+    gap: 0;
     overflow-y: auto;
     overscroll-behavior: contain;
     background: #fff;
-    box-shadow: -18px 0 44px rgba(20, 33, 61, .16);
-    transform: translateX(100%);
+    box-shadow: 0 18px 44px rgba(20, 33, 61, .14);
+    transform: translateY(-8px);
+    opacity: 0;
     visibility: hidden;
-    transition: transform .34s cubic-bezier(.32, .72, 0, 1), visibility 0s .34s;
+    transition: transform .28s cubic-bezier(.32, .72, 0, 1), opacity .22s ease, visibility 0s .28s;
   }
   body[data-nav-open="true"] .links {
-    transform: translateX(0);
+    transform: translateY(0);
+    opacity: 1;
     visibility: visible;
-    transition: transform .34s cubic-bezier(.32, .72, 0, 1), visibility 0s 0s;
+    transition: transform .28s cubic-bezier(.32, .72, 0, 1), opacity .22s ease, visibility 0s 0s;
   }
 
-  /* text-decoration and background are reset explicitly: several pages style
-     bare `a` and `button` elements, and those rules leak into the drawer once
-     it is portalled out to <body>. */
+  /* Rows are full-bleed so the tap target spans the sheet and the active tint
+     reads as a band, matching the reference. text-decoration/background are
+     reset explicitly: several pages style bare `a`/`button` elements, and
+     those rules leak in once the drawer is portalled out to <body>. */
   .nav-inner .links a,
   body > .links a {
-    padding: 13px 2px;
-    font-size: 16.5px;
-    font-weight: 500;
-    color: var(--text);
+    display: block;
+    padding: 16px 22px;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--navy);
     text-decoration: none;
     background: none;
     border: 0;
     border-bottom: 1px solid var(--line);
     border-radius: 0;
   }
-  .links a[aria-current="page"] { color: var(--brand-strong); font-weight: 600; }
+  .links a[aria-current="page"] {
+    color: var(--brand-strong);
+    background: rgba(196, 122, 90, .07);
+    box-shadow: inset 3px 0 0 var(--brand);
+  }
 
-  /* Services becomes a labelled section rather than a tap-to-open menu —
-     fewer taps to reach a page, and nothing is hidden behind a second level. */
-  .links .nav-group { display: contents; }
-  .links .nav-group > button {
+  /* ---- Services: a row that expands in place ---- */
+  .links .nav-group {
     display: block;
-    width: auto;
-    margin: 22px 0 6px;
-    padding: 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .links .nav-group > button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin: 0;
+    padding: 16px 22px;
     background: none !important;
     border: 0 !important;
     border-radius: 0 !important;
     box-shadow: none !important;
     text-align: left;
-    font-size: 11.5px;
+    text-transform: none;
+    letter-spacing: normal;
+    font-family: var(--font-sans);
+    font-size: 17px;
     font-weight: 600;
-    letter-spacing: .09em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    pointer-events: none;
+    color: var(--navy);
+    cursor: pointer;
+    pointer-events: auto;
   }
-  .links .nav-group > button::after { content: none; }
+  .links .nav-group > button[aria-current="page"] { color: var(--brand-strong); }
 
+  /* Chevron: points right when closed, rotates down when open. */
+  .links .nav-group > button::after {
+    content: "";
+    display: block;
+    width: 7px;
+    height: 7px;
+    margin-left: 12px;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: rotate(-45deg);
+    transition: transform .25s ease;
+    opacity: .75;
+  }
+  .links .nav-group[data-open="true"] > button::after {
+    transform: rotate(45deg);
+  }
+
+  /* Collapsed by default. max-height animates against a value nav.js measures
+     from the real content, so the panel is never clipped no matter how many
+     services are added. */
   .nav-menu {
     position: static !important;
     top: auto !important;
     left: auto !important;
-    display: contents;
+    display: block !important;
+    max-height: 0;
     min-width: 0;
     padding: 0;
-    background: none;
+    background: var(--surface-sunken);
     border: 0;
     border-radius: 0;
     box-shadow: none;
     opacity: 1;
     visibility: visible;
     transform: none;
+    overflow: hidden;
+    transition: max-height .28s cubic-bezier(.32, .72, 0, 1);
+  }
+  .links .nav-group[data-open="true"] .nav-menu {
+    max-height: var(--nav-menu-h, 400px);
   }
   .nav-menu::before { content: none; }
   .nav-menu a {
-    padding: 13px 2px;
+    padding: 14px 22px 14px 38px;
     border-radius: 0;
-    color: var(--text);
-    font-size: 16.5px;
+    border-bottom: 1px solid rgba(20, 33, 61, .06);
+    color: var(--text-secondary);
+    font-size: 16px;
+    font-weight: 500;
     text-decoration: none;
     background: none;
   }
+  .nav-menu a:last-child { border-bottom: 0; }
   .nav-menu a:hover { background: none; color: var(--brand); }
 
   /* Stop the page behind the drawer from scrolling. */
