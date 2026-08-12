@@ -1,4 +1,5 @@
-const DAILY_LIMIT = 300;
+const DAILY_LIMIT = 300;        // Brevo free tier
+const RESEND_DAILY_LIMIT = 100; // Resend free tier
 
 function json(statusCode, body) {
   return {
@@ -92,6 +93,33 @@ function b64urlEncode(str) {
     .replace(/=+$/g, "");
 }
 
+// Resend returns {name, message} on failure. Its two most common rejections are
+// an unverified sending domain and a bad key, so name those explicitly.
+async function describeResendError(res) {
+  let detail = "";
+  let name = "";
+  try {
+    const parsed = JSON.parse(await res.text());
+    detail = parsed.message || "";
+    name = parsed.name || "";
+  } catch {
+    detail = "";
+  }
+
+  // Domain errors also arrive as 403, so test the message before the key check
+  // or an unverified domain reports itself as a bad API key.
+  if (/domain/i.test(detail)) {
+    return `Resend has not verified the sending domain. Add the domain for ${env("BREVO_SENDER_EMAIL", "your sender address")} under Domains in Resend and complete the DNS records. Resend said: ${detail}`;
+  }
+  if (res.status === 401 || res.status === 403) {
+    return "Resend rejected the API key. Check RESEND_API_KEY in Netlify env vars — it should start with 're_' and needs Sending access.";
+  }
+  if (res.status === 429) {
+    return "Resend rate limit hit (free tier allows 100 emails/day). Wait and try again, or upgrade the plan.";
+  }
+  return `Resend error ${res.status}${name ? ` (${name})` : ""}: ${detail || "no details returned."}`;
+}
+
 // Brevo returns {code, message} on failure. Surfacing that raw JSON in the admin
 // toast is what made send failures read as an unexplained "API error", so map the
 // codes we can act on to instructions and keep Brevo's own text as the fallback.
@@ -145,10 +173,19 @@ exports.handler = async function handler(event) {
       return json(400, { ok: false, error: "Subject and message are required." });
     }
 
+    // Set EMAIL_PROVIDER=resend to switch; anything else keeps Brevo, so the
+    // fallback is a single env var change rather than a redeploy of this code.
+    const provider = env("EMAIL_PROVIDER", "brevo").trim().toLowerCase();
+    const dailyLimit = provider === "resend" ? RESEND_DAILY_LIMIT : DAILY_LIMIT;
+
     // Check config before touching the database, so a missing key reports the
     // actual cause instead of surfacing as a generic 500 mid-send.
-    const missing = ["BREVO_API_KEY", "SUPABASE_URL", "SUPABASE_SERVICE_ROLE_KEY", "NEWSLETTER_UNSUBSCRIBE_SECRET"]
-      .filter((name) => !process.env[name]);
+    const missing = [
+      provider === "resend" ? "RESEND_API_KEY" : "BREVO_API_KEY",
+      "SUPABASE_URL",
+      "SUPABASE_SERVICE_ROLE_KEY",
+      "NEWSLETTER_UNSUBSCRIBE_SECRET"
+    ].filter((name) => !process.env[name]);
     if (missing.length) {
       return json(500, {
         ok: false,
@@ -157,14 +194,14 @@ exports.handler = async function handler(event) {
     }
 
     const used = await getDailyUsed();
-    const remaining = Math.max(0, DAILY_LIMIT - used);
+    const remaining = Math.max(0, dailyLimit - used);
 
     if (remaining <= 0) {
       return json(400, {
         ok: false,
-        error: "Daily limit reached (300 emails). sending wont work for past 300 users.",
+        error: `Daily limit reached (${dailyLimit} emails on ${provider}). Remaining subscribers will need to wait until tomorrow.`,
         used,
-        dailyLimit: DAILY_LIMIT
+        dailyLimit
       });
     }
 
@@ -182,7 +219,7 @@ exports.handler = async function handler(event) {
     const subscribers = await listRes.json();
 
     if (!Array.isArray(subscribers) || !subscribers.length) {
-      return json(200, { ok: true, message: "No subscribers found.", sentCount: 0, used, dailyLimit: DAILY_LIMIT });
+      return json(200, { ok: true, message: "No subscribers found.", sentCount: 0, used, dailyLimit });
     }
 
     const senderEmail = env("BREVO_SENDER_EMAIL", "info@hocanholdings.co.ke");
@@ -207,7 +244,7 @@ exports.handler = async function handler(event) {
       </div>
     `;
 
-    const apiKey = required("BREVO_API_KEY");
+    const apiKey = provider === "resend" ? required("RESEND_API_KEY") : required("BREVO_API_KEY");
 
     // Send individually (better deliverability than BCC blasting)
     const sendOne = async (recipient) => {
@@ -218,24 +255,42 @@ exports.handler = async function handler(event) {
         .replace("__TOKEN__", encodeURIComponent(unsubscribeToken(recipient.email)))
         .replace("__GREETING__", greeting);
       const renderedText = `${firstName ? `Hi ${firstName},` : "Hi there,"}\n\n${message}`;
-      const payload = {
-        sender: { email: senderEmail, name: senderName },
-        to: [{ email: recipient.email, name: `${recipient.first_name || ""} ${recipient.last_name || ""}`.trim() || recipient.email }],
-        subject,
-        htmlContent: renderedHtml,
-        textContent: renderedText,
-        headers: unsubUrl
-          ? {
-              "List-Unsubscribe": `<${unsubUrl}>`,
-              "List-Unsubscribe-Post": "List-Unsubscribe=One-Click"
-            }
-          : undefined
-      };
+      const recipientName = `${recipient.first_name || ""} ${recipient.last_name || ""}`.trim();
+      const unsubHeaders = unsubUrl
+        ? {
+            "List-Unsubscribe": `<${unsubUrl}>`,
+            "List-Unsubscribe-Post": "List-Unsubscribe=One-Click"
+          }
+        : undefined;
+
+      if (provider === "resend") {
+        const res = await fetch("https://api.resend.com/emails", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
+          body: JSON.stringify({
+            from: `${senderName} <${senderEmail}>`,
+            to: [recipient.email],
+            subject,
+            html: renderedHtml,
+            text: renderedText,
+            headers: unsubHeaders
+          })
+        });
+        if (!res.ok) throw new Error(await describeResendError(res));
+        return;
+      }
 
       const res = await fetch("https://api.brevo.com/v3/smtp/email", {
         method: "POST",
         headers: { "Content-Type": "application/json", "api-key": apiKey },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({
+          sender: { email: senderEmail, name: senderName },
+          to: [{ email: recipient.email, name: recipientName || recipient.email }],
+          subject,
+          htmlContent: renderedHtml,
+          textContent: renderedText,
+          headers: unsubHeaders
+        })
       });
       if (!res.ok) {
         throw new Error(await describeBrevoError(res));
@@ -287,7 +342,7 @@ exports.handler = async function handler(event) {
     }
 
     const newUsed = used + sentCount;
-    const limitWarning = newUsed >= 250 ? "Approaching daily limit (250+)." : null;
+    const limitWarning = newUsed >= dailyLimit * 0.83 ? `Approaching daily limit (${newUsed}/${dailyLimit}).` : null;
     const failureWarning = failures.length
       ? `${failures.length} recipient(s) failed. First: ${failures[0].email} — ${failures[0].reason}`
       : null;
@@ -297,7 +352,7 @@ exports.handler = async function handler(event) {
       sentCount,
       failedCount: failures.length,
       used: newUsed,
-      dailyLimit: DAILY_LIMIT,
+      dailyLimit,
       warning: failureWarning || limitWarning
     });
   } catch (error) {
