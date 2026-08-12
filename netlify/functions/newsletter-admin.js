@@ -1,4 +1,11 @@
-const DAILY_LIMIT = 300;
+// Must track the limits in send-newsletter.js, or the admin panel reports a
+// daily cap the send path will not honour.
+const BREVO_DAILY_LIMIT = 300;
+const RESEND_DAILY_LIMIT = 100;
+const DAILY_LIMIT =
+  (process.env.EMAIL_PROVIDER || "brevo").trim().toLowerCase() === "resend"
+    ? RESEND_DAILY_LIMIT
+    : BREVO_DAILY_LIMIT;
 
 function getEnv(name) {
   const value = process.env[name];

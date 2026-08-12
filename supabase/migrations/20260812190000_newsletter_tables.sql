@@ -42,9 +42,13 @@ create table if not exists public.newsletter_send_logs (
 create index if not exists newsletter_send_logs_created_at_idx
   on public.newsletter_send_logs (created_at desc);
 
--- Both tables are reached only through Netlify functions using the service role
--- key, which bypasses RLS. Enabling RLS without policies therefore keeps the
--- functions working while denying access to the anon key, so subscriber email
--- addresses are not readable from the browser.
-alter table public.newsletter_subscribers enable row level security;
-alter table public.newsletter_send_logs enable row level security;
+-- NOTE: an earlier version of this migration enabled row level security on both
+-- tables without creating any policies. That emptied the admin panel, because
+-- RLS with no policies denies every read that does not come through a key which
+-- bypasses it. Enabling RLS here is therefore deliberately omitted: it is a
+-- worthwhile hardening step, but it has to ship together with policies and a
+-- verified admin read path, not on its own.
+--
+-- If RLS was already turned on by that earlier version, undo it with:
+--   alter table public.newsletter_subscribers disable row level security;
+--   alter table public.newsletter_send_logs disable row level security;
