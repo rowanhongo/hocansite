@@ -28,7 +28,7 @@
       "foundingDate": "2015",
       "address": {
         "@type": "PostalAddress",
-        "streetAddress": "iHiT Building",
+        "streetAddress": "Suite E4, SK Offices, Raphta Road, Westlands",
         "addressLocality": "Nairobi",
         "addressCountry": "KE"
       }
@@ -67,7 +67,17 @@
     .values-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 20px; }
     .value-card { background: rgba(255,255,255,0.7); border-radius: 14px; padding: 20px; border: 1px solid rgba(255,255,255,0.45); }
     .value-card h4 { margin-bottom: 8px; color: #111827; }
-    @media (max-width: 900px) { .hero, .values-grid { grid-template-columns: 1fr; } }
+
+    .office { margin-top: 20px; padding: 30px; }
+    .office h2 { font-size: 32px; margin-bottom: 8px; }
+    .office > p { color: #4b5563; line-height: 1.7; max-width: 70ch; }
+    .office-address { display: flex; align-items: flex-start; gap: 10px; margin-top: 14px; font-weight: 600; color: #111827; }
+    .office-address svg { width: 20px; height: 20px; flex: none; margin-top: 2px; color: #C47A5A; }
+    .office-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 22px; }
+    .office-figure { margin: 0; }
+    .office-figure img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 14px; display: block; border: 1px solid rgba(255,255,255,0.45); box-shadow: 0 8px 22px rgba(0,0,0,0.08); }
+    .office-figure figcaption { margin-top: 8px; font-size: 14px; color: #4b5563; }
+    @media (max-width: 900px) { .hero, .values-grid, .office-grid { grid-template-columns: 1fr; } }
   
     /* Social icons without a real profile URL yet are hidden rather than
        linking to "#", which would open a blank tab. Set the href and the
@@ -134,6 +144,24 @@
         <article class="value-card"><h4>Gratitude</h4><p>We are truly thankful for the opportunities given to us. Our positive-minded team embraces gratitude as the key to true greatness and concern for others.</p></article>
         <article class="value-card"><h4>Excellence</h4><p>We strive to always improve. We teach and encourage our team to improve performance and efficiency to add value beyond what is expected.</p></article>
         <article class="value-card"><h4>Passion</h4><p>We show pride, enthusiasm and dedication in everything we do, committed to delivering superior value to our clients.</p></article>
+      </div>
+    </section>
+    <section class="office glass">
+      <h2>Visit Our Office</h2>
+      <p>Our team works out of Westlands, Nairobi — the base from which we serve clients across Kenya and East Africa. You are welcome to stop by, or get in touch to arrange a meeting.</p>
+      <p class="office-address">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <span>Suite E4, SK Offices, Raphta Road, Westlands, Nairobi, Kenya</span>
+      </p>
+      <div class="office-grid">
+        <figure class="office-figure">
+          <img src="assets/opt/office-reception.jpg" alt="The Hocan Holdings reception area, with the company logo and tagline mounted on the wall" width="1600" height="1200" loading="lazy" decoding="async">
+          <figcaption>Our reception at Suite E4, SK Offices.</figcaption>
+        </figure>
+        <figure class="office-figure">
+          <img src="assets/opt/office-entrance.jpg" alt="Branded glass office partitions at the Hocan Holdings entrance in Westlands, Nairobi" width="1600" height="1200" loading="lazy" decoding="async">
+          <figcaption>Branded offices on Raphta Road, Westlands.</figcaption>
+        </figure>
       </div>
     </section>
   </main>
