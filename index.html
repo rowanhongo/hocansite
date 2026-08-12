@@ -677,11 +677,12 @@
 
     .employers-section img {
       width: 100%;
+      height: auto;
       border-radius: 14px;
       /* Fixed ratio so the photo squares up with the text column beside it;
-         without it object-fit has no height to work against. */
+         without it object-fit has no height to work against. max-height is
+         omitted deliberately — it would fight the ratio and squash the photo. */
       aspect-ratio: 3 / 2;
-      max-height: 280px;
       object-fit: cover;
       display: block;
     }

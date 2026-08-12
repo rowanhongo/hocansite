@@ -63,9 +63,11 @@
     .btn { background: #C47A5A; color: #fff; border: none; padding: 12px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; }
     /* Photo leads the card, then the details — the layout most contact pages
        use, so the office reads as real before the address is scanned. */
-    .info-card { display: flex; flex-direction: column; }
-    .office-photo { margin: -20px -20px 18px; }
-    .office-photo img { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; display: block; border-radius: 14px 14px 0 0; }
+    .info-card { display: flex; flex-direction: column; align-self: start; }
+    /* flex:none stops the photo being stretched when the card grows to match
+       the taller form column; without it the 3:2 ratio distorts. */
+    .office-photo { margin: -20px -20px 18px; flex: none; }
+    .office-photo img { width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: cover; display: block; border-radius: 14px 14px 0 0; }
     .info-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 14px; }
     .info-list li { display: flex; align-items: flex-start; gap: 12px; }
     .info-icon { flex: none; width: 34px; height: 34px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; background: rgba(196,122,90,0.12); color: #C47A5A; }
