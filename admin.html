@@ -517,8 +517,8 @@ tr:hover td{background:#FAFBFD;}
         <div class="section-header">
           <h3>Newsletter Subscribers</h3>
           <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-            <span id="newsletterTotal" class="badge published">0 subscribers</span>
-            <span id="newsletterLimitBadge" class="badge draft">0 / 300 daily limit used</span>
+            <span id="newsletterTotal" class="badge published">loading…</span>
+            <span id="newsletterLimitBadge" class="badge draft">loading daily limit…</span>
           </div>
         </div>
         <div class="form-grid">
@@ -1093,6 +1093,14 @@ async function loadNewsletter(page=newsletterPage){
     renderNewsletter(newsletterTotal,newsletterDailyUsed,Number(body.dailyLimit||300));
     if(body.setupRequired&&body.message){showToast(body.message,'error');}
   }catch(err){
+    // Without this the placeholder "0 subscribers / 0 / 300" stays on screen and
+    // a failed load is indistinguishable from an genuinely empty list.
+    const totalEl=document.getElementById('newsletterTotal');
+    const limitEl=document.getElementById('newsletterLimitBadge');
+    const tbody=document.getElementById('newsletterTable');
+    if(totalEl)totalEl.textContent='could not load';
+    if(limitEl)limitEl.textContent='limit unknown';
+    if(tbody)tbody.innerHTML=`<tr><td colspan="4" style="padding:16px;color:#b91c1c;">Could not load subscribers: ${esc(err.message)}</td></tr>`;
     showToast(err.message,'error');
   }
 }
@@ -1109,9 +1117,9 @@ function renderNewsletter(total,dailyUsed,dailyLimit){
   limitEl.textContent=`${dailyUsed} / ${dailyLimit} daily limit used`;
 
   if(dailyUsed>=dailyLimit){
-    warningEl.textContent='Daily limit reached (300 emails). sending wont work for past 300 users.';
-  }else if(dailyUsed>=250){
-    warningEl.textContent='Warning: You are approaching the daily send limit (250+).';
+    warningEl.textContent=`Daily limit reached (${dailyLimit} emails). Remaining subscribers will have to wait until tomorrow.`;
+  }else if(dailyUsed>=dailyLimit*0.83){
+    warningEl.textContent=`Warning: approaching the daily send limit (${dailyUsed}/${dailyLimit}).`;
   }else{
     warningEl.textContent='';
   }
