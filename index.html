@@ -435,6 +435,10 @@
 
     .hero-image img {
       width: 100%;
+      /* The office photo is 4:3; without a fixed ratio it renders taller than
+         the 3:2 image it replaced and outgrows the text column beside it. */
+      aspect-ratio: 3 / 2;
+      max-height: 420px;
       border-radius: 20px;
       object-fit: cover;
       display: block;
@@ -965,6 +969,7 @@
 
       /* Restore image to full natural size on mobile */
       .hero-image img {
+        aspect-ratio: auto;
         max-height: none;
       }
     }
@@ -1155,7 +1160,7 @@
             </div>
           </div>
           <div class="hero-image">
-            <img src="assets/opt/office-entrance.jpg" alt="The branded glass entrance to the Hocan Holdings offices in Westlands, Nairobi" width="1600" height="1200" fetchpriority="high" decoding="async">
+            <img src="assets/opt/office-entrance.jpg" alt="The branded glass entrance to the Hocan Holdings offices in Westlands, Nairobi" width="1600" height="1067" fetchpriority="high" decoding="async">
           </div>
         </section>
       </section>
