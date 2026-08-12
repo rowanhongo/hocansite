@@ -109,7 +109,7 @@ async function describeResendError(res) {
   // Domain errors also arrive as 403, so test the message before the key check
   // or an unverified domain reports itself as a bad API key.
   if (/domain/i.test(detail)) {
-    return `Resend has not verified the sending domain. Add the domain for ${env("BREVO_SENDER_EMAIL", "your sender address")} under Domains in Resend and complete the DNS records. Resend said: ${detail}`;
+    return `Resend has not verified the sending domain. Add the domain for the newsletter sender address under Domains in Resend and complete the DNS records. Resend said: ${detail}`;
   }
   if (res.status === 401 || res.status === 403) {
     return "Resend rejected the API key. Check RESEND_API_KEY in Netlify env vars — it should start with 're_' and needs Sending access.";
@@ -222,8 +222,10 @@ exports.handler = async function handler(event) {
       return json(200, { ok: true, message: "No subscribers found.", sentCount: 0, used, dailyLimit });
     }
 
-    const senderEmail = env("BREVO_SENDER_EMAIL", "info@hocanholdings.co.ke");
-    const senderName = env("BREVO_SENDER_NAME", "Hocan Holdings");
+    // NEWSLETTER_SENDER_* is the provider-neutral name; the BREVO_* names are
+    // still honoured so existing Netlify config keeps working after the switch.
+    const senderEmail = env("NEWSLETTER_SENDER_EMAIL", env("BREVO_SENDER_EMAIL", "info@hocanholdings.co.ke"));
+    const senderName = env("NEWSLETTER_SENDER_NAME", env("BREVO_SENDER_NAME", "Hocan Holdings"));
     const logoUrl = buildLogoUrl();
 
     const messageHtml = message.includes("<")
