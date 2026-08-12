@@ -1039,7 +1039,9 @@ async function init(){
   await loadApplications();
   renderOverview();
   if(!newsletterPoller){
-    newsletterPoller=setInterval(loadNewsletter,15000);
+    // setInterval passes its own argument to the callback, which loadNewsletter
+    // would read as a page number — wrap it so it always reloads the current page.
+    newsletterPoller=setInterval(()=>loadNewsletter(newsletterPage),15000);
   }
 }
 
@@ -1084,9 +1086,30 @@ async function loadJobs(){
 async function loadNewsletter(page=newsletterPage){
   newsletterPage=page;
   try{
-    const res=await fetch(`/.netlify/functions/newsletter-admin?page=${newsletterPage}&perPage=${newsletterPerPage}`);
-    const body=await res.json();
-    if(!res.ok||!body.ok)throw new Error(body.error||'Could not load newsletter data');
+    // Netlify functions hard-stop at 10s. Without a client-side abort the badges
+    // sit on "loading…" indefinitely, so cap it just past the platform limit.
+    const ctrl=new AbortController();
+    const timer=setTimeout(()=>ctrl.abort(),12000);
+    let res;
+    try{
+      res=await fetch(`/.netlify/functions/newsletter-admin?page=${newsletterPage}&perPage=${newsletterPerPage}`,{signal:ctrl.signal});
+    }catch(e){
+      throw new Error(e.name==='AbortError'
+        ?'Request timed out after 12s. The newsletter-admin function is not responding — check its logs in Netlify.'
+        :`Network error reaching newsletter-admin: ${e.message}`);
+    }finally{
+      clearTimeout(timer);
+    }
+    // A timed-out or crashed function returns HTML, not JSON, so res.json()
+    // throws a parse error that hides the real status.
+    const raw=await res.text();
+    let body;
+    try{
+      body=JSON.parse(raw);
+    }catch{
+      throw new Error(`newsletter-admin returned ${res.status} (not JSON): ${raw.slice(0,200)||'empty response'}`);
+    }
+    if(!res.ok||!body.ok)throw new Error(body.error||`Could not load newsletter data (HTTP ${res.status})`);
     newsletterSubscribers=Array.isArray(body.subscribers)?body.subscribers:[];
     newsletterDailyUsed=Number(body.dailyUsed||0);
     newsletterTotal=Number(body.total||newsletterSubscribers.length||0);
