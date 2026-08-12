@@ -92,6 +92,38 @@ function b64urlEncode(str) {
     .replace(/=+$/g, "");
 }
 
+// Brevo returns {code, message} on failure. Surfacing that raw JSON in the admin
+// toast is what made send failures read as an unexplained "API error", so map the
+// codes we can act on to instructions and keep Brevo's own text as the fallback.
+async function describeBrevoError(res) {
+  let detail = "";
+  let code = "";
+  try {
+    const parsed = JSON.parse(await res.text());
+    detail = parsed.message || "";
+    code = parsed.code || "";
+  } catch {
+    detail = "";
+  }
+
+  if (res.status === 401) {
+    return "Brevo rejected the API key. Check BREVO_API_KEY in Netlify env vars — a key that was regenerated in Brevo must be updated here too.";
+  }
+  if (code === "unauthorized" || code === "permission_denied") {
+    return `Brevo denied the request: ${detail || "the API key lacks permission to send transactional email."}`;
+  }
+  if (res.status === 400 && /sender/i.test(detail)) {
+    return `Brevo rejected the sender address. Verify BREVO_SENDER_EMAIL in Brevo (Senders & IP) before sending. Brevo said: ${detail}`;
+  }
+  if (res.status === 402 || /credit/i.test(detail)) {
+    return `Brevo account is out of sending credits: ${detail || "add credits or wait for the plan to reset."}`;
+  }
+  if (res.status === 429) {
+    return "Brevo rate limit hit. Wait a minute and send again.";
+  }
+  return `Brevo error ${res.status}${code ? ` (${code})` : ""}: ${detail || "no details returned."}`;
+}
+
 function unsubscribeToken(email) {
   const secret = required("NEWSLETTER_UNSUBSCRIBE_SECRET");
   const ts = String(Date.now());
@@ -111,6 +143,17 @@ exports.handler = async function handler(event) {
 
     if (!subject || !message) {
       return json(400, { ok: false, error: "Subject and message are required." });
+    }
+
+    // Check config before touching the database, so a missing key reports the
+    // actual cause instead of surfacing as a generic 500 mid-send.
+    const missing = ["BREVO_API_KEY", "SUPABASE_URL", "SUPABASE_SERVICE_ROLE_KEY", "NEWSLETTER_UNSUBSCRIBE_SECRET"]
+      .filter((name) => !process.env[name]);
+    if (missing.length) {
+      return json(500, {
+        ok: false,
+        error: `Newsletter is not configured. Missing Netlify environment variable(s): ${missing.join(", ")}.`
+      });
     }
 
     const used = await getDailyUsed();
@@ -195,8 +238,7 @@ exports.handler = async function handler(event) {
         body: JSON.stringify(payload)
       });
       if (!res.ok) {
-        const errBody = await res.text();
-        throw new Error(errBody);
+        throw new Error(await describeBrevoError(res));
       }
     };
 
@@ -204,15 +246,33 @@ exports.handler = async function handler(event) {
     const concurrency = 3;
     let idx = 0;
     let sentCount = 0;
+    // One bad recipient used to reject Promise.all and abort the run, losing the
+    // count of everything already sent and re-sending it on the next attempt.
+    // Collect failures instead so a single address cannot sink the batch.
+    const failures = [];
     const workers = new Array(concurrency).fill(0).map(async () => {
       while (idx < subscribers.length) {
         const current = subscribers[idx++];
-        await sendOne(current);
-        sentCount += 1;
+        try {
+          await sendOne(current);
+          sentCount += 1;
+        } catch (err) {
+          failures.push({ email: current.email, reason: err.message });
+        }
       }
     });
 
     await Promise.all(workers);
+
+    // Every recipient failing means a configuration problem, not bad addresses —
+    // report it as an error so it is not mistaken for a successful send.
+    if (!sentCount && failures.length) {
+      return json(502, {
+        ok: false,
+        error: `Newsletter could not be sent. ${failures[0].reason}`,
+        failedCount: failures.length
+      });
+    }
 
     const logRes = await fetch(supabase("newsletter_send_logs"), {
       method: "POST",
@@ -227,13 +287,18 @@ exports.handler = async function handler(event) {
     }
 
     const newUsed = used + sentCount;
+    const limitWarning = newUsed >= 250 ? "Approaching daily limit (250+)." : null;
+    const failureWarning = failures.length
+      ? `${failures.length} recipient(s) failed. First: ${failures[0].email} — ${failures[0].reason}`
+      : null;
     return json(200, {
       ok: true,
       message: `Newsletter sent to ${sentCount} subscriber(s).`,
       sentCount,
+      failedCount: failures.length,
       used: newUsed,
       dailyLimit: DAILY_LIMIT,
-      warning: newUsed >= 250 ? "Approaching daily limit (250+)." : null
+      warning: failureWarning || limitWarning
     });
   } catch (error) {
     return json(500, { ok: false, error: error.message || "Server error" });
