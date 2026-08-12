@@ -678,6 +678,9 @@
     .employers-section img {
       width: 100%;
       border-radius: 14px;
+      /* Fixed ratio so the photo squares up with the text column beside it;
+         without it object-fit has no height to work against. */
+      aspect-ratio: 3 / 2;
       max-height: 280px;
       object-fit: cover;
       display: block;
@@ -1181,7 +1184,7 @@
       </section>
 
       <section class="employers-section" aria-label="For employers">
-        <img src="assets/opt/office-logo-wall.jpg" alt="The Hocan Holdings logo and tagline mounted on the reception wall" width="1600" height="550" loading="lazy" decoding="async">
+        <img src="assets/opt/office-logo-wall.jpg" alt="The Hocan Holdings logo and tagline mounted on the reception wall" width="1500" height="1000" loading="lazy" decoding="async">
         <div>
           <h3>For Employers</h3>
           <p>Streamline your hiring by posting jobs with us.</p>

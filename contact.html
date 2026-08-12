@@ -61,9 +61,19 @@
     .field { margin-bottom: 12px; } .field label { display: block; margin-bottom: 6px; font-size: 14px; font-weight: 600; }
     .field input, .field textarea { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid rgba(0,0,0,0.12); font-family: inherit; }
     .btn { background: #C47A5A; color: #fff; border: none; padding: 12px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; }
-    .office-photo { margin: 16px 0 0; }
-    .office-photo img { width: 100%; object-fit: cover; border-radius: 12px; display: block; }
-    .office-photo figcaption { margin-top: 8px; font-size: 13px; color: #4b5563; }
+    /* Photo leads the card, then the details — the layout most contact pages
+       use, so the office reads as real before the address is scanned. */
+    .info-card { display: flex; flex-direction: column; }
+    .office-photo { margin: -20px -20px 18px; }
+    .office-photo img { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; display: block; border-radius: 14px 14px 0 0; }
+    .info-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 14px; }
+    .info-list li { display: flex; align-items: flex-start; gap: 12px; }
+    .info-icon { flex: none; width: 34px; height: 34px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; background: rgba(196,122,90,0.12); color: #C47A5A; }
+    .info-icon svg { width: 17px; height: 17px; }
+    .info-body { font-size: 14.5px; line-height: 1.5; color: #333; min-width: 0; }
+    .info-label { display: block; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #8a8f98; margin-bottom: 2px; }
+    .info-body a { color: #333; text-decoration: none; word-break: break-word; }
+    .info-body a:hover { color: #C47A5A; text-decoration: underline; }
     .site-footer { margin-top: 40px; background: #1C1C2E; color: #fff; border-radius: 20px; overflow: hidden; }
     .footer-grid { display: grid; grid-template-columns: 1.2fr 1fr 1.2fr 1fr 1fr; gap: 24px; padding: 32px; }
     .footer-col h4 { margin-bottom: 10px; font-size: 16px; }
@@ -128,15 +138,29 @@
             </form>
           </div>
         </div>
-        <aside class="card">
-          <h3>Contact Information</h3>
-          <p>Office: Suite E4, SK Offices, Raphta Road, Westlands, Nairobi, Kenya</p>
-          <p>Email: careers@hocanholdings.co.ke</p>
-          <p>Email: info@hocanholdings.co.ke</p>
+        <aside class="card info-card">
           <figure class="office-photo">
-            <img src="assets/opt/office-logo-wall.jpg" alt="The Hocan Holdings logo and tagline mounted on the reception wall" width="1600" height="550" loading="lazy" decoding="async">
-            <figcaption>Find us at Suite E4, SK Offices, Raphta Road, Westlands.</figcaption>
+            <img src="assets/opt/office-logo-wall.jpg" alt="The Hocan Holdings logo and tagline mounted on the reception wall" width="1500" height="1000" loading="lazy" decoding="async">
           </figure>
+          <h3>Contact Information</h3>
+          <ul class="info-list">
+            <li>
+              <span class="info-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
+              <span class="info-body"><span class="info-label">Office</span>Suite E4, SK Offices,<br>Raphta Road, Westlands,<br>Nairobi, Kenya</span>
+            </li>
+            <li>
+              <span class="info-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
+              <span class="info-body"><span class="info-label">Phone</span><a href="tel:+254791235830">+254 791 235 830</a></span>
+            </li>
+            <li>
+              <span class="info-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></span>
+              <span class="info-body"><span class="info-label">General enquiries</span><a href="mailto:info@hocanholdings.co.ke">info@hocanholdings.co.ke</a></span>
+            </li>
+            <li>
+              <span class="info-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7h-4V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M10 7V5h4v2"/></svg></span>
+              <span class="info-body"><span class="info-label">Careers</span><a href="mailto:careers@hocanholdings.co.ke">careers@hocanholdings.co.ke</a></span>
+            </li>
+          </ul>
         </aside>
       </div>
     </section>
