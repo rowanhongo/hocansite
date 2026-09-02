@@ -2,3 +2,8 @@ node_modules/
 
 # Generated at build time by scripts/prerender-blogs.js
 blog/
+
+# Local secrets — never commit
+.env
+.env.*
+!.env.example

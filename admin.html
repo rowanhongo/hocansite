@@ -222,6 +222,110 @@ tr:hover td{background:#FAFBFD;}
 .toast.success{border-left:4px solid var(--green);}
 .toast.error{border-left:4px solid #E53E3E;}
 .app-inline-note{font-size:12px;color:var(--muted);margin-bottom:8px;}
+
+/* ── LINK HUB ─────────────────────────────────────────────────────────────── */
+/* The panel is built to be self-explanatory: a numbered how-it-works strip, a
+   live phone preview beside the list, and inline hints on every field — so
+   nobody has to be shown how to add a link. */
+.lh-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;}
+.lh-step{background:linear-gradient(135deg,rgba(74,179,212,.07),rgba(196,122,90,.06));border:1px solid var(--border);border-radius:12px;padding:16px 16px 15px;position:relative;}
+.lh-step .num{width:24px;height:24px;border-radius:50%;background:var(--dark);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-bottom:9px;font-family:'Sora',sans-serif;}
+.lh-step h4{font-family:'Sora',sans-serif;font-size:13.5px;font-weight:700;margin-bottom:4px;color:var(--dark);}
+.lh-step p{font-size:12px;color:var(--muted);line-height:1.5;}
+.lh-live{display:inline-flex;align-items:center;gap:7px;background:rgba(93,186,126,.12);color:#2E7D52;border-radius:999px;padding:5px 13px;font-size:12px;font-weight:600;}
+.lh-live .dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:lhPulse 1.8s ease-in-out infinite;}
+@keyframes lhPulse{0%,100%{opacity:1;}50%{opacity:.35;}}
+
+.lh-layout{display:grid;grid-template-columns:1fr 340px;gap:22px;align-items:start;}
+
+/* Link list rows — drag handle, thumbnail, text, stats, actions. */
+.lh-list{display:flex;flex-direction:column;gap:10px;}
+.lh-row{display:flex;align-items:center;gap:13px;background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:11px 14px;transition:border-color .18s,box-shadow .18s,opacity .18s;}
+.lh-row:hover{border-color:rgba(74,179,212,.4);box-shadow:0 3px 12px rgba(0,0,0,.06);}
+.lh-row.dragging{opacity:.4;border-style:dashed;}
+.lh-row.drop-target{border-color:var(--sky);box-shadow:0 0 0 3px rgba(74,179,212,.15);}
+.lh-row.is-off{background:#FAFBFC;}
+.lh-row.is-off .lh-row-title{color:var(--muted);}
+.lh-handle{cursor:grab;color:#C3CCD8;font-size:17px;line-height:1;user-select:none;padding:4px 2px;flex-shrink:0;}
+.lh-handle:active{cursor:grabbing;}
+.lh-thumb{width:44px;height:44px;border-radius:9px;object-fit:cover;background:#F0F3F6;flex-shrink:0;}
+.lh-thumb-blank{width:44px;height:44px;border-radius:9px;flex-shrink:0;background:linear-gradient(135deg,#ffd9cf,#e6f3fa);display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:#a04a39;}
+.lh-row-main{flex:1;min-width:0;}
+.lh-row-title{font-size:14px;font-weight:600;color:var(--dark);display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
+.lh-row-url{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;}
+.lh-chip{font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:rgba(74,179,212,.12);color:#1d6f8a;}
+.lh-chip.feat{background:rgba(196,122,90,.14);color:#a04a39;}
+.lh-chip.sched{background:rgba(232,168,23,.14);color:#B07D10;}
+.lh-clicks{font-size:12px;color:var(--muted);text-align:center;flex-shrink:0;min-width:52px;}
+.lh-clicks strong{display:block;font-family:'Sora',sans-serif;font-size:16px;color:var(--dark);}
+.lh-row-actions{display:flex;gap:6px;align-items:center;flex-shrink:0;}
+
+/* Section header rows inside the admin list mirror the public page grouping. */
+.lh-group-label{font-size:10.5px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);padding:10px 4px 2px;}
+
+/* Live preview — a phone frame so what you see is literally what visitors see. */
+.lh-preview-wrap{position:sticky;top:28px;}
+.lh-phone{background:var(--dark);border-radius:26px;padding:11px;box-shadow:0 14px 40px rgba(0,0,0,.18);}
+.lh-phone-screen{background:linear-gradient(170deg,#f7eee9,#f4f6f8 45%,#eaf4f9);border-radius:18px;height:520px;overflow-y:auto;padding:20px 14px;}
+.lh-phone-screen::-webkit-scrollbar{width:0;}
+.lh-pv-avatar{width:60px;height:60px;border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;background:var(--dark);color:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:20px;border:3px solid #fff;object-fit:cover;}
+.lh-pv-name{font-family:'Sora',sans-serif;font-size:15px;font-weight:700;text-align:center;color:var(--dark);}
+.lh-pv-tag{font-size:11.5px;color:var(--muted);text-align:center;line-height:1.5;margin-top:5px;padding:0 6px;}
+.lh-pv-socials{display:flex;justify-content:center;gap:6px;margin-top:11px;}
+.lh-pv-socials span{width:26px;height:26px;border-radius:50%;background:#fff;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;}
+.lh-pv-label{font-size:9px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);margin:15px 2px 7px;}
+.lh-pv-card{display:flex;align-items:center;gap:9px;background:#fff;border:1px solid var(--border);border-radius:11px;padding:8px 10px 8px 8px;margin-bottom:8px;}
+.lh-pv-thumb{width:34px;height:34px;border-radius:8px;object-fit:cover;background:#f0f3f6;flex-shrink:0;}
+.lh-pv-thumb-blank{width:34px;height:34px;border-radius:8px;flex-shrink:0;background:linear-gradient(135deg,#ffd9cf,#e6f3fa);display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-weight:700;font-size:12px;color:#a04a39;}
+.lh-pv-txt{flex:1;min-width:0;}
+.lh-pv-title{font-size:12px;font-weight:600;color:var(--dark);line-height:1.3;}
+.lh-pv-sub{font-size:10.5px;color:var(--muted);margin-top:2px;line-height:1.35;}
+.lh-pv-feat{background:#fff;border:1px solid var(--border);border-radius:11px;overflow:hidden;margin-bottom:8px;}
+.lh-pv-hero{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;background:linear-gradient(135deg,#ffd9cf,#e6f3fa);}
+.lh-pv-feat-body{padding:9px 11px 10px;}
+.lh-pv-empty{text-align:center;color:var(--muted);font-size:11.5px;padding:30px 14px;line-height:1.6;}
+.lh-preview-cap{text-align:center;font-size:11.5px;color:var(--muted);margin-top:11px;line-height:1.5;}
+
+/* "More options" disclosure keeps the add form to two fields by default. */
+.lh-more{border:1.5px solid var(--border);border-radius:10px;margin-top:4px;overflow:hidden;}
+.lh-more > summary{padding:12px 15px;cursor:pointer;font-size:13px;font-weight:600;color:var(--text);list-style:none;display:flex;align-items:center;gap:8px;user-select:none;background:#FAFBFD;}
+.lh-more > summary::-webkit-details-marker{display:none;}
+.lh-more > summary::before{content:"▸";color:var(--sky);font-size:11px;transition:transform .2s;display:inline-block;}
+.lh-more[open] > summary::before{transform:rotate(90deg);}
+.lh-more-body{padding:18px 15px 6px;border-top:1px solid var(--border);}
+
+/* Layout picker — two visual cards rather than a select, so the difference
+   between a standard row and a featured hero is obvious before you commit. */
+.lh-layout-pick{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.lh-pick{border:2px solid var(--border);border-radius:11px;padding:13px;cursor:pointer;transition:.18s;background:#fff;}
+.lh-pick:hover{border-color:rgba(74,179,212,.45);}
+.lh-pick.sel{border-color:var(--sky);background:rgba(74,179,212,.05);}
+.lh-pick .mock{background:#F0F3F6;border-radius:7px;padding:7px;margin-bottom:9px;display:flex;align-items:center;gap:6px;}
+.lh-pick .mock .sq{width:20px;height:20px;border-radius:4px;background:linear-gradient(135deg,#ffd9cf,#c7e6f4);flex-shrink:0;}
+.lh-pick .mock .ln{height:5px;border-radius:3px;background:#D6DEE6;flex:1;}
+.lh-pick .mock.wide{flex-direction:column;align-items:stretch;gap:5px;padding:6px;}
+.lh-pick .mock.wide .rect{width:100%;aspect-ratio:16/9;border-radius:5px;background:linear-gradient(135deg,#ffd9cf,#c7e6f4);}
+.lh-pick h5{font-size:12.5px;font-weight:700;color:var(--dark);margin-bottom:3px;}
+.lh-pick p{font-size:11px;color:var(--muted);line-height:1.45;}
+
+.lh-warn{display:none;background:rgba(232,168,23,.09);border:1px solid rgba(232,168,23,.28);color:#8A6109;border-radius:10px;padding:11px 14px;font-size:12.5px;line-height:1.5;margin-bottom:14px;}
+.lh-warn.show{display:block;}
+.lh-url-note{font-size:12px;margin-top:5px;line-height:1.45;display:none;}
+.lh-url-note.bad{display:block;color:#C53030;}
+.lh-url-note.good{display:block;color:#2E7D52;}
+.lh-archived summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--muted);padding:6px 0;}
+
+@media (max-width:1100px){
+  .lh-layout{grid-template-columns:1fr;}
+  .lh-preview-wrap{position:static;max-width:340px;margin:0 auto;}
+  .lh-steps{grid-template-columns:repeat(2,1fr);}
+}
+@media (max-width:560px){
+  .lh-steps{grid-template-columns:1fr;}
+  .lh-layout-pick{grid-template-columns:1fr;}
+  .lh-clicks{display:none;}
+  .lh-row{flex-wrap:wrap;}
+}
 .app-link{color:#1d6f8a;text-decoration:none;}
 .app-link:hover{text-decoration:underline;}
 
@@ -398,6 +502,7 @@ tr:hover td{background:#FAFBFD;}
       <div class="nav-item" data-panel="stories"><span class="icon">🏆</span> Success Stories</div>
       <div class="nav-item" data-panel="partners"><span class="icon">🤝</span> Partners</div>
       <div class="nav-item" data-panel="newsletter"><span class="icon">📧</span> Newsletter</div>
+      <div class="nav-item" data-panel="linkhub"><span class="icon">🔗</span> Link Hub</div>
     </nav>
     <div class="sidebar-footer">
       <button class="btn-logout" id="logoutBtn">Sign Out</button>
@@ -576,7 +681,251 @@ tr:hover td{background:#FAFBFD;}
         </div>
       </div>
     </div>
+
+    <!-- LINK HUB -->
+    <div class="panel" id="panel-linkhub">
+      <div class="section-card">
+        <div class="section-header">
+          <h3>How the Link Hub works</h3>
+          <span class="lh-live"><span class="dot"></span> Changes go live instantly</span>
+        </div>
+        <div class="lh-steps">
+          <div class="lh-step">
+            <div class="num">1</div>
+            <h4>Add a link</h4>
+            <p>Click <strong>+ Add Link</strong>, paste the web address and give it a name. That is all that is required.</p>
+          </div>
+          <div class="lh-step">
+            <div class="num">2</div>
+            <h4>Add a picture</h4>
+            <p>Optional, but links with a picture get clicked more. Drag an image in or tap to upload.</p>
+          </div>
+          <div class="lh-step">
+            <div class="num">3</div>
+            <h4>Drag to reorder</h4>
+            <p>Grab the <strong>⠿</strong> handle and drag. Whatever is at the top shows at the top of the page.</p>
+          </div>
+          <div class="lh-step">
+            <div class="num">4</div>
+            <h4>It is already live</h4>
+            <p>No publish button. Anyone with the page open sees your new link appear without refreshing.</p>
+          </div>
+        </div>
+        <div class="app-inline-note" style="margin-bottom:0;">
+          This is the page behind <strong>links.hocanholdings.co.ke</strong> — the one link in our Instagram and WhatsApp bio.
+          <a href="/links" target="_blank" rel="noopener" style="color:var(--sky);font-weight:600;">Open the live page ↗</a>
+        </div>
+      </div>
+
+      <div class="lh-layout">
+        <div>
+          <div class="section-card">
+            <div class="section-header">
+              <h3>Your Links</h3>
+              <button class="btn-new" id="lhNewBtn">+ Add Link</button>
+            </div>
+            <div class="lh-warn" id="lhTooMany">
+              <strong>That is a lot of links.</strong> Pages with more than 10 get scrolled past. Consider turning
+              off the ones that matter least, or grouping them under section headings.
+            </div>
+            <div class="lh-list" id="lhList"></div>
+            <details class="lh-archived" id="lhArchivedWrap" style="margin-top:16px;display:none;">
+              <summary>Removed links (<span id="lhArchivedCount">0</span>)</summary>
+              <div class="lh-list" id="lhArchivedList" style="margin-top:10px;"></div>
+            </details>
+          </div>
+
+          <div class="section-card">
+            <div class="section-header"><h3>Page Heading</h3></div>
+            <div class="app-inline-note">This is the name, photo and description at the very top of the page.</div>
+            <div class="form-grid">
+              <div class="form-group form-full">
+                <label>Picture at the top</label>
+                <div class="image-upload-zone" id="lhAvatarZone">
+                  <input type="file" id="lhAvatarInput" accept="image/*">
+                  <div class="upload-icon">🏢</div>
+                  <div class="upload-text">Drag &amp; drop or <strong>click to upload</strong> your logo or photo</div>
+                  <div class="upload-preview" id="lhAvatarPreview" style="display:none;">
+                    <img id="lhAvatarPreviewImg" src="" alt="">
+                    <button class="upload-remove" id="lhAvatarRemove">×</button>
+                  </div>
+                  <div class="progress-bar-wrap" id="lhAvatarProgressWrap" style="display:none;"><div class="progress-bar" id="lhAvatarProgress"></div></div>
+                </div>
+                <small class="hint">Square works best. If you leave this empty we show your initials in a circle.</small>
+                <input type="hidden" id="lhAvatarUrl">
+              </div>
+              <div class="form-group form-full">
+                <label>Name <span class="req">Required</span></label>
+                <input type="text" id="lhDisplayName" placeholder="Hocan Holdings">
+              </div>
+              <div class="form-group form-full">
+                <label>One-line description</label>
+                <input type="text" id="lhTagline" placeholder="e.g. Connecting talent and opportunity across Africa.">
+                <small class="hint">Keep it short — one sentence sits best under the name.</small>
+              </div>
+              <div class="form-group">
+                <label>Instagram</label>
+                <input type="text" id="lhInstagram" placeholder="https://instagram.com/…">
+              </div>
+              <div class="form-group">
+                <label>LinkedIn</label>
+                <input type="text" id="lhLinkedin" placeholder="https://linkedin.com/…">
+              </div>
+              <div class="form-group">
+                <label>WhatsApp</label>
+                <input type="text" id="lhWhatsapp" placeholder="https://wa.me/254…">
+              </div>
+              <div class="form-group">
+                <label>Website</label>
+                <input type="text" id="lhWebsite" placeholder="https://hocanholdings.co.ke">
+              </div>
+              <div class="form-group form-full">
+                <small class="hint" style="margin-bottom:8px;">Leave any of these empty to hide that icon from the page.</small>
+                <button class="btn-save" id="lhSaveProfileBtn" style="width:max-content;">Save Heading</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="lh-preview-wrap">
+          <div class="lh-phone">
+            <div class="lh-phone-screen" id="lhPreview"></div>
+          </div>
+          <div class="lh-preview-cap">Exactly what visitors see on their phone.<br>Updates as you type.</div>
+        </div>
+      </div>
+    </div>
   </main>
+</div>
+
+<!-- LINK EDITOR MODAL -->
+<div class="modal-overlay" id="lhModal">
+  <div class="modal" style="max-width:660px;">
+    <div class="modal-header">
+      <h3 id="lhModalTitle">Add a Link</h3>
+      <button class="modal-close" id="lhModalClose">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-full step-head">
+          <span class="step-num">1</span>
+          <div>
+            <h4>Where should the link go?</h4>
+            <p>Paste the full web address, then give it a name people will understand.</p>
+          </div>
+        </div>
+        <div class="form-group form-full">
+          <label>Web address <span class="req">Required</span></label>
+          <input type="text" id="lhUrl" placeholder="https://hocanholdings.co.ke/jobs">
+          <small class="hint">Copy it from your browser's address bar and paste it here. It must start with https://</small>
+          <div class="lh-url-note" id="lhUrlNote"></div>
+        </div>
+        <div class="form-group form-full">
+          <label>Button text <span class="req">Required</span></label>
+          <input type="text" id="lhTitle" placeholder="e.g. Apply for our open roles">
+          <small class="hint">This is what people read on the button. Say what they get, not where it goes.</small>
+        </div>
+        <div class="form-group form-full">
+          <label>Small note underneath</label>
+          <input type="text" id="lhSubtitle" placeholder="e.g. 12 positions open right now">
+          <small class="hint">Optional. A short line under the button text — good for deadlines or counts.</small>
+        </div>
+
+        <div class="form-full step-head">
+          <span class="step-num">2</span>
+          <div>
+            <h4>Add a picture</h4>
+            <p>Optional, but it makes a big difference. Skip it and we show the first letter instead.</p>
+          </div>
+        </div>
+        <div class="form-group form-full">
+          <label>Picture</label>
+          <div class="image-upload-zone" id="lhImageZone">
+            <input type="file" id="lhImageInput" accept="image/*">
+            <div class="upload-icon">🖼️</div>
+            <div class="upload-text">Drag &amp; drop or <strong>click to upload</strong> a picture</div>
+            <div class="upload-preview" id="lhImagePreview" style="display:none;">
+              <img id="lhImagePreviewImg" src="" alt="">
+              <button class="upload-remove" id="lhImageRemove">×</button>
+            </div>
+            <div class="progress-bar-wrap" id="lhImageProgressWrap" style="display:none;"><div class="progress-bar" id="lhImageProgress"></div></div>
+          </div>
+          <small class="hint" id="lhImageHint">Use a square picture, at least 200×200 pixels.</small>
+          <input type="hidden" id="lhImageUrl">
+        </div>
+
+        <div class="form-full step-head">
+          <span class="step-num">3</span>
+          <div>
+            <h4>How should it look?</h4>
+            <p>Pick a shape. Featured takes more space, so use it for the one thing you want noticed.</p>
+          </div>
+        </div>
+        <div class="form-group form-full">
+          <div class="lh-layout-pick">
+            <div class="lh-pick sel" data-layout="standard">
+              <div class="mock"><div class="sq"></div><div class="ln"></div></div>
+              <h5>Standard</h5>
+              <p>A normal row with a small square picture. Use this for most links.</p>
+            </div>
+            <div class="lh-pick" data-layout="featured">
+              <div class="mock wide"><div class="rect"></div><div class="ln"></div></div>
+              <h5>Featured</h5>
+              <p>A big wide picture that stands out. Best for one link at a time.</p>
+            </div>
+          </div>
+          <input type="hidden" id="lhLayout" value="standard">
+        </div>
+
+        <div class="form-group form-full">
+          <details class="lh-more">
+            <summary>More options — grouping, scheduling</summary>
+            <div class="lh-more-body">
+              <div class="form-grid">
+                <div class="form-group form-full">
+                  <label>Group under a heading</label>
+                  <input type="text" id="lhCategory" list="lhCategoryList" placeholder="e.g. Opportunities">
+                  <datalist id="lhCategoryList">
+                    <option value="Opportunities"></option>
+                    <option value="Our Services"></option>
+                    <option value="Read &amp; Watch"></option>
+                    <option value="Get In Touch"></option>
+                  </datalist>
+                  <small class="hint">Optional. Links sharing a heading are shown together under that title. Leave empty for no heading.</small>
+                </div>
+                <div class="form-group">
+                  <label>Start showing on</label>
+                  <input type="datetime-local" id="lhStartsAt">
+                  <small class="hint">Leave empty to show it straight away.</small>
+                </div>
+                <div class="form-group">
+                  <label>Stop showing on</label>
+                  <input type="datetime-local" id="lhEndsAt">
+                  <small class="hint">Leave empty to keep it up until you remove it.</small>
+                </div>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <div class="form-group form-full">
+          <div class="toggle-row">
+            <label class="toggle">
+              <input type="checkbox" id="lhActive" checked>
+              <div class="toggle-track"></div>
+              <div class="toggle-thumb"></div>
+            </label>
+            <span class="toggle-label">Show this link on the page</span>
+          </div>
+          <small class="hint">Turn this off to hide a link without deleting it.</small>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" id="lhCancelBtn">Cancel</button>
+      <button class="btn-save" id="lhSaveBtn">Save Link</button>
+    </div>
+  </div>
 </div>
 
 <!-- BLOG EDITOR MODAL -->
@@ -994,11 +1343,12 @@ function toggleMobileSidebar(){
 function setPanel(name){
   navItems.forEach(n=>n.classList.toggle('active',n.dataset.panel===name));
   Object.entries(panels).forEach(([k,v])=>v.classList.toggle('active',k===name));
-  const titles={overview:'Overview',blogs:'Blog Posts',jobs:'Job Listings',applications:'Applications',stories:'Success Stories',partners:'Partners',newsletter:'Newsletter'};
+  const titles={overview:'Overview',blogs:'Blog Posts',jobs:'Job Listings',applications:'Applications',stories:'Success Stories',partners:'Partners',newsletter:'Newsletter',linkhub:'Link Hub'};
   document.getElementById('panelTitle').textContent=titles[name]||name;
   if(name==='applications') loadApplications();
   if(name==='stories') loadStories();
   if(name==='partners') loadPartners();
+  if(name==='linkhub') loadLinkHub();
 }
 
 navItems.forEach(n=>n.addEventListener('click',()=>setPanel(n.dataset.panel)));
@@ -2432,6 +2782,492 @@ document.getElementById('blogModal').addEventListener('click',e=>{if(e.target===
 document.getElementById('jobModal').addEventListener('click',e=>{if(e.target===document.getElementById('jobModal'))closeJobModal();});
 document.getElementById('storyModal').addEventListener('click',e=>{if(e.target===document.getElementById('storyModal'))closeStoryModal();});
 document.getElementById('partnerModal').addEventListener('click',e=>{if(e.target===document.getElementById('partnerModal'))closePartnerModal();});
+
+// ── LINK HUB ──────────────────────────────────────────────────────────────────
+// Every write goes through the Netlify function, which re-checks the password
+// server-side and uses the service role key. bio_links has RLS with a
+// read-only public policy, so the anon key in this page cannot write to it.
+
+let lhLinks=[];
+let lhProfile=null;
+let lhEditingId=null;
+let lhLoaded=false;
+
+async function lhCall(action,payload){
+  const res=await fetch('/.netlify/functions/bio-links-admin',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({action,password:adminPassword,...(payload||{})})
+  });
+  let data=null;
+  try{data=await res.json();}catch(_e){throw new Error('The server sent back an unexpected response.');}
+  if(!res.ok||!data.ok)throw new Error(data&&data.error?data.error:'Something went wrong.');
+  return data;
+}
+
+function lhInitials(s){return String(s||'H').trim().split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase();}
+
+// datetime-local gives a naive local string; the column is timestamptz.
+function lhToIso(v){if(!v)return null;const d=new Date(v);return isNaN(d.getTime())?null:d.toISOString();}
+function lhToLocalInput(iso){
+  if(!iso)return '';
+  const d=new Date(iso);
+  if(isNaN(d.getTime()))return '';
+  const pad=n=>String(n).padStart(2,'0');
+  return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes());
+}
+
+function lhIsScheduled(l){
+  const now=Date.now();
+  if(l.starts_at&&new Date(l.starts_at).getTime()>now)return 'Scheduled';
+  if(l.ends_at&&new Date(l.ends_at).getTime()<=now)return 'Expired';
+  return '';
+}
+
+// A link only reaches the public page when it is on, not archived, and inside
+// its schedule window — the same conditions the RLS policy enforces.
+function lhIsVisible(l){
+  return l.active&&!l.archived_at&&!lhIsScheduled(l);
+}
+
+async function loadLinkHub(){
+  if(lhLoaded)return;
+  lhLoaded=true;
+  await lhRefresh();
+}
+
+async function lhRefresh(){
+  const list=document.getElementById('lhList');
+  list.innerHTML='<div class="app-inline-note" style="padding:20px 4px;">Loading your links…</div>';
+  try{
+    const [linkData,profileData]=await Promise.all([lhCall('list'),lhCall('getProfile')]);
+    lhLinks=linkData.links||[];
+    lhProfile=profileData.profile||null;
+    lhFillProfileForm();
+    lhRender();
+  }catch(err){
+    list.innerHTML='<div class="app-inline-note" style="padding:20px 4px;color:#C53030;">Could not load your links: '+esc(err.message)+' <button class="btn-edit" id="lhRetryBtn" style="margin-left:10px;">Try again</button></div>';
+    const retry=document.getElementById('lhRetryBtn');
+    if(retry)retry.addEventListener('click',lhRefresh);
+  }
+}
+
+function lhFillProfileForm(){
+  const p=lhProfile||{};
+  document.getElementById('lhDisplayName').value=p.display_name||'Hocan Holdings';
+  document.getElementById('lhTagline').value=p.tagline||'';
+  document.getElementById('lhInstagram').value=p.instagram_url||'';
+  document.getElementById('lhLinkedin').value=p.linkedin_url||'';
+  document.getElementById('lhWhatsapp').value=p.whatsapp_url||'';
+  document.getElementById('lhWebsite').value=p.website_url||'';
+  document.getElementById('lhAvatarUrl').value=p.avatar_url||'';
+  if(p.avatar_url){
+    document.getElementById('lhAvatarPreviewImg').src=p.avatar_url;
+    document.getElementById('lhAvatarPreview').style.display='inline-block';
+  }else{
+    document.getElementById('lhAvatarPreview').style.display='none';
+  }
+}
+
+function lhRowMarkup(l,archived){
+  const chips=[];
+  if(l.layout==='featured')chips.push('<span class="lh-chip feat">Featured</span>');
+  const sched=lhIsScheduled(l);
+  if(sched)chips.push('<span class="lh-chip sched">'+sched+'</span>');
+  if(!l.active&&!archived)chips.push('<span class="lh-chip">Hidden</span>');
+
+  const thumb=l.image_url
+    ?'<img class="lh-thumb" src="'+esc(l.image_url)+'" alt="">'
+    :'<div class="lh-thumb-blank">'+esc(lhInitials(l.title))+'</div>';
+
+  const actions=archived
+    ?'<button class="btn-edit" data-lh-restore="'+esc(l.id)+'">Restore</button><button class="btn-delete" data-lh-purge="'+esc(l.id)+'">Delete forever</button>'
+    :'<button class="btn-edit" data-lh-toggle="'+esc(l.id)+'">'+(l.active?'Hide':'Show')+'</button><button class="btn-edit" data-lh-edit="'+esc(l.id)+'">Edit</button><button class="btn-delete" data-lh-archive="'+esc(l.id)+'">Remove</button>';
+
+  return '<div class="lh-row'+(l.active&&!archived?'':' is-off')+'" data-lh-id="'+esc(l.id)+'" '+(archived?'':'draggable="true"')+'>'
+    +(archived?'':'<span class="lh-handle" title="Drag to reorder">⠿</span>')
+    +thumb
+    +'<div class="lh-row-main"><div class="lh-row-title">'+esc(l.title)+' '+chips.join(' ')+'</div>'
+    +'<div class="lh-row-url">'+esc(l.url)+'</div></div>'
+    +'<div class="lh-clicks"><strong>'+Number(l.click_count||0)+'</strong>clicks</div>'
+    +'<div class="lh-row-actions">'+actions+'</div></div>';
+}
+
+function lhRender(){
+  const live=lhLinks.filter(l=>!l.archived_at);
+  const archived=lhLinks.filter(l=>l.archived_at);
+  const list=document.getElementById('lhList');
+
+  if(!live.length){
+    list.innerHTML='<div class="app-inline-note" style="text-align:center;padding:36px 20px;line-height:1.6;"><strong style="display:block;font-size:14px;color:var(--text);margin-bottom:5px;">No links yet</strong>Click <strong>+ Add Link</strong> above to put your first one on the page.</div>';
+  }else{
+    // Insert a heading row whenever the category changes, mirroring how the
+    // public page groups them, so the admin list reads the same as the result.
+    let html='';let lastCat=null;
+    live.forEach(l=>{
+      const cat=(l.category||'').trim();
+      if(cat!==lastCat){
+        if(cat)html+='<div class="lh-group-label">'+esc(cat)+'</div>';
+        lastCat=cat;
+      }
+      html+=lhRowMarkup(l,false);
+    });
+    list.innerHTML=html;
+  }
+
+  const wrap=document.getElementById('lhArchivedWrap');
+  if(archived.length){
+    wrap.style.display='block';
+    document.getElementById('lhArchivedCount').textContent=archived.length;
+    document.getElementById('lhArchivedList').innerHTML=archived.map(l=>lhRowMarkup(l,true)).join('');
+  }else{
+    wrap.style.display='none';
+  }
+
+  document.getElementById('lhTooMany').classList.toggle('show',live.filter(l=>l.active).length>10);
+  lhRenderPreview();
+  lhBindDrag();
+}
+
+// The preview renders from the same data and the same grouping rules as
+// links.html, so it is a true preview rather than an approximation.
+function lhRenderPreview(){
+  const el=document.getElementById('lhPreview');
+  const name=document.getElementById('lhDisplayName').value.trim()||'Hocan Holdings';
+  const tagline=document.getElementById('lhTagline').value.trim();
+  const avatar=document.getElementById('lhAvatarUrl').value.trim();
+
+  const socialIcons=[
+    [document.getElementById('lhInstagram').value.trim(),'IG'],
+    [document.getElementById('lhLinkedin').value.trim(),'in'],
+    [document.getElementById('lhWhatsapp').value.trim(),'WA'],
+    [document.getElementById('lhWebsite').value.trim(),'W']
+  ].filter(pair=>pair[0]).map(pair=>'<span>'+pair[1]+'</span>').join('');
+
+  const head=(avatar
+      ?'<img class="lh-pv-avatar" src="'+esc(avatar)+'" alt="">'
+      :'<div class="lh-pv-avatar">'+esc(lhInitials(name))+'</div>')
+    +'<div class="lh-pv-name">'+esc(name)+'</div>'
+    +(tagline?'<div class="lh-pv-tag">'+esc(tagline)+'</div>':'')
+    +(socialIcons?'<div class="lh-pv-socials">'+socialIcons+'</div>':'');
+
+  const visible=lhLinks.filter(lhIsVisible);
+  if(!visible.length){
+    el.innerHTML=head+'<div class="lh-pv-empty">Links you add will show here.</div>';
+    return;
+  }
+
+  let body='';let lastCat=null;
+  visible.forEach(l=>{
+    const cat=(l.category||'').trim();
+    if(cat!==lastCat){
+      if(cat)body+='<div class="lh-pv-label">'+esc(cat)+'</div>';
+      lastCat=cat;
+    }
+    const sub=l.subtitle?'<div class="lh-pv-sub">'+esc(l.subtitle)+'</div>':'';
+    if(l.layout==='featured'){
+      body+='<div class="lh-pv-feat">'
+        +(l.image_url?'<img class="lh-pv-hero" src="'+esc(l.image_url)+'" alt="">':'<div class="lh-pv-hero"></div>')
+        +'<div class="lh-pv-feat-body"><div class="lh-pv-title">'+esc(l.title)+'</div>'+sub+'</div></div>';
+    }else{
+      const t=l.image_url
+        ?'<img class="lh-pv-thumb" src="'+esc(l.image_url)+'" alt="">'
+        :'<div class="lh-pv-thumb-blank">'+esc(lhInitials(l.title))+'</div>';
+      body+='<div class="lh-pv-card">'+t+'<div class="lh-pv-txt"><div class="lh-pv-title">'+esc(l.title)+'</div>'+sub+'</div></div>';
+    }
+  });
+  el.innerHTML=head+body;
+}
+
+// ── Drag to reorder ───────────────────────────────────────────────────────────
+let lhDragId=null;
+
+function lhBindDrag(){
+  const rows=document.querySelectorAll('#lhList .lh-row[draggable="true"]');
+  rows.forEach(row=>{
+    row.addEventListener('dragstart',e=>{
+      lhDragId=row.dataset.lhId;
+      row.classList.add('dragging');
+      e.dataTransfer.effectAllowed='move';
+      // Firefox will not start a drag unless some data is set.
+      try{e.dataTransfer.setData('text/plain',lhDragId);}catch(_e){}
+    });
+    row.addEventListener('dragend',()=>{
+      row.classList.remove('dragging');
+      document.querySelectorAll('.lh-row.drop-target').forEach(r=>r.classList.remove('drop-target'));
+      lhDragId=null;
+    });
+    row.addEventListener('dragover',e=>{
+      e.preventDefault();
+      e.dataTransfer.dropEffect='move';
+      if(row.dataset.lhId!==lhDragId)row.classList.add('drop-target');
+    });
+    row.addEventListener('dragleave',()=>row.classList.remove('drop-target'));
+    row.addEventListener('drop',async e=>{
+      e.preventDefault();
+      row.classList.remove('drop-target');
+      const targetId=row.dataset.lhId;
+      if(!lhDragId||targetId===lhDragId)return;
+      await lhReorder(lhDragId,targetId);
+    });
+  });
+}
+
+async function lhReorder(dragId,targetId){
+  const live=lhLinks.filter(l=>!l.archived_at);
+  const from=live.findIndex(l=>l.id===dragId);
+  const to=live.findIndex(l=>l.id===targetId);
+  if(from<0||to<0)return;
+
+  const reordered=live.slice();
+  const moved=reordered.splice(from,1)[0];
+  reordered.splice(to,0,moved);
+
+  // Repaint from the new order first so the drag feels instant; the save
+  // follows, and a failure reloads the true order from the server.
+  lhLinks=reordered.concat(lhLinks.filter(l=>l.archived_at));
+  lhRender();
+
+  try{
+    await lhCall('reorder',{ids:reordered.map(l=>l.id)});
+    showToast('New order saved — the page is already updated');
+  }catch(err){
+    showToast('Could not save the order: '+err.message,'error');
+    lhRefresh();
+  }
+}
+
+// ── Modal ─────────────────────────────────────────────────────────────────────
+function lhOpenModal(link){
+  lhEditingId=link?link.id:null;
+  document.getElementById('lhModalTitle').textContent=link?'Edit Link':'Add a Link';
+  document.getElementById('lhUrl').value=link?link.url||'':'';
+  document.getElementById('lhTitle').value=link?link.title||'':'';
+  document.getElementById('lhSubtitle').value=link?link.subtitle||'':'';
+  document.getElementById('lhCategory').value=link?link.category||'':'';
+  document.getElementById('lhStartsAt').value=link?lhToLocalInput(link.starts_at):'';
+  document.getElementById('lhEndsAt').value=link?lhToLocalInput(link.ends_at):'';
+  document.getElementById('lhActive').checked=link?!!link.active:true;
+  document.getElementById('lhUrlNote').className='lh-url-note';
+
+  const imageUrl=link?link.image_url||'':'';
+  document.getElementById('lhImageUrl').value=imageUrl;
+  document.getElementById('lhImagePreviewImg').src=imageUrl;
+  document.getElementById('lhImagePreview').style.display=imageUrl?'inline-block':'none';
+
+  lhSetLayout(link&&link.layout==='featured'?'featured':'standard');
+  document.querySelector('#lhModal .lh-more').open=!!(link&&(link.category||link.starts_at||link.ends_at));
+  document.getElementById('lhModal').classList.add('open');
+}
+
+function lhCloseModal(){document.getElementById('lhModal').classList.remove('open');lhEditingId=null;}
+
+function lhSetLayout(layout){
+  document.getElementById('lhLayout').value=layout;
+  document.querySelectorAll('#lhModal .lh-pick').forEach(p=>p.classList.toggle('sel',p.dataset.layout===layout));
+  document.getElementById('lhImageHint').textContent=layout==='featured'
+    ?'Use a wide picture, at least 680×383 pixels (16:9). It fills the top of the card.'
+    :'Use a square picture, at least 200×200 pixels.';
+}
+
+document.querySelectorAll('#lhModal .lh-pick').forEach(pick=>{
+  pick.addEventListener('click',()=>lhSetLayout(pick.dataset.layout));
+});
+
+// Validate as they type so a bad address is caught before saving, not after.
+document.getElementById('lhUrl').addEventListener('input',e=>{
+  const note=document.getElementById('lhUrlNote');
+  const v=e.target.value.trim();
+  if(!v){note.className='lh-url-note';note.textContent='';return;}
+  let parsed=null;
+  try{parsed=new URL(v);}catch(_err){}
+  if(!parsed){
+    note.className='lh-url-note bad';
+    note.textContent=v.indexOf(' ')>=0?'Web addresses cannot contain spaces.':'Add https:// to the front of the address.';
+  }else if(parsed.protocol!=='http:'&&parsed.protocol!=='https:'){
+    note.className='lh-url-note bad';
+    note.textContent='Only web addresses starting with https:// are allowed.';
+  }else{
+    note.className='lh-url-note good';
+    note.textContent='Looks good — this opens '+parsed.hostname;
+  }
+});
+
+document.getElementById('lhNewBtn').addEventListener('click',()=>lhOpenModal(null));
+document.getElementById('lhModalClose').addEventListener('click',lhCloseModal);
+document.getElementById('lhCancelBtn').addEventListener('click',lhCloseModal);
+document.getElementById('lhModal').addEventListener('click',e=>{
+  if(e.target===document.getElementById('lhModal'))lhCloseModal();
+});
+
+document.getElementById('lhImageInput').addEventListener('change',async e=>{
+  const file=e.target.files[0];if(!file)return;
+  const wrap=document.getElementById('lhImageProgressWrap');
+  const bar=document.getElementById('lhImageProgress');
+  wrap.style.display='block';bar.style.width='0%';
+  try{
+    const result=await uploadToCloudinary(file,{folder:'hocan/links',onProgress:p=>{bar.style.width=p+'%';}});
+    document.getElementById('lhImageUrl').value=result.url;
+    document.getElementById('lhImagePreviewImg').src=result.url;
+    document.getElementById('lhImagePreview').style.display='inline-block';
+    wrap.style.display='none';
+    showToast('Picture uploaded!');
+  }catch(err){wrap.style.display='none';showToast('Upload failed: '+err.message,'error');}
+  e.target.value='';
+});
+
+document.getElementById('lhImageRemove').addEventListener('click',e=>{
+  e.stopPropagation();
+  document.getElementById('lhImageUrl').value='';
+  document.getElementById('lhImagePreview').style.display='none';
+  document.getElementById('lhImagePreviewImg').src='';
+});
+
+document.getElementById('lhSaveBtn').addEventListener('click',async()=>{
+  const btn=document.getElementById('lhSaveBtn');
+  const url=document.getElementById('lhUrl').value.trim();
+  const title=document.getElementById('lhTitle').value.trim();
+
+  if(!url){showToast('Paste the web address first','error');document.getElementById('lhUrl').focus();return;}
+  if(!title){showToast('Give the button some text','error');document.getElementById('lhTitle').focus();return;}
+
+  const payload={
+    id:lhEditingId,
+    url:url,
+    title:title,
+    subtitle:document.getElementById('lhSubtitle').value.trim(),
+    imageUrl:document.getElementById('lhImageUrl').value.trim(),
+    layout:document.getElementById('lhLayout').value,
+    category:document.getElementById('lhCategory').value.trim(),
+    active:document.getElementById('lhActive').checked,
+    startsAt:lhToIso(document.getElementById('lhStartsAt').value),
+    endsAt:lhToIso(document.getElementById('lhEndsAt').value)
+  };
+
+  btn.disabled=true;btn.textContent='Saving…';
+  try{
+    const wasEditing=lhEditingId;
+    await lhCall(wasEditing?'update':'create',payload);
+    lhCloseModal();
+    await lhRefresh();
+    showToast(wasEditing?'Link updated — already live':'Link added — already live on the page');
+  }catch(err){
+    showToast(err.message,'error');
+  }finally{
+    btn.disabled=false;btn.textContent='Save Link';
+  }
+});
+
+// ── List actions ──────────────────────────────────────────────────────────────
+document.getElementById('panel-linkhub').addEventListener('click',async e=>{
+  const editBtn=e.target.closest('[data-lh-edit]');
+  if(editBtn){
+    const link=lhLinks.find(l=>l.id===editBtn.dataset.lhEdit);
+    if(link)lhOpenModal(link);
+    return;
+  }
+
+  const toggleBtn=e.target.closest('[data-lh-toggle]');
+  if(toggleBtn){
+    const link=lhLinks.find(l=>l.id===toggleBtn.dataset.lhToggle);
+    if(!link)return;
+    toggleBtn.disabled=true;
+    try{
+      await lhCall('toggle',{id:link.id,active:!link.active});
+      const wasActive=link.active;
+      await lhRefresh();
+      showToast(wasActive?'Link hidden from the page':'Link is now showing');
+    }catch(err){showToast(err.message,'error');toggleBtn.disabled=false;}
+    return;
+  }
+
+  const archiveBtn=e.target.closest('[data-lh-archive]');
+  if(archiveBtn){
+    const link=lhLinks.find(l=>l.id===archiveBtn.dataset.lhArchive);
+    if(!link)return;
+    if(!confirm('Remove "'+link.title+'" from the page?\n\nIt moves to Removed links, where you can restore it later.'))return;
+    try{
+      await lhCall('archive',{id:link.id});
+      await lhRefresh();
+      showToast('Link removed — you can restore it below');
+    }catch(err){showToast(err.message,'error');}
+    return;
+  }
+
+  const restoreBtn=e.target.closest('[data-lh-restore]');
+  if(restoreBtn){
+    try{
+      await lhCall('archive',{id:restoreBtn.dataset.lhRestore,restore:true});
+      await lhRefresh();
+      showToast('Link restored');
+    }catch(err){showToast(err.message,'error');}
+    return;
+  }
+
+  const purgeBtn=e.target.closest('[data-lh-purge]');
+  if(purgeBtn){
+    const link=lhLinks.find(l=>l.id===purgeBtn.dataset.lhPurge);
+    if(!link)return;
+    if(!confirm('Permanently delete "'+link.title+'"?\n\nThis cannot be undone.'))return;
+    try{
+      await lhCall('purge',{id:link.id});
+      await lhRefresh();
+      showToast('Link deleted');
+    }catch(err){showToast(err.message,'error');}
+  }
+});
+
+// ── Profile ───────────────────────────────────────────────────────────────────
+['lhDisplayName','lhTagline','lhInstagram','lhLinkedin','lhWhatsapp','lhWebsite'].forEach(id=>{
+  document.getElementById(id).addEventListener('input',lhRenderPreview);
+});
+
+document.getElementById('lhAvatarInput').addEventListener('change',async e=>{
+  const file=e.target.files[0];if(!file)return;
+  const wrap=document.getElementById('lhAvatarProgressWrap');
+  const bar=document.getElementById('lhAvatarProgress');
+  wrap.style.display='block';bar.style.width='0%';
+  try{
+    const result=await uploadToCloudinary(file,{folder:'hocan/links',onProgress:p=>{bar.style.width=p+'%';}});
+    document.getElementById('lhAvatarUrl').value=result.url;
+    document.getElementById('lhAvatarPreviewImg').src=result.url;
+    document.getElementById('lhAvatarPreview').style.display='inline-block';
+    wrap.style.display='none';
+    lhRenderPreview();
+    showToast('Picture uploaded — remember to Save Heading');
+  }catch(err){wrap.style.display='none';showToast('Upload failed: '+err.message,'error');}
+  e.target.value='';
+});
+
+document.getElementById('lhAvatarRemove').addEventListener('click',e=>{
+  e.stopPropagation();
+  document.getElementById('lhAvatarUrl').value='';
+  document.getElementById('lhAvatarPreview').style.display='none';
+  document.getElementById('lhAvatarPreviewImg').src='';
+  lhRenderPreview();
+});
+
+document.getElementById('lhSaveProfileBtn').addEventListener('click',async()=>{
+  const btn=document.getElementById('lhSaveProfileBtn');
+  btn.disabled=true;btn.textContent='Saving…';
+  try{
+    await lhCall('saveProfile',{
+      displayName:document.getElementById('lhDisplayName').value.trim(),
+      tagline:document.getElementById('lhTagline').value.trim(),
+      avatarUrl:document.getElementById('lhAvatarUrl').value.trim(),
+      instagramUrl:document.getElementById('lhInstagram').value.trim(),
+      linkedinUrl:document.getElementById('lhLinkedin').value.trim(),
+      whatsappUrl:document.getElementById('lhWhatsapp').value.trim(),
+      websiteUrl:document.getElementById('lhWebsite').value.trim()
+    });
+    showToast('Heading saved — already live on the page');
+  }catch(err){
+    showToast(err.message,'error');
+  }finally{
+    btn.disabled=false;btn.textContent='Save Heading';
+  }
+});
+
 </script>
 </body>
 </html>

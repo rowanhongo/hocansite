@@ -1,0 +1,51 @@
+# Applies supabase/migrations/*.sql to the production database on every push to
+# main that changes them.
+#
+# Netlify deploys the site but never touches the database, so before this
+# workflow existed every schema change had to be pasted into the SQL Editor by
+# hand — which is how the newsletter tables ended up live with no migration
+# recording them. Running them here keeps the files in this repo the real
+# source of truth for the schema.
+#
+# Requires one repository secret: SUPABASE_DB_URL (see README).
+
+name: Supabase migrations
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "supabase/migrations/**"
+      - ".github/workflows/supabase-migrations.yml"
+  # Lets you re-run migrations from the Actions tab without pushing a commit.
+  workflow_dispatch:
+
+# Two concurrent runs could apply migrations out of order, so queue them
+# instead. Never cancel an in-flight run: a half-applied migration is worse
+# than a slow one.
+concurrency:
+  group: supabase-migrations
+  cancel-in-progress: false
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      # `db push` applies only migrations the database has not recorded yet,
+      # tracked in supabase_migrations.schema_migrations. Re-running it is a
+      # no-op, so a redeploy cannot double-apply anything.
+      - name: Apply pending migrations
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          if [ -z "$SUPABASE_DB_URL" ]; then
+            echo "::error::SUPABASE_DB_URL is not set. Add it under Settings → Secrets and variables → Actions."
+            exit 1
+          fi
+          supabase db push --db-url "$SUPABASE_DB_URL"

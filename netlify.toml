@@ -26,6 +26,24 @@ from = "/jobs/*"
 to = "/job-detail.html"
 status = 200
 
+# ---- Link hub ----------------------------------------------------------------
+# The link-in-bio page is served from links.hocanholdings.co.ke, which is added
+# as a domain alias on this same site. This rule rewrites that host's root to
+# links.html; without it the subdomain would serve the main site's index.
+# Netlify matches these host-scoped rules before the path-only rules below.
+[[redirects]]
+from = "https://links.hocanholdings.co.ke/"
+to = "/links.html"
+status = 200
+force = true
+
+# Same page on the main domain, so /links keeps working as a fallback and the
+# admin's "Open the live page" button resolves in local dev too.
+[[redirects]]
+from = "/links"
+to = "/links.html"
+status = 200
+
 # ---- Caching -----------------------------------------------------------------
 # HTML must revalidate so edits go live immediately; the assets it references are
 # content-addressed by path and safe to cache hard. must-revalidate means the

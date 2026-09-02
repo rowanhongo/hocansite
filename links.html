@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Hocan Holdings — Links</title>
+<meta name="description" content="Every Hocan Holdings opportunity, service and channel in one place.">
+<link rel="canonical" href="https://links.hocanholdings.co.ke/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Hocan Holdings">
+<meta property="og:title" content="Hocan Holdings — Links">
+<meta property="og:description" content="Every Hocan Holdings opportunity, service and channel in one place.">
+<meta property="og:url" content="https://links.hocanholdings.co.ke/">
+<meta property="og:image" content="https://hocanholdings.co.ke/full-logo-with-tagline-square-1080.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Hocan Holdings — Links">
+<meta name="twitter:description" content="Every Hocan Holdings opportunity, service and channel in one place.">
+<meta name="twitter:image" content="https://hocanholdings.co.ke/full-logo-with-tagline-square-1080.png">
+
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" href="assets/icon-512.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://esm.sh" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Brand tokens mirror assets/theme.css. They are inlined rather than linked so
+   this page renders correctly on first paint even on a cold mobile connection —
+   it is the link in our bio, so it is almost always someone's first impression. */
+:root{
+  --brand:#C47A5A; --brand-strong:#a04a39; --brand-soft:#ffd9cf;
+  --navy:#1A1A2E; --sky:#4AB3D4;
+  --text:#14213d; --text-secondary:#50617a; --text-muted:#6b7280;
+  --surface:#ffffff; --line:#e8ecf0;
+  --radius:16px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{-webkit-text-size-adjust:100%;}
+body{
+  font-family:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  color:var(--text);
+  background:linear-gradient(170deg,#f7eee9 0%,#f4f6f8 42%,#eaf4f9 100%);
+  background-attachment:fixed;
+  min-height:100vh;
+  padding:calc(36px + env(safe-area-inset-top)) 20px calc(40px + env(safe-area-inset-bottom));
+  display:flex; justify-content:center;
+  -webkit-font-smoothing:antialiased;
+}
+.shell{width:100%;max-width:600px;}
+
+/* ── HEADER ─────────────────────────────────────────────────────────── */
+.profile{text-align:center;margin-bottom:30px;}
+.avatar{
+  width:104px;height:104px;border-radius:50%;object-fit:cover;
+  background:var(--surface);border:4px solid #fff;
+  box-shadow:0 10px 30px rgba(26,26,46,.14);
+  margin:0 auto 16px;display:block;
+}
+.avatar-fallback{
+  width:104px;height:104px;border-radius:50%;margin:0 auto 16px;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--navy);color:#fff;border:4px solid #fff;
+  font-family:'Sora',sans-serif;font-size:34px;font-weight:700;letter-spacing:-1px;
+  box-shadow:0 10px 30px rgba(26,26,46,.14);
+}
+.profile h1{font-family:'Sora',sans-serif;font-size:24px;font-weight:700;letter-spacing:-.02em;color:var(--navy);}
+.profile .tagline{font-size:15px;color:var(--text-secondary);line-height:1.55;margin:8px auto 0;max-width:420px;}
+
+.socials{display:flex;justify-content:center;gap:10px;margin-top:18px;}
+.socials a{
+  width:42px;height:42px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--surface);color:var(--navy);
+  border:1px solid var(--line);
+  box-shadow:0 2px 8px rgba(26,26,46,.06);
+  transition:transform .18s ease, color .18s ease, box-shadow .18s ease;
+}
+.socials a:hover{transform:translateY(-2px);color:var(--brand);box-shadow:0 6px 16px rgba(26,26,46,.12);}
+.socials svg{width:19px;height:19px;fill:currentColor;}
+
+/* ── SECTION HEADERS ────────────────────────────────────────────────── */
+.section-label{
+  font-size:11px;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;
+  color:var(--text-muted);margin:26px 4px 12px;
+}
+.section-label:first-of-type{margin-top:8px;}
+
+/* ── STANDARD LINK ──────────────────────────────────────────────────── */
+.link-card{
+  display:flex;align-items:center;gap:14px;
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);padding:12px 16px 12px 12px;
+  margin-bottom:12px;text-decoration:none;color:inherit;
+  box-shadow:0 2px 10px rgba(26,26,46,.05);
+  transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  min-height:72px;
+}
+.link-card:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(26,26,46,.12);border-color:var(--brand-soft);}
+.link-card:active{transform:translateY(0);}
+.link-thumb{
+  width:52px;height:52px;flex-shrink:0;border-radius:12px;object-fit:cover;
+  background:#f2f5f8;
+}
+.link-thumb-blank{
+  width:52px;height:52px;flex-shrink:0;border-radius:12px;
+  background:linear-gradient(135deg,var(--brand-soft),#e6f3fa);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Sora',sans-serif;font-weight:700;font-size:19px;color:var(--brand-strong);
+}
+.link-body{flex:1;min-width:0;}
+.link-title{font-weight:600;font-size:15.5px;line-height:1.35;color:var(--navy);}
+.link-sub{font-size:13px;color:var(--text-muted);line-height:1.45;margin-top:3px;}
+.link-arrow{flex-shrink:0;color:#c3ccd8;transition:color .18s ease,transform .18s ease;}
+.link-card:hover .link-arrow{color:var(--brand);transform:translateX(2px);}
+.link-arrow svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+
+/* ── FEATURED LINK (16:9 hero) ──────────────────────────────────────── */
+.link-featured{
+  display:block;background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);overflow:hidden;margin-bottom:12px;
+  text-decoration:none;color:inherit;
+  box-shadow:0 2px 10px rgba(26,26,46,.05);
+  transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.link-featured:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(26,26,46,.14);border-color:var(--brand-soft);}
+.link-featured .hero{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;background:#f2f5f8;}
+.link-featured .hero-blank{
+  width:100%;aspect-ratio:16/9;
+  background:linear-gradient(135deg,var(--brand-soft),#e6f3fa);
+}
+.link-featured .feat-body{padding:14px 16px 16px;display:flex;align-items:center;gap:12px;}
+.link-featured .feat-text{flex:1;min-width:0;}
+.link-featured .link-title{font-size:16.5px;}
+
+/* ── STATES ─────────────────────────────────────────────────────────── */
+.skeleton{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  height:72px;margin-bottom:12px;position:relative;overflow:hidden;
+}
+.skeleton::after{
+  content:"";position:absolute;inset:0;transform:translateX(-100%);
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.75),transparent);
+  animation:shimmer 1.4s infinite;
+}
+@keyframes shimmer{100%{transform:translateX(100%);}}
+.state{
+  text-align:center;padding:44px 24px;color:var(--text-muted);font-size:14.5px;line-height:1.6;
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+}
+.state strong{display:block;color:var(--navy);font-family:'Sora',sans-serif;font-size:16px;margin-bottom:6px;}
+.retry{
+  margin-top:14px;background:var(--navy);color:#fff;border:none;
+  padding:10px 20px;border-radius:10px;font-size:13.5px;font-weight:600;
+  font-family:inherit;cursor:pointer;
+}
+.retry:hover{background:var(--brand);}
+
+/* A quiet confirmation that a newly-published link arrived without a refresh. */
+.live-toast{
+  position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom));
+  transform:translate(-50%,140%);
+  background:var(--navy);color:#fff;padding:11px 20px;border-radius:999px;
+  font-size:13.5px;font-weight:500;box-shadow:0 10px 30px rgba(26,26,46,.28);
+  transition:transform .35s cubic-bezier(.2,.9,.3,1);z-index:50;pointer-events:none;
+  max-width:calc(100% - 40px);text-align:center;
+}
+.live-toast.show{transform:translate(-50%,0);}
+
+/* ── FOOTER ─────────────────────────────────────────────────────────── */
+.footer{text-align:center;margin-top:32px;}
+.share-btn{
+  background:var(--surface);border:1px solid var(--line);color:var(--text-secondary);
+  padding:10px 20px;border-radius:999px;font-size:13.5px;font-weight:500;
+  font-family:inherit;cursor:pointer;display:inline-flex;align-items:center;gap:8px;
+  transition:.18s;box-shadow:0 2px 8px rgba(26,26,46,.05);
+}
+.share-btn:hover{color:var(--brand);border-color:var(--brand-soft);}
+.share-btn svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.footer .wordmark{margin-top:18px;font-size:12.5px;color:var(--text-muted);}
+.footer .wordmark a{color:var(--text-secondary);text-decoration:none;font-weight:500;}
+.footer .wordmark a:hover{color:var(--brand);}
+
+@media (max-width:420px){
+  body{padding-left:16px;padding-right:16px;}
+  .profile h1{font-size:22px;}
+  .link-card{padding:11px 14px 11px 11px;}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms !important;transition-duration:.01ms !important;}
+}
+</style>
+</head>
+<body>
+
+<main class="shell">
+  <header class="profile" id="profile"></header>
+  <div id="links">
+    <div class="skeleton"></div>
+    <div class="skeleton"></div>
+    <div class="skeleton"></div>
+  </div>
+  <footer class="footer">
+    <button class="share-btn" id="shareBtn">
+      <svg viewBox="0 0 24 24"><path d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v14"/></svg>
+      Share this page
+    </button>
+    <div class="wordmark">&copy; <span id="year"></span> <a href="https://hocanholdings.co.ke">Hocan Holdings</a></div>
+  </footer>
+</main>
+
+<div class="live-toast" id="liveToast"></div>
+
+<script type="module">
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const linksEl = document.getElementById("links");
+const profileEl = document.getElementById("profile");
+const toastEl = document.getElementById("liveToast");
+document.getElementById("year").textContent = new Date().getFullYear();
+
+const esc = (s) => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;")
+  .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+const SOCIAL_ICONS = {
+  instagram: '<path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41-.56-.22-.96-.48-1.38-.9-.42-.42-.68-.82-.9-1.38-.16-.42-.36-1.06-.41-2.23-.06-1.27-.07-1.65-.07-4.85s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41 1.27-.06 1.65-.07 4.85-.07M12 0C8.74 0 8.33.01 7.05.07 5.78.13 4.9.33 4.14.63c-.79.31-1.46.72-2.13 1.38C1.35 2.68.94 3.35.63 4.14.33 4.9.13 5.78.07 7.05.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.06 1.27.26 2.15.56 2.91.31.79.72 1.46 1.38 2.13.67.66 1.34 1.07 2.13 1.38.76.3 1.64.5 2.91.56C8.33 23.99 8.74 24 12 24s3.67-.01 4.95-.07c1.27-.06 2.15-.26 2.91-.56.79-.31 1.46-.72 2.13-1.38.66-.67 1.07-1.34 1.38-2.13.3-.76.5-1.64.56-2.91.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.06-1.27-.26-2.15-.56-2.91-.31-.79-.72-1.46-1.38-2.13C21.32 1.35 20.65.94 19.86.63c-.76-.3-1.64-.5-2.91-.56C15.67.01 15.26 0 12 0zm0 5.84a6.16 6.16 0 100 12.32 6.16 6.16 0 000-12.32zm0 10.16a4 4 0 110-8 4 4 0 010 8zm7.85-10.4a1.44 1.44 0 11-2.88 0 1.44 1.44 0 012.88 0z"/>',
+  linkedin: '<path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.07 2.07 0 110-4.14 2.07 2.07 0 010 4.14zm1.78 13.02H3.55V9h3.57v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"/>',
+  whatsapp: '<path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.25-.46-2.39-1.47-.88-.79-1.48-1.76-1.65-2.06-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.61-.92-2.21-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48s1.06 2.88 1.21 3.08c.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.69.63.71.23 1.36.19 1.87.12.57-.09 1.76-.72 2.01-1.41.25-.7.25-1.29.17-1.42-.07-.13-.27-.2-.57-.35zM12.05 21.8h-.02a9.8 9.8 0 01-4.99-1.37l-.36-.21-3.71.97.99-3.62-.23-.37a9.78 9.78 0 01-1.5-5.23c0-5.41 4.4-9.81 9.82-9.81 2.62 0 5.08 1.02 6.94 2.88a9.75 9.75 0 012.87 6.94c0 5.41-4.4 9.82-9.81 9.82zM20.52 3.45A11.76 11.76 0 0012.05 0C5.5 0 .17 5.33.17 11.88c0 2.09.55 4.14 1.59 5.94L.07 24l6.33-1.66a11.85 11.85 0 005.65 1.44h.01c6.55 0 11.88-5.33 11.88-11.88a11.8 11.8 0 00-3.42-8.45z"/>',
+  website: '<path d="M12 0C5.37 0 0 5.37 0 12s5.37 12 12 12 12-5.37 12-12S18.63 0 12 0zm7.94 7.2h-3.2a17.6 17.6 0 00-1.6-4.14 9.85 9.85 0 014.8 4.14zM12 2.05c.9 1.3 1.6 2.75 2.06 4.3.16.28.3.57.42.85H9.52c.12-.28.26-.57.42-.85A13.6 13.6 0 0112 2.05zM2.26 14.4A9.9 9.9 0 011.8 12c0-.83.1-1.63.3-2.4h3.67A20.3 20.3 0 005.6 12c0 .81.06 1.62.17 2.4H2.26zm.8 2.4h3.2c.4 1.45.94 2.84 1.6 4.14a9.85 9.85 0 01-4.8-4.14zm3.2-9.6h-3.2a9.85 9.85 0 014.8-4.14A17.6 17.6 0 006.26 7.2zM12 21.95a13.6 13.6 0 01-2.06-4.3c-.16-.28-.3-.57-.42-.85h4.96c-.12.28-.26.57-.42.85A13.6 13.6 0 0112 21.95zm2.96-7.55H9.04A18.4 18.4 0 018.85 12c0-.81.07-1.62.19-2.4h5.92c.12.78.19 1.59.19 2.4 0 .81-.07 1.62-.19 2.4zm.38 6.54c.66-1.3 1.2-2.69 1.6-4.14h3.2a9.85 9.85 0 01-4.8 4.14zm2.03-6.54c.11-.78.17-1.59.17-2.4 0-.81-.06-1.62-.17-2.4h3.67c.2.77.3 1.57.3 2.4 0 .83-.1 1.63-.3 2.4h-3.67z"/>'
+};
+
+function initials(name) {
+  return String(name || "H").trim().split(/\s+/).slice(0, 2).map((w) => w[0]).join("").toUpperCase();
+}
+
+function renderProfile(p) {
+  const name = p?.display_name || "Hocan Holdings";
+  const avatar = p?.avatar_url
+    ? `<img class="avatar" src="${esc(p.avatar_url)}" alt="${esc(name)}" width="104" height="104">`
+    : `<div class="avatar-fallback" aria-hidden="true">${esc(initials(name))}</div>`;
+
+  const socials = [
+    ["instagram", p?.instagram_url, "Instagram"],
+    ["linkedin", p?.linkedin_url, "LinkedIn"],
+    ["whatsapp", p?.whatsapp_url, "WhatsApp"],
+    ["website", p?.website_url, "Website"]
+  ]
+    .filter(([, url]) => url)
+    .map(([key, url, label]) =>
+      `<a href="${esc(url)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(label)}">
+         <svg viewBox="0 0 24 24" aria-hidden="true">${SOCIAL_ICONS[key]}</svg>
+       </a>`)
+    .join("");
+
+  profileEl.innerHTML = `
+    ${avatar}
+    <h1>${esc(name)}</h1>
+    ${p?.tagline ? `<p class="tagline">${esc(p.tagline)}</p>` : ""}
+    ${socials ? `<nav class="socials">${socials}</nav>` : ""}`;
+}
+
+function linkMarkup(link) {
+  const title = esc(link.title);
+  const sub = link.subtitle ? `<div class="link-sub">${esc(link.subtitle)}</div>` : "";
+  const arrow = `<span class="link-arrow"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg></span>`;
+  // rel=noopener is required on every outbound link: without it the destination
+  // page gets a handle on this one via window.opener.
+  const attrs = `href="${esc(link.url)}" target="_blank" rel="noopener noreferrer" data-id="${esc(link.id)}"`;
+
+  if (link.layout === "featured") {
+    const hero = link.image_url
+      ? `<img class="hero" src="${esc(link.image_url)}" alt="" loading="lazy" decoding="async">`
+      : `<div class="hero-blank"></div>`;
+    return `<a class="link-featured" ${attrs}>
+      ${hero}
+      <div class="feat-body"><div class="feat-text"><div class="link-title">${title}</div>${sub}</div>${arrow}</div>
+    </a>`;
+  }
+
+  const thumb = link.image_url
+    ? `<img class="link-thumb" src="${esc(link.image_url)}" alt="" loading="lazy" decoding="async" width="52" height="52">`
+    : `<div class="link-thumb-blank" aria-hidden="true">${esc(initials(link.title))}</div>`;
+
+  return `<a class="link-card" ${attrs}>
+    ${thumb}
+    <div class="link-body"><div class="link-title">${title}</div>${sub}</div>
+    ${arrow}
+  </a>`;
+}
+
+function renderLinks(rows) {
+  if (!rows.length) {
+    linksEl.innerHTML = `<div class="state"><strong>Nothing here just yet</strong>New opportunities and updates land here first — check back soon.</div>`;
+    return;
+  }
+
+  // Group under section headers while preserving the admin's drag order. A link
+  // with no category simply sits in the leading, unlabelled group.
+  const groups = [];
+  rows.forEach((row) => {
+    const key = (row.category || "").trim();
+    const last = groups[groups.length - 1];
+    if (last && last.key === key) last.items.push(row);
+    else groups.push({ key, items: [row] });
+  });
+
+  linksEl.innerHTML = groups
+    .map((g) => (g.key ? `<div class="section-label">${esc(g.key)}</div>` : "") + g.items.map(linkMarkup).join(""))
+    .join("");
+}
+
+function showToast(message) {
+  toastEl.textContent = message;
+  toastEl.classList.add("show");
+  setTimeout(() => toastEl.classList.remove("show"), 3600);
+}
+
+// ── Data ──────────────────────────────────────────────────────────────────
+let supabase = null;
+let lastSignature = "";
+let lastRenderedOnce = false;
+
+async function getClient() {
+  if (supabase) return supabase;
+  const res = await fetch("/.netlify/functions/get-config", { cache: "no-store" });
+  if (!res.ok) throw new Error("config unavailable");
+  const cfg = await res.json();
+  if (!cfg.supabaseUrl || !cfg.supabaseAnonKey) throw new Error("not configured");
+  supabase = createClient(cfg.supabaseUrl, cfg.supabaseAnonKey);
+  return supabase;
+}
+
+// The RLS policy already filters to active, non-archived, in-window rows, so an
+// unpublished link is never sent to the browser at all.
+async function load(announce) {
+  const db = await getClient();
+
+  const [linkRes, profileRes] = await Promise.all([
+    db.from("bio_links").select("id,title,subtitle,url,image_url,layout,category,display_order")
+      .order("display_order", { ascending: true }).order("created_at", { ascending: true }),
+    db.from("bio_profile").select("*").limit(1).maybeSingle()
+  ]);
+
+  if (linkRes.error) throw linkRes.error;
+
+  const rows = linkRes.data || [];
+  const signature = JSON.stringify(rows);
+  const changed = lastSignature && signature !== lastSignature;
+  const grew = changed && rows.length > JSON.parse(lastSignature).length;
+  lastSignature = signature;
+
+  renderProfile(profileRes.data || null);
+  if (!lastRenderedOnce || changed) renderLinks(rows);
+  lastRenderedOnce = true;
+
+  if (announce && grew) showToast("New link just added");
+}
+
+function renderError() {
+  linksEl.innerHTML = `<div class="state">
+    <strong>We couldn't load the links</strong>
+    Check your connection and try again.
+    <br><button class="retry" id="retryBtn">Try again</button>
+  </div>`;
+  document.getElementById("retryBtn").addEventListener("click", () => {
+    linksEl.innerHTML = '<div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>';
+    boot();
+  });
+}
+
+async function boot() {
+  try {
+    await load(false);
+    subscribeRealtime();
+  } catch (_err) {
+    renderError();
+  }
+}
+
+// Realtime is the primary update path: publishing a link in the dashboard makes
+// it appear here with no refresh.
+function subscribeRealtime() {
+  getClient().then((db) => {
+    db.channel("bio-links-public")
+      .on("postgres_changes", { event: "*", schema: "public", table: "bio_links" }, () => load(true).catch(() => {}))
+      .on("postgres_changes", { event: "*", schema: "public", table: "bio_profile" }, () => load(false).catch(() => {}))
+      .subscribe();
+  }).catch(() => {});
+}
+
+// Fallbacks, because this page is opened mostly inside Instagram and WhatsApp
+// in-app browsers where a websocket can be dropped without notice.
+setInterval(() => { if (!document.hidden) load(true).catch(() => {}); }, 30000);
+document.addEventListener("visibilitychange", () => { if (!document.hidden) load(true).catch(() => {}); });
+
+// ── Click tracking ────────────────────────────────────────────────────────
+// Fired without awaiting so it can never delay or block navigation.
+linksEl.addEventListener("click", (e) => {
+  const anchor = e.target.closest("a[data-id]");
+  if (!anchor) return;
+  const id = anchor.dataset.id;
+  if (!id || !supabase) return;
+  try {
+    supabase.rpc("increment_bio_link_click", { link_id: id }).then(() => {}, () => {});
+  } catch (_err) {
+    // Never let analytics break the click.
+  }
+});
+
+// ── Share ─────────────────────────────────────────────────────────────────
+document.getElementById("shareBtn").addEventListener("click", async () => {
+  const url = window.location.href;
+  try {
+    if (navigator.share) {
+      await navigator.share({ title: "Hocan Holdings", url });
+      return;
+    }
+    await navigator.clipboard.writeText(url);
+    showToast("Link copied to clipboard");
+  } catch (_err) {
+    // User dismissed the share sheet — nothing to report.
+  }
+});
+
+boot();
+</script>
+</body>
+</html>
