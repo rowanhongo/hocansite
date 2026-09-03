@@ -518,6 +518,9 @@ tr:hover td{background:#FAFBFD;}
 
     <!-- OVERVIEW -->
     <div class="panel active" id="panel-overview">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:14px;">
+        <button class="btn-secondary" id="overviewRefreshBtn">Refresh</button>
+      </div>
       <div class="stats-row" style="grid-template-columns:repeat(3,1fr);">
         <div class="stat-card blue"><div class="stat-label">Total Blogs</div><div class="stat-val" id="statBlogs">–</div></div>
         <div class="stat-card rose"><div class="stat-label">Active Jobs</div><div class="stat-val" id="statJobs">–</div></div>
@@ -527,6 +530,11 @@ tr:hover td{background:#FAFBFD;}
         <div class="stat-card green"><div class="stat-label">Published Blogs</div><div class="stat-val" id="statPublished">–</div></div>
         <div class="stat-card amber"><div class="stat-label">Draft Blogs</div><div class="stat-val" id="statDrafts">–</div></div>
         <div class="stat-card blue"><div class="stat-label">Partners</div><div class="stat-val" id="statPartners">–</div></div>
+      </div>
+      <div class="stats-row" style="grid-template-columns:repeat(3,1fr);">
+        <div class="stat-card rose"><div class="stat-label">Live Bio Links</div><div class="stat-val" id="statLinks">–</div></div>
+        <div class="stat-card amber"><div class="stat-label">Link Clicks</div><div class="stat-val" id="statLinkClicks">–</div></div>
+        <div class="stat-card green"><div class="stat-label">Subscribers</div><div class="stat-val" id="statSubscribers">–</div></div>
       </div>
       <div class="section-card">
         <div class="section-header"><h3>Recent Blog Posts</h3><button class="btn-new" id="overviewNewBlog">+ New Blog Post</button></div>
@@ -1378,6 +1386,15 @@ let editingJobId=null;
 let cbBlocks=[];
 let stories=[];
 let partners=[];
+
+// Link hub state lives up here with the rest: renderOverview() reads lhLinks
+// and lhLoaded at init time, and a `let` declared further down the file is in
+// the temporal dead zone until then — reading it would throw a ReferenceError
+// and blank the whole Overview panel.
+let lhLinks=[];
+let lhProfile=null;
+let lhEditingId=null;
+let lhLoaded=false;
 let editingStoryId=null;
 let editingPartnerId=null;
 let storyImages=[];
@@ -1398,7 +1415,15 @@ async function init(){
 // ── BLOGS ─────────────────────────────────────────────────────────────────────
 
 async function loadBlogs(){
-  blogs=await adminGetBlogs()||[];
+  // Every loader has to swallow its own failure. init() awaits these with
+  // Promise.all, so one rejection there skips renderOverview() entirely and
+  // leaves every stat sitting on an em-dash with nothing explaining why.
+  try{
+    blogs=await adminGetBlogs()||[];
+  }catch(err){
+    blogs=[];
+    showToast('Could not load blog posts: '+err.message,'error');
+  }
   renderBlogTable(blogs);
 }
 
@@ -1427,7 +1452,12 @@ document.getElementById('blogSearch').addEventListener('input',e=>{
 // ── JOBS ──────────────────────────────────────────────────────────────────────
 
 async function loadJobs(){
-  jobs=await adminGetJobs()||[];
+  try{
+    jobs=await adminGetJobs()||[];
+  }catch(err){
+    jobs=[];
+    showToast('Could not load job listings: '+err.message,'error');
+  }
   renderJobTable(jobs);
 }
 
@@ -1692,11 +1722,38 @@ function renderOverview(){
   document.getElementById('statJobs').textContent=jobs.filter(j=>j.is_active).length;
   document.getElementById('statStories').textContent=stories.filter(s=>s.published).length;
   document.getElementById('statPartners').textContent=partners.filter(p=>p.active).length;
+
+  // Link hub figures come from lhLinks, which the Link Hub panel loads lazily.
+  // Until it has, show an em-dash rather than a wrong zero.
+  const liveLinks=lhLinks.filter(lhIsVisible);
+  document.getElementById('statLinks').textContent=lhLoaded?liveLinks.length:'–';
+  document.getElementById('statLinkClicks').textContent=lhLoaded
+    ?lhLinks.reduce((sum,l)=>sum+Number(l.click_count||0),0)
+    :'–';
+  document.getElementById('statSubscribers').textContent=newsletterTotal||0;
+
   const bt=document.getElementById('overviewBlogTable');
   bt.innerHTML=blogs.slice(0,5).map(b=>`<tr><td data-label="Title">${esc(b.title)}</td><td data-label="Category">${esc(b.category||'—')}</td><td data-label="Status"><span class="badge ${b.published?'published':'draft'}">${b.published?'Published':'Draft'}</span></td><td data-label="Date">${fmt(b.published_at)}</td></tr>`).join('')||`<tr class="empty-row"><td colspan="4">No blogs yet</td></tr>`;
   const jt=document.getElementById('overviewJobTable');
   jt.innerHTML=jobs.slice(0,5).map(j=>`<tr><td data-label="Title">${esc(j.title)}</td><td data-label="Location">${esc(j.location||'—')}</td><td data-label="Type">${esc(j.job_type||'—')}</td><td data-label="Status"><span class="badge ${j.is_active?'active':'inactive'}">${j.is_active?'Active':'Inactive'}</span></td></tr>`).join('')||`<tr class="empty-row"><td colspan="4">No jobs yet</td></tr>`;
 }
+
+// Overview is rendered once at init; this reloads every source on demand so a
+// panel that failed on a flaky connection can be recovered without a full
+// page reload (which would also mean signing in again).
+document.getElementById('overviewRefreshBtn').addEventListener('click',async()=>{
+  const btn=document.getElementById('overviewRefreshBtn');
+  btn.disabled=true;btn.textContent='Refreshing…';
+  try{
+    await Promise.all([loadBlogs(),loadJobs(),loadNewsletter(),loadStories(),loadPartners()]);
+    await loadApplications();
+    if(lhLoaded)await lhRefresh();
+    renderOverview();
+    showToast('Dashboard refreshed');
+  }finally{
+    btn.disabled=false;btn.textContent='Refresh';
+  }
+});
 
 document.getElementById('overviewNewBlog').addEventListener('click',()=>{setPanel('blogs');openBlogModal();});
 document.getElementById('overviewNewJob').addEventListener('click',()=>{setPanel('jobs');openJobModal();});
@@ -2787,11 +2844,6 @@ document.getElementById('partnerModal').addEventListener('click',e=>{if(e.target
 // Every write goes through the Netlify function, which re-checks the password
 // server-side and uses the service role key. bio_links has RLS with a
 // read-only public policy, so the anon key in this page cannot write to it.
-
-let lhLinks=[];
-let lhProfile=null;
-let lhEditingId=null;
-let lhLoaded=false;
 
 async function lhCall(action,payload){
   const res=await fetch('/.netlify/functions/bio-links-admin',{
