@@ -1296,7 +1296,13 @@ let adminPassword = '';
 function checkAuth(){return sessionStorage.getItem('hocan_admin')==='1';}
 function setAuth(v){if(v)sessionStorage.setItem('hocan_admin','1');else sessionStorage.removeItem('hocan_admin');}
 
-if(checkAuth()){document.getElementById('loginScreen').classList.add('hidden');document.getElementById('app').classList.add('show');init();}
+// Restoring a session used to call init() from right here, above the state
+// declarations further down. init() reaches loadNewsletter(page=newsletterPage),
+// and a `let` read before its declaration is evaluated throws a ReferenceError,
+// so Promise.all in init() rejected and the whole Overview stayed on em-dashes.
+// It only ever broke for someone already signed in — a fresh login runs later,
+// after the declarations — which is why it survived this long. The call now
+// lives at the end of the module, once everything it touches exists.
 
 document.getElementById('loginBtn').addEventListener('click',doLogin);
 document.getElementById('passwordInput').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
@@ -3320,6 +3326,14 @@ document.getElementById('lhSaveProfileBtn').addEventListener('click',async()=>{
   }
 });
 
+// ── SESSION RESTORE ───────────────────────────────────────────────────────────
+// Last thing in the module, so every declaration and handler above already
+// exists by the time init() runs.
+if(checkAuth()){
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('app').classList.add('show');
+  init();
+}
 </script>
 </body>
 </html>

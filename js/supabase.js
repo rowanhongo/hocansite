@@ -2,6 +2,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 let cachedConfig = null;
 let cachedClient = null;
+let clientPromise = null;
 const RUNTIME_CONFIG_CACHE_KEY = "hocan_runtime_config_v1";
 
 const BLOGS_TABLE_CANDIDATES = ["blog_posts", "blogs"];
@@ -57,15 +58,31 @@ async function getConfig() {
   return cachedConfig;
 }
 
+// Caches the in-flight promise, not just the finished client. init() starts
+// five loaders at once through Promise.all; awaiting getConfig() yields before
+// cachedClient is ever assigned, so each of them used to sail past a
+// `if (cachedClient)` check and build its own client. That is what produced
+// the "Multiple GoTrueClient instances detected in the same browser context"
+// warnings — several clients sharing one auth storage key.
 async function getClient() {
   if (cachedClient) return cachedClient;
-  const cfg = await getConfig();
-  if (!cfg.supabaseUrl || !cfg.supabaseAnonKey) {
-    throw new Error("Supabase is not configured. Check Netlify env vars.");
+
+  if (!clientPromise) {
+    clientPromise = (async () => {
+      const cfg = await getConfig();
+      if (!cfg.supabaseUrl || !cfg.supabaseAnonKey) {
+        throw new Error("Supabase is not configured. Check Netlify env vars.");
+      }
+      cachedClient = createClient(cfg.supabaseUrl, cfg.supabaseAnonKey);
+      return cachedClient;
+    })().catch((err) => {
+      // Do not cache a rejection: a later call should be free to retry.
+      clientPromise = null;
+      throw err;
+    });
   }
 
-  cachedClient = createClient(cfg.supabaseUrl, cfg.supabaseAnonKey);
-  return cachedClient;
+  return clientPromise;
 }
 
 const TABLE_CACHE_KEY = "hocan_resolved_tables_v1";
