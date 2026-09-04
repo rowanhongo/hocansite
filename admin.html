@@ -224,6 +224,13 @@ tr:hover td{background:#FAFBFD;}
 .app-inline-note{font-size:12px;color:var(--muted);margin-bottom:8px;}
 
 /* ── LINK HUB ─────────────────────────────────────────────────────────────── */
+/* A pasted share URL can be hundreds of characters with no spaces in it. Left
+   alone it sizes the whole grid and pushes the panel far wider than the
+   viewport — .main clips the overflow rather than scrolling, so the right-hand
+   side of the panel simply became unreachable. Every container in the chain
+   down to the URL is therefore told it may shrink. */
+#panel-linkhub{min-width:0;max-width:100%;overflow-x:hidden;}
+#panel-linkhub .section-card{min-width:0;max-width:100%;}
 /* The panel is built to be self-explanatory: a numbered how-it-works strip, a
    live phone preview beside the list, and inline hints on every field — so
    nobody has to be shown how to add a link. */
@@ -236,11 +243,11 @@ tr:hover td{background:#FAFBFD;}
 .lh-live .dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:lhPulse 1.8s ease-in-out infinite;}
 @keyframes lhPulse{0%,100%{opacity:1;}50%{opacity:.35;}}
 
-.lh-layout{display:grid;grid-template-columns:1fr 340px;gap:22px;align-items:start;}
+.lh-layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:22px;align-items:start;min-width:0;}
 
 /* Link list rows — drag handle, thumbnail, text, stats, actions. */
-.lh-list{display:flex;flex-direction:column;gap:10px;}
-.lh-row{display:flex;align-items:center;gap:13px;background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:11px 14px;transition:border-color .18s,box-shadow .18s,opacity .18s;}
+.lh-list{display:flex;flex-direction:column;gap:10px;min-width:0;}
+.lh-row{display:flex;align-items:center;gap:13px;background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:11px 14px;transition:border-color .18s,box-shadow .18s,opacity .18s;min-width:0;max-width:100%;overflow:hidden;}
 .lh-row:hover{border-color:rgba(74,179,212,.4);box-shadow:0 3px 12px rgba(0,0,0,.06);}
 .lh-row.dragging{opacity:.4;border-style:dashed;}
 .lh-row.drop-target{border-color:var(--sky);box-shadow:0 0 0 3px rgba(74,179,212,.15);}
@@ -251,14 +258,14 @@ tr:hover td{background:#FAFBFD;}
 .lh-thumb{width:44px;height:44px;border-radius:9px;object-fit:cover;background:#F0F3F6;flex-shrink:0;}
 .lh-thumb-blank{width:44px;height:44px;border-radius:9px;flex-shrink:0;background:linear-gradient(135deg,#ffd9cf,#e6f3fa);display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:#a04a39;}
 .lh-row-main{flex:1;min-width:0;}
-.lh-row-title{font-size:14px;font-weight:600;color:var(--dark);display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
-.lh-row-url{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;}
+.lh-row-title{font-size:14px;font-weight:600;color:var(--dark);display:flex;align-items:center;gap:7px;flex-wrap:wrap;min-width:0;overflow-wrap:anywhere;}
+.lh-row-url{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;max-width:100%;}
 .lh-chip{font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:rgba(74,179,212,.12);color:#1d6f8a;}
 .lh-chip.feat{background:rgba(196,122,90,.14);color:#a04a39;}
 .lh-chip.sched{background:rgba(232,168,23,.14);color:#B07D10;}
 .lh-clicks{font-size:12px;color:var(--muted);text-align:center;flex-shrink:0;min-width:52px;}
 .lh-clicks strong{display:block;font-family:'Sora',sans-serif;font-size:16px;color:var(--dark);}
-.lh-row-actions{display:flex;gap:6px;align-items:center;flex-shrink:0;}
+.lh-row-actions{display:flex;gap:6px;align-items:center;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;}
 
 /* Section header rows inside the admin list mirror the public page grouping. */
 .lh-group-label{font-size:10.5px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);padding:10px 4px 2px;}
@@ -324,7 +331,10 @@ tr:hover td{background:#FAFBFD;}
   .lh-steps{grid-template-columns:1fr;}
   .lh-layout-pick{grid-template-columns:1fr;}
   .lh-clicks{display:none;}
+  /* Actions drop to their own full-width line rather than squeezing the title. */
   .lh-row{flex-wrap:wrap;}
+  .lh-row-main{flex:1 1 100%;order:2;}
+  .lh-row-actions{flex:1 1 100%;order:3;justify-content:flex-start;margin-top:4px;}
 }
 .app-link{color:#1d6f8a;text-decoration:none;}
 .app-link:hover{text-decoration:underline;}
@@ -2940,7 +2950,10 @@ function lhRowMarkup(l,archived){
 
   const actions=archived
     ?'<button class="btn-edit" data-lh-restore="'+esc(l.id)+'">Restore</button><button class="btn-delete" data-lh-purge="'+esc(l.id)+'">Delete forever</button>'
-    :'<button class="btn-edit" data-lh-toggle="'+esc(l.id)+'">'+(l.active?'Hide':'Show')+'</button><button class="btn-edit" data-lh-edit="'+esc(l.id)+'">Edit</button><button class="btn-delete" data-lh-archive="'+esc(l.id)+'">Remove</button>';
+    :'<button class="btn-edit" data-lh-toggle="'+esc(l.id)+'">'+(l.active?'Hide':'Show')+'</button>'
+      +'<button class="btn-edit" data-lh-edit="'+esc(l.id)+'">Edit</button>'
+      +'<button class="btn-edit" data-lh-archive="'+esc(l.id)+'" title="Hide it from the page but keep it, so you can put it back later">Remove</button>'
+      +'<button class="btn-delete" data-lh-delete="'+esc(l.id)+'" title="Delete permanently">Delete</button>';
 
   return '<div class="lh-row'+(l.active&&!archived?'':' is-off')+'" data-lh-id="'+esc(l.id)+'" '+(archived?'':'draggable="true"')+'>'
     +(archived?'':'<span class="lh-handle" title="Drag to reorder">⠿</span>')
@@ -3249,6 +3262,27 @@ document.getElementById('panel-linkhub').addEventListener('click',async e=>{
       await lhRefresh();
       showToast('Link removed — you can restore it below');
     }catch(err){showToast(err.message,'error');}
+    return;
+  }
+
+  // Deleting straight from the list is for a link that was added by mistake —
+  // typically a mistyped URL — so the prompt shows the address, not just the
+  // title. Two links can easily share a title; the URL is what tells them apart.
+  const deleteBtn=e.target.closest('[data-lh-delete]');
+  if(deleteBtn){
+    const link=lhLinks.find(l=>l.id===deleteBtn.dataset.lhDelete);
+    if(!link)return;
+    const msg='Permanently delete this link?\n\n'
+      +link.title+'\n'+link.url+'\n\n'
+      +'It disappears from links.hocanholdings.co.ke straight away and cannot be undone.\n'
+      +'To take it off the page but keep it, press Cancel and use Remove instead.';
+    if(!confirm(msg))return;
+    deleteBtn.disabled=true;
+    try{
+      await lhCall('purge',{id:link.id});
+      await lhRefresh();
+      showToast('Link deleted permanently');
+    }catch(err){showToast(err.message,'error');deleteBtn.disabled=false;}
     return;
   }
 
