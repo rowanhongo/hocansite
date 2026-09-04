@@ -244,6 +244,10 @@ tr:hover td{background:#FAFBFD;}
 @keyframes lhPulse{0%,100%{opacity:1;}50%{opacity:.35;}}
 
 .lh-layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:22px;align-items:start;min-width:0;}
+/* The grid item wrapping the left column is itself a flex/block box whose
+   min-width defaults to auto, same hazard as the track it sits in — this is
+   what was still forcing 861px on a 390px phone after the track fix alone. */
+.lh-col-main{min-width:0;max-width:100%;}
 
 /* Link list rows — drag handle, thumbnail, text, stats, actions. */
 .lh-list{display:flex;flex-direction:column;gap:10px;min-width:0;}
@@ -736,7 +740,7 @@ tr:hover td{background:#FAFBFD;}
       </div>
 
       <div class="lh-layout">
-        <div>
+        <div class="lh-col-main">
           <div class="section-card">
             <div class="section-header">
               <h3>Your Links</h3>
