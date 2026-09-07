@@ -435,9 +435,9 @@
 
     .hero-image img {
       width: 100%;
-      /* The office photo is 4:3; without a fixed ratio it renders taller than
-         the 3:2 image it replaced and outgrows the text column beside it. */
-      aspect-ratio: 3 / 2;
+      /* Matches the actual home-secondary.jpg dimensions (1150x647) so the
+         image never stretches or crops unexpectedly. */
+      aspect-ratio: 1150 / 647;
       max-height: 420px;
       border-radius: 20px;
       object-fit: cover;
@@ -967,9 +967,10 @@
         text-align: center;
       }
 
-      /* Restore image to full natural size on mobile */
+      /* Keep the image's natural ratio on mobile instead of the desktop
+         3:2 crop, which stretched this wider photo out of shape. */
       .hero-image img {
-        aspect-ratio: auto;
+        aspect-ratio: 1150 / 647;
         max-height: none;
       }
     }
