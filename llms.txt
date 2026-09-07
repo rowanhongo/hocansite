@@ -4,7 +4,7 @@
 
 ## Company Overview
 
-Hocan Holdings is a comprehensive logistics and consulting provider dedicated to business success across Kenya and East Africa. Since 2015, Hocan Holdings has supported companies across the region with logistics and consulting solutions designed for scale. The company has a particular speciality in the hospitality and services industry.
+Hocan Holdings is a comprehensive HR consulting and logistics provider dedicated to business success across Kenya and East Africa. Since 2015, Hocan Holdings has supported companies across the region with HR, logistics, and consulting solutions designed for scale. The company serves organizations across every major industry — corporate, healthcare, hospitality, and more.
 
 - Website: https://hocanholdings.co.ke
 - Phone: +254 791 235 830
@@ -14,7 +14,7 @@ Hocan Holdings is a comprehensive logistics and consulting provider dedicated to
 
 ## Mission
 
-Providing service excellence at competitive pricing for best value. A one stop service provider to both local and international markets, with a niche in Hospitality and Gaming industries.
+Providing service excellence at competitive pricing for best value. A one stop service provider to both local and international markets, serving corporate, healthcare, hospitality, and other major industries.
 
 ## Vision
 
@@ -30,7 +30,7 @@ To be the regional premier provider of choice.
 ## Services
 
 ### Hocan HR Consulting
-HR consulting and workforce solutions for organizations across East Africa, with deep expertise in the hospitality and services industry.
+HR consulting and workforce solutions for organizations across every major industry in East Africa — corporate, healthcare, hospitality, and more.
 - Talent Acquisition & Recruitment: End-to-end hiring solutions tailored to your business
 - Corporate Training & Professional Development: Expert-led programs to upskill your workforce
 - Labour Outsourcing & Workforce Solutions: Flexible staffing and managed workforce services
@@ -57,9 +57,10 @@ Consultancy services and strategic support across multiple domains.
 
 ## Industries Served
 
-- Hospitality (primary speciality — hotels, restaurants, resorts, catering, events)
-- Services industry (facility management, cleaning, security, customer-facing operations)
 - Corporate / Enterprise
+- Healthcare (hospitals, clinics, and health service providers)
+- Hospitality (hotels, restaurants, resorts, catering, events)
+- Services industry (facility management, cleaning, security, customer-facing operations)
 - Startups
 - Government and NGOs
 
