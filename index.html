@@ -1336,29 +1336,6 @@
       } catch (_e) { return { url: '', key: '' }; }
     }
 
-    // Merge DB partners with the bundled scroll*.png logos rather than letting
-    // either side replace the other. Adding a single partner in the admin used
-    // to blank out every local logo; now both sets show until the local files
-    // have been migrated into Cloudinary/Supabase, at which point the dedupe
-    // below keeps them from appearing twice.
-    function dedupeLogos(logos) {
-      var seenSrc = {};
-      var seenName = {};
-      return logos.filter(function(logo) {
-        if (!logo || !logo.src) return false;
-        var src = String(logo.src).split('?')[0];
-        // The admin's "Import built-in logos" action copies scroll*.png into
-        // Cloudinary under the same "Partner N" label the local probe uses, so
-        // matching on the label is what actually collapses the duplicate pair —
-        // the Cloudinary URL no longer resembles the original filename.
-        var name = String(logo.alt || '').trim().toLowerCase();
-        if (seenSrc[src] || (name && seenName[name])) return false;
-        seenSrc[src] = true;
-        if (name) seenName[name] = true;
-        return true;
-      });
-    }
-
     // The Supabase library is deferred, so it may not have executed yet.
     function whenSupabaseReady() {
       if (window.supabase) return Promise.resolve(true);
@@ -1373,30 +1350,35 @@
     }
 
     async function initPartners() {
-      // Paint the bundled logos immediately so the carousel is never empty
-      // while the network round-trip is in flight.
-      var localLogos = await loadLogosFromLocal();
-      renderLogos(localLogos);
-
+      // The database is the source of truth now that the built-in logos have
+      // been imported into it. Wait for it rather than painting the bundled
+      // fallback first and repainting a moment later — that produced a visible
+      // flash (wrong set of logos, then the right one) on every load.
       var dbLogos = [];
       try {
         var ready = await whenSupabaseReady();
-        if (!ready) return;
-        var cfg = await getSupabaseConfig();
-        if (!cfg.url || !cfg.key) throw new Error('no config');
-        var sb = window.supabase.createClient(cfg.url, cfg.key);
-        var res = await sb.from('partners')
-          .select('logo_url,name,display_order')
-          .eq('active', true)
-          .order('display_order', { ascending: true });
-        if (!res.error && res.data && res.data.length) {
-          dbLogos = res.data.map(function(p) { return { src: p.logo_url, alt: p.name || 'Partner' }; });
+        if (ready) {
+          var cfg = await getSupabaseConfig();
+          if (cfg.url && cfg.key) {
+            var sb = window.supabase.createClient(cfg.url, cfg.key);
+            var res = await sb.from('partners')
+              .select('logo_url,name,display_order')
+              .eq('active', true)
+              .order('display_order', { ascending: true });
+            if (!res.error && res.data && res.data.length) {
+              dbLogos = res.data.map(function(p) { return { src: p.logo_url, alt: p.name || 'Partner' }; });
+            }
+          }
         }
       } catch (_e) {}
 
-      // Only repaint if the database actually added something.
-      if (!dbLogos.length) return;
-      renderLogos(dedupeLogos(dbLogos.concat(localLogos)));
+      // Only fall back to the bundled local logos if the database is
+      // unreachable or genuinely empty, so the carousel is never blank.
+      if (dbLogos.length) {
+        renderLogos(dbLogos);
+      } else {
+        renderLogos(await loadLogosFromLocal());
+      }
     }
 
     function renderLogos(logos) {
