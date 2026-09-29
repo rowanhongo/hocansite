@@ -62,8 +62,14 @@ async function request(pathAndQuery, options = {}) {
 
   if (!res.ok) {
     const text = await res.text().catch(() => "");
+    // Include what Postgres actually said. The message used to carry only the
+    // table and status, which made a 400 from a malformed filter completely
+    // opaque — the one detail needed to fix it was the one detail thrown away.
+    // Trimmed, because a PostgREST error can carry a long hint.
+    const detail = String(text || "").replace(/\s+/g, " ").trim().slice(0, 300);
     throw new RestError(
-      `Supabase ${options.method || "GET"} ${pathAndQuery.split("?")[0]} failed (${res.status})`,
+      `Supabase ${options.method || "GET"} ${pathAndQuery.split("?")[0]} failed (${res.status})` +
+        (detail ? `: ${detail}` : ""),
       res.status,
       text
     );

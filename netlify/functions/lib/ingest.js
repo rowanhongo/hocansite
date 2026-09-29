@@ -320,12 +320,20 @@ async function checkJobLinks(settings, limit = 400) {
   const cutoff = new Date(Date.now() - maxAge * rules.MS_PER_DAY).toISOString();
   const staleBefore = new Date(Date.now() - recheckDays * rules.MS_PER_DAY).toISOString();
 
+  /* Two independent OR groups: "recent or undated" AND "never checked or stale".
+
+     They have to be nested inside a single `and=(...)`, because PostgREST keeps
+     only one `or=` parameter per level — passing two silently drops one of them,
+     which here would have meant re-checking every link on every run or checking
+     none of the undated ones. */
+  const recentOrUndated = `or(posted_at.gte.${cutoff},posted_at.is.null)`;
+  const uncheckedOrStale = `or(link_checked_at.is.null,link_checked_at.lt.${staleBefore})`;
+
   const candidates = await db.select(
     "scraped_jobs?select=id,canonical_url,raw_url,link_checked_at" +
       "&excluded_reason=is.null" +
       "&featured_in_list_id=is.null" +
-      `&or=(posted_at.gte.${cutoff},posted_at.is.null)` +
-      `&or=(link_checked_at.is.null,link_checked_at.lt.${staleBefore})` +
+      `&and=(${recentOrUndated},${uncheckedOrStale})` +
       "&order=posted_at.desc.nullslast,first_seen.desc" +
       `&limit=${limit}`
   );
