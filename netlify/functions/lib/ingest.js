@@ -570,7 +570,9 @@ async function runBorderlineFlagging(settings, state) {
 
   let flagged = 0;
   let quota = false;
-  const batchSize = 40;
+  // Four short fields per job, so a large batch costs little and saves calls,
+  // which are the scarce resource on the free tier.
+  const batchSize = 120;
 
   for (let i = 0; i < jobs.length; i += batchSize) {
     const batch = jobs.slice(i, i + batchSize).map((j) => ({
@@ -615,7 +617,12 @@ async function runCompanyReview(settings, state, limit = 120) {
   let reviewed = 0;
   let quota = false;
   let quotaMessage = "Gemini quota reached. Resume the review to finish.";
-  const batchSize = 20;
+  /* Deliberately large. A real free-tier project turned out to allow only 20
+     requests per DAY for this model, so the binding constraint is the number of
+     calls, not the size of each one. Each company contributes just its name,
+     location and a list of role titles with counts, so sixty of them is still a
+     modest prompt — and it is one request instead of three. */
+  const batchSize = 60;
   const reviewedIds = new Set();
 
   for (let i = 0; i < companies.length; i += batchSize) {
@@ -766,7 +773,7 @@ async function selectListCandidates(settings, state) {
 
     if (relevantFeatured.length) {
       const suppress = new Set();
-      const batchSize = 30;
+      const batchSize = 100;
       for (let i = 0; i < eligible.length; i += batchSize) {
         const batch = eligible.slice(i, i + batchSize);
         const result = await gemini.matchReposts(
@@ -878,7 +885,7 @@ async function summarizeForList(candidates, state) {
 
   let summarized = 0;
   let quota = false;
-  const batchSize = 30;
+  const batchSize = 100;
 
   for (let i = 0; i < needed.length; i += batchSize) {
     const batch = needed.slice(i, i + batchSize);
@@ -948,17 +955,22 @@ async function ingestDataset({ datasetId, runId, scrapedAt, publish = true, repo
     }
   };
 
-  const flagResult = await tryAi("flagging", () => runBorderlineFlagging(settings, state), { flagged: 0, quota: false });
-  const reviewResult = await tryAi("review", () => runCompanyReview(settings, state), { reviewed: 0, pending: 0, quota: false });
-
+  /* Order matters, because the daily allowance is small and the passes are not
+     equally valuable. The list goes out to job seekers, so it is built first and
+     its reposts checked first; company fit scores come next; the optional
+     one-line summaries and the borderline-agency flagging come last, since a
+     list is perfectly usable without either. Whatever the quota runs out on,
+     it runs out on the least important thing. */
   let list = null;
   let listStats = { candidates: 0, dropped_featured: 0, dropped_ai_repost: 0, flagged: 0 };
   let summaryResult = { summarized: 0, quota: false };
 
   if (publish) {
-    // The repost check inside this is AI-assisted, but the deterministic
-    // fallback-key match still runs, so a failure here costs fuzzy matching, not
-    // the whole list.
+    /* The AI repost check lives inside this, but the deterministic fallback-key
+       match does too — and that one catches the ordinary repost. So a failure
+       here must still yield a list. selectListCandidates already swallows its
+       own Gemini errors, and this second net covers anything else: without it a
+       thrown error skipped publishList entirely and the week produced nothing. */
     const selection = await tryAi(
       "list selection",
       () => selectListCandidates(settings, state),
@@ -967,9 +979,14 @@ async function ingestDataset({ datasetId, runId, scrapedAt, publish = true, repo
     listStats = { ...selection.stats, dead_links: linkResult.dead };
     if (selection.items.length) {
       summaryResult = await tryAi("summaries", () => summarizeForList(selection.items, state), { summarized: 0, quota: false });
+      // Publishes whether or not the summaries landed: a row without a one-line
+      // description is still a job someone can apply for.
       list = await publishList(selection.items, listStats, settings, null);
     }
   }
+
+  const reviewResult = await tryAi("review", () => runCompanyReview(settings, state), { reviewed: 0, pending: 0, quota: false });
+  const flagResult = await tryAi("flagging", () => runBorderlineFlagging(settings, state), { flagged: 0, quota: false });
 
   const aiQuotaHit = Boolean(flagResult.quota || reviewResult.quota || summaryResult.quota);
 

@@ -19,9 +19,17 @@
 const MODEL = (process.env.GEMINI_MODEL || "gemini-3.8-flash").trim();
 const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`;
 
-// Netlify background functions get 15 minutes, but we stay well inside it: the
-// ingest path also has link checks and database writes to do.
-const MAX_CALLS_PER_INVOCATION = 40;
+/* Total Gemini calls one invocation may make, overridable via GEMINI_MAX_CALLS.
+
+   Set from what a real project actually allows, not from what the docs imply: a
+   live free-tier key turned out to permit 20 requests per DAY for this model.
+   A budget of 40 per run could therefore burn two days' allowance in a single
+   sync and leave nothing for the weekly scrape. 12 leaves headroom for a manual
+   sync and a resume on the same day; raise it if the key is on a paid tier.
+
+   Retries count against this too, deliberately — a retry consumes quota exactly
+   as a first attempt does. */
+const MAX_CALLS_PER_INVOCATION = Math.max(1, Number(process.env.GEMINI_MAX_CALLS) || 12);
 const REQUEST_TIMEOUT_MS = 30000;
 // ~6s between calls. Free-tier limits are not published as a fixed number any
 // more (they are per-project, visible in AI Studio), so this stays deliberately
@@ -103,8 +111,15 @@ async function callGemini(prompt, responseSchema, state) {
   if (!key) throw new Error("Gemini API key is not configured.");
 
   if (state) {
+    // Once the daily allowance is gone, every further call is refused anyway.
+    // Failing fast keeps a run from spending minutes re-learning that.
+    if (state.dailyQuotaHit) {
+      throw new QuotaExhausted(state.quotaMessage || "Gemini daily quota is exhausted.");
+    }
     if (state.calls >= MAX_CALLS_PER_INVOCATION) {
-      throw new QuotaExhausted("Reached this run's Gemini call budget.");
+      throw new QuotaExhausted(
+        `Reached this run's Gemini call budget (${MAX_CALLS_PER_INVOCATION}). Raise GEMINI_MAX_CALLS if the key allows more.`
+      );
     }
     // Space the calls out to respect requests-per-minute.
     const since = Date.now() - (state.lastCallAt || 0);
@@ -175,7 +190,13 @@ async function callGemini(prompt, responseSchema, state) {
          MAX_429_RETRIES rather than by the attempt counter, so a short burst is
          waited out while a genuine cap still ends the run promptly. */
       const perDay = /per\s*day|daily|quota_limit_value|GenerateRequestsPerDay|exhausted your current quota/i.test(text);
-      if (perDay) throw new QuotaExhausted(`Gemini daily quota reached. ${summarizeQuotaError(text)}`);
+      if (perDay) {
+        const message = `Gemini daily quota reached. ${summarizeQuotaError(text)}`;
+        // Remember it, so the passes that follow stop instead of re-discovering
+        // the same wall one call at a time.
+        if (state) { state.dailyQuotaHit = true; state.quotaMessage = message; }
+        throw new QuotaExhausted(message);
+      }
       if (rateLimitRetries >= MAX_429_RETRIES) {
         throw new QuotaExhausted(`Gemini rate limit did not clear after ${MAX_429_RETRIES} retries. ${summarizeQuotaError(text)}`);
       }
@@ -501,8 +522,14 @@ Return {"summaries": [...]} with one entry per job, job_id copied exactly.`;
   }
 }
 
+/* Shared across every AI pass in one ingest.
+
+   `dailyQuotaHit` is the important field: once Google says the daily allowance
+   is gone, the remaining passes must not keep calling. Each wasted call costs
+   nothing but time here, but on a 20-per-day key it would also mean the next
+   legitimate attempt is refused. */
 function newState() {
-  return { calls: 0, lastCallAt: 0 };
+  return { calls: 0, lastCallAt: 0, dailyQuotaHit: false, quotaMessage: null };
 }
 
 module.exports = {
