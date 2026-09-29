@@ -217,6 +217,105 @@ tr:hover td{background:#FAFBFD;}
 .btn-save:disabled{opacity:.5;cursor:not-allowed;}
 
 /* TOAST */
+/* ── Leads & Jobs Feed ────────────────────────────────────────────────────── */
+.bd-help{font-size:13px;color:var(--muted);line-height:1.65;margin:0 0 16px;max-width:76ch;}
+.bd-filters{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px;}
+.bd-filters input[type=text]{flex:1 1 220px;min-width:180px;padding:9px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--text);}
+.bd-filters input[type=text]:focus{border-color:var(--sky);outline:none;}
+.bd-filters select{padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;background:#fff;color:var(--text);cursor:pointer;}
+.bd-filters select:focus{border-color:var(--sky);outline:none;}
+.bd-check{display:inline-flex;align-items:center;gap:7px;font-size:13px;color:var(--muted);cursor:pointer;white-space:nowrap;}
+.bd-pager{margin-top:14px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;}
+.bd-pager span{font-size:13px;color:var(--muted);}
+.bd-pager button:disabled{opacity:.45;cursor:not-allowed;}
+
+/* Score pill. Colour is a band, not a gradient, so two leads that rank
+   differently never look identical at a glance. */
+.bd-score{display:inline-flex;align-items:center;justify-content:center;min-width:46px;padding:5px 10px;border-radius:8px;font-size:13px;font-weight:700;font-variant-numeric:tabular-nums;}
+.bd-score.hot{background:rgba(229,62,62,.12);color:#C53030;}
+.bd-score.warm{background:rgba(232,168,23,.16);color:#B07D10;}
+.bd-score.mild{background:rgba(74,179,212,.14);color:#1d6f8a;}
+.bd-score.cold{background:var(--bg);color:var(--muted);}
+
+.bd-fit{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;font-variant-numeric:tabular-nums;}
+.bd-fit .num{min-width:22px;}
+.bd-unknown{color:var(--muted);font-size:12.5px;font-style:italic;}
+
+/* Role chips: distinct titles with their counts, so "6 drivers" reads as bulk
+   hiring rather than six separate rows. */
+.bd-roles{display:flex;flex-wrap:wrap;gap:5px;max-width:280px;}
+.bd-role{display:inline-flex;align-items:center;gap:5px;background:var(--bg);border-radius:6px;padding:3px 8px;font-size:11.5px;color:var(--text);}
+.bd-role b{background:var(--dark);color:#fff;border-radius:4px;padding:0 5px;font-size:10.5px;font-weight:700;}
+
+.bd-status{padding:6px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-family:'DM Sans',sans-serif;background:#fff;cursor:pointer;color:var(--text);}
+.bd-status:focus{border-color:var(--sky);outline:none;}
+.bd-status[data-value=new]{border-color:rgba(232,168,23,.4);}
+.bd-status[data-value=contacted]{border-color:rgba(74,179,212,.45);}
+.bd-status[data-value=replied]{border-color:rgba(74,179,212,.6);}
+.bd-status[data-value=won]{border-color:rgba(93,186,126,.55);background:rgba(93,186,126,.06);}
+.bd-status[data-value=rejected]{border-color:rgba(229,62,62,.3);color:var(--muted);}
+
+.bd-banner{background:rgba(232,168,23,.1);border:1px solid rgba(232,168,23,.35);border-left:4px solid var(--amber);border-radius:10px;padding:14px 18px;font-size:13.5px;line-height:1.6;color:#8A5F0A;margin-bottom:22px;}
+.bd-warn{background:rgba(232,168,23,.1);border-left:4px solid var(--amber);border-radius:8px;padding:12px 16px;font-size:13px;line-height:1.6;color:#8A5F0A;margin-top:14px;}
+.bd-setup{background:rgba(229,62,62,.07);border:1px solid rgba(229,62,62,.25);border-left:4px solid #E53E3E;border-radius:10px;padding:16px 20px;font-size:13.5px;line-height:1.7;color:#9B2C2C;margin-bottom:22px;}
+.bd-setup code{background:rgba(0,0,0,.06);padding:2px 6px;border-radius:4px;font-size:12.5px;}
+
+.bd-run-info{font-size:13px;color:var(--text);line-height:1.8;}
+.bd-run-info .bd-kv{display:inline-block;margin-right:20px;}
+.bd-run-info .bd-kv span{color:var(--muted);}
+.bd-run-info b{font-variant-numeric:tabular-nums;}
+
+.bd-advanced summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:10px;margin:-2px 0 0;}
+.bd-advanced summary::-webkit-details-marker{display:none;}
+.bd-advanced summary::before{content:'▸';color:var(--muted);font-size:13px;transition:.2s;}
+.bd-advanced[open] summary::before{transform:rotate(90deg);}
+.bd-advanced summary h3{font-size:15px;font-weight:700;color:var(--text);}
+.bd-advanced[open] summary{margin-bottom:16px;}
+
+/* One card per signal: the weight input sits next to the explanation of what it
+   does, so a number is never adjusted blind. */
+.bd-weights{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:14px;}
+.bd-weight{background:var(--bg);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;}
+.bd-weight-head{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.bd-weight-head label{font-size:13px;font-weight:700;color:var(--text);}
+.bd-weight-head input{width:68px;padding:6px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;font-weight:700;text-align:center;font-family:'DM Sans',sans-serif;background:#fff;color:var(--text);font-variant-numeric:tabular-nums;}
+.bd-weight-head input:focus{border-color:var(--sky);outline:none;}
+.bd-weight .why{font-size:12px;color:var(--muted);line-height:1.55;}
+.bd-weight .measure{font-size:11px;color:var(--muted);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:#fff;border-radius:5px;padding:5px 8px;line-height:1.45;word-break:break-word;}
+
+.bd-preview{margin-top:16px;background:var(--bg);border-radius:10px;padding:16px 18px;font-size:13px;line-height:1.7;}
+.bd-preview h4{font-size:13px;font-weight:700;margin-bottom:10px;color:var(--text);}
+.bd-preview table{width:100%;border-collapse:collapse;}
+.bd-preview th{padding:6px 10px;font-size:10.5px;}
+.bd-preview td{padding:6px 10px;font-size:12.5px;border-bottom:1px solid var(--border);}
+.bd-preview .up{color:#2E7D52;font-weight:700;}
+.bd-preview .down{color:#C53030;font-weight:700;}
+.bd-preview .same{color:var(--muted);}
+
+/* Expanded company row: the postings behind the score. */
+.bd-detail-row td{background:var(--bg);padding:16px 18px;}
+.bd-detail h5{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:10px;}
+.bd-detail table{width:100%;border-collapse:collapse;background:#fff;border-radius:8px;overflow:hidden;}
+.bd-detail td{padding:7px 12px;font-size:12.5px;border-bottom:1px solid var(--border);background:#fff;}
+.bd-detail .bd-notes{margin-top:16px;display:flex;flex-direction:column;gap:8px;}
+.bd-detail .bd-notes label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);}
+.bd-detail .bd-notes textarea{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;resize:vertical;color:var(--text);}
+.bd-detail .bd-notes textarea:focus{border-color:var(--sky);outline:none;}
+.bd-breakdown{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;}
+.bd-breakdown .part{background:#fff;border-radius:6px;padding:4px 9px;font-size:11px;color:var(--muted);}
+.bd-breakdown .part b{color:var(--text);font-variant-numeric:tabular-nums;}
+
+.bd-approx{color:var(--muted);font-size:11px;}
+.bd-link-ok{color:#2E7D52;font-size:11.5px;font-weight:700;}
+.bd-link-dead{color:#C53030;font-size:11.5px;font-weight:700;}
+.bd-link-unknown{color:var(--muted);font-size:11.5px;}
+
+@media(max-width:860px){
+  .bd-weights{grid-template-columns:1fr;}
+  .bd-roles{max-width:none;}
+  .bd-filters input[type=text],.bd-filters select{flex:1 1 100%;}
+  .bd-check{flex:1 1 100%;}
+}
 .toast{position:fixed;bottom:28px;right:28px;background:var(--dark);color:#fff;padding:12px 20px;border-radius:14px;font-size:14px;font-weight:500;box-shadow:0 8px 30px rgba(0,0,0,.2);z-index:2000;transform:translateY(20px);opacity:0;transition:.3s;pointer-events:none;}
 .toast.show{transform:translateY(0);opacity:1;}
 .toast.success{border-left:4px solid var(--green);}
@@ -517,6 +616,8 @@ tr:hover td{background:#FAFBFD;}
       <div class="nav-item" data-panel="partners"><span class="icon">🤝</span> Partners</div>
       <div class="nav-item" data-panel="newsletter"><span class="icon">📧</span> Newsletter</div>
       <div class="nav-item" data-panel="linkhub"><span class="icon">🔗</span> Link Hub</div>
+      <div class="nav-item" data-panel="leads"><span class="icon">🎯</span> Leads</div>
+      <div class="nav-item" data-panel="jobsfeed"><span class="icon">📡</span> Jobs Feed</div>
     </nav>
     <div class="sidebar-footer">
       <button class="btn-logout" id="logoutBtn">Sign Out</button>
@@ -817,6 +918,217 @@ tr:hover td{background:#FAFBFD;}
         </div>
       </div>
     </div>
+    <!-- LEADS -->
+    <div class="panel" id="panel-leads">
+      <div class="bd-setup" id="leadsSetupNote" style="display:none;"></div>
+
+      <div class="stats-row" style="grid-template-columns:repeat(4,1fr);">
+        <div class="stat-card blue"><div class="stat-label">Live Leads</div><div class="stat-val" id="statLeadsTotal">–</div></div>
+        <div class="stat-card amber"><div class="stat-label">New / Uncontacted</div><div class="stat-val" id="statLeadsNew">–</div></div>
+        <div class="stat-card green"><div class="stat-label">In Pipeline</div><div class="stat-val" id="statLeadsContacted">–</div></div>
+        <div class="stat-card rose"><div class="stat-label">Awaiting AI Review</div><div class="stat-val" id="statLeadsAiPending">–</div></div>
+      </div>
+
+      <div class="bd-banner" id="leadsAiBanner" style="display:none;"></div>
+
+      <div class="section-card">
+        <div class="section-header">
+          <h3>Hiring Companies</h3>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+            <button class="btn-secondary" id="leadsResumeAiBtn" style="display:none;">Resume AI Review</button>
+            <button class="btn-secondary" id="leadsRescoreBtn">Recompute Ranks</button>
+            <button class="btn-secondary" id="leadsRefreshBtn">Refresh</button>
+          </div>
+        </div>
+
+        <div class="bd-filters">
+          <input type="text" id="leadsSearch" placeholder="Search company name…">
+          <select id="leadsStatus">
+            <option value="all">All statuses</option>
+            <option value="new">New</option>
+            <option value="contacted">Contacted</option>
+            <option value="replied">Replied</option>
+            <option value="won">Won</option>
+            <option value="rejected">Rejected</option>
+          </select>
+          <select id="leadsSort">
+            <option value="urgency">Urgency (highest first)</option>
+            <option value="fit">AI fit score</option>
+            <option value="recent">Most recent posting</option>
+            <option value="openings">Most openings</option>
+            <option value="company">Company A–Z</option>
+          </select>
+          <select id="leadsMinFit">
+            <option value="0">Any fit score</option>
+            <option value="6">Fit 6+</option>
+            <option value="8">Fit 8+</option>
+          </select>
+          <label class="bd-check"><input type="checkbox" id="leadsShowExcluded"> Show rejected/excluded</label>
+        </div>
+
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Company</th><th>Roles Hiring</th><th>Location</th><th>Recency</th>
+                <th>Industry</th><th>Urgency</th><th>AI Fit</th><th>Status</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="leadsTable"></tbody>
+          </table>
+        </div>
+
+        <div class="bd-pager">
+          <span id="leadsRange">Showing 0–0</span>
+          <div style="display:flex;gap:8px;">
+            <button class="btn-edit" id="leadsPrevBtn">Previous</button>
+            <button class="btn-edit" id="leadsNextBtn">Next</button>
+          </div>
+        </div>
+      </div>
+
+      <details class="section-card bd-advanced" id="leadsWeightsCard">
+        <summary><h3 style="display:inline;">Urgency Formula &amp; Weights</h3></summary>
+        <p class="bd-help">
+          Urgency is worked out by a script, not by the AI — models miscount, and a rank has to
+          mean the same thing every week. Each signal below produces a value between 0 and 1,
+          gets multiplied by its weight, and the results are added up and scaled to 0–100.
+          Every count is taken over de-duplicated jobs, so the same posting seen on five job
+          boards counts once and cannot inflate a rank.
+        </p>
+        <div id="leadsWeightsGrid" class="bd-weights"></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;">
+          <button class="btn-secondary" id="leadsPreviewWeightsBtn">Preview Effect</button>
+          <button class="btn-save" id="leadsSaveWeightsBtn" style="width:max-content;">Save Weights &amp; Rescore</button>
+          <button class="btn-edit" id="leadsResetWeightsBtn">Reset to Defaults</button>
+        </div>
+        <div id="leadsWeightsPreview" class="bd-preview" style="display:none;"></div>
+      </details>
+
+      <details class="section-card bd-advanced">
+        <summary><h3 style="display:inline;">Exclusions &amp; AI Brief</h3></summary>
+        <p class="bd-help">
+          Agencies, confidential postings and non-Kenya jobs are excluded by keyword rules first,
+          so every exclusion is explainable. The AI only gets a second look, and it flags borderline
+          cases for you rather than dropping them quietly. Add a company here if the rules got it wrong.
+        </p>
+        <div class="form-grid">
+          <div class="form-group form-full">
+            <label>Extra recruitment agencies to exclude</label>
+            <textarea id="leadsAgencyList" rows="3" placeholder="One company per line"></textarea>
+            <span class="hint">Matched loosely, so &quot;Acme&quot; also catches &quot;Acme Kenya Ltd&quot;.</span>
+          </div>
+          <div class="form-group form-full">
+            <label>Competitors to exclude</label>
+            <textarea id="leadsCompetitorList" rows="3" placeholder="One company per line"></textarea>
+          </div>
+          <div class="form-group form-full">
+            <label>What we sell (used by the AI to judge fit)</label>
+            <textarea id="leadsServices" rows="6"></textarea>
+            <span class="hint">The AI is told to use only this and the scraped text, to answer &quot;unknown&quot; rather than guess, and never to invent contacts.</span>
+          </div>
+          <div class="form-group">
+            <label>Max job age for lists (days)</label>
+            <input type="number" id="leadsMaxAge" min="1" max="90">
+          </div>
+          <div class="form-group">
+            <label>Re-check apply links after (days)</label>
+            <input type="number" id="leadsRecheck" min="1" max="60">
+          </div>
+          <div class="form-group form-full">
+            <button class="btn-save" id="leadsSaveSettingsBtn" style="width:max-content;">Save Settings</button>
+          </div>
+        </div>
+      </details>
+    </div>
+
+    <!-- JOBS FEED -->
+    <div class="panel" id="panel-jobsfeed">
+      <div class="bd-setup" id="feedSetupNote" style="display:none;"></div>
+
+      <div class="stats-row" style="grid-template-columns:repeat(4,1fr);">
+        <div class="stat-card blue"><div class="stat-label">Jobs Scraped</div><div class="stat-val" id="statFeedTotal">–</div></div>
+        <div class="stat-card green"><div class="stat-label">Ready for a List</div><div class="stat-val" id="statFeedEligible">–</div></div>
+        <div class="stat-card amber"><div class="stat-label">Flagged for Review</div><div class="stat-val" id="statFeedFlagged">–</div></div>
+        <div class="stat-card rose"><div class="stat-label">Dead Apply Links</div><div class="stat-val" id="statFeedDead">–</div></div>
+      </div>
+
+      <div class="section-card">
+        <div class="section-header">
+          <h3>Ingestion</h3>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn-secondary" id="feedRecheckBtn">Re-check Links</button>
+            <button class="btn-new" id="feedSyncBtn">Sync Latest Apify Run</button>
+          </div>
+        </div>
+        <div id="feedRunInfo" class="bd-run-info">Loading…</div>
+        <div id="feedUnmapped" class="bd-warn" style="display:none;"></div>
+      </div>
+
+      <div class="section-card">
+        <div class="section-header">
+          <h3>Weekly Job-Seeker Lists</h3>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn-secondary" id="feedPreviewListBtn">Preview Next List</button>
+            <button class="btn-new" id="feedPublishBtn">Publish List Now</button>
+          </div>
+        </div>
+        <p class="bd-help">
+          A list is published automatically after each weekly scrape. Once a job goes out it is
+          never featured again — including if it is reposted at a new address, which is matched on
+          company, title and location and then double-checked by the AI for reworded titles.
+          Four weeks are kept, so older PDFs drop off as new ones arrive.
+        </p>
+        <div id="feedListPreview" class="bd-preview" style="display:none;"></div>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>Week Of</th><th>Title</th><th>Jobs</th><th>Held Back</th><th>Published</th><th>Actions</th></tr></thead>
+            <tbody id="feedListsTable"></tbody>
+          </table>
+        </div>
+        <div class="bd-pager">
+          <span id="feedListsRange">Showing 0–0</span>
+          <div style="display:flex;gap:8px;">
+            <button class="btn-edit" id="feedListsPrevBtn">Previous</button>
+            <button class="btn-edit" id="feedListsNextBtn">Next</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <div class="section-header">
+          <h3>Scraped Jobs</h3>
+          <button class="btn-secondary" id="feedRefreshBtn">Refresh</button>
+        </div>
+        <div class="bd-filters">
+          <input type="text" id="feedSearch" placeholder="Search title or company…">
+          <select id="feedView">
+            <option value="eligible">Ready for a list</option>
+            <option value="all">All jobs</option>
+            <option value="featured">Already featured</option>
+            <option value="flagged">Flagged by AI</option>
+            <option value="excluded">Excluded</option>
+            <option value="dead">Dead links</option>
+          </select>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr><th>Title</th><th>Company</th><th>Location</th><th>Posted</th><th>Source</th><th>Link</th><th>Status</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="feedJobsTable"></tbody>
+          </table>
+        </div>
+        <div class="bd-pager">
+          <span id="feedJobsRange">Showing 0–0</span>
+          <div style="display:flex;gap:8px;">
+            <button class="btn-edit" id="feedJobsPrevBtn">Previous</button>
+            <button class="btn-edit" id="feedJobsNextBtn">Next</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </main>
 </div>
 
@@ -1371,12 +1683,17 @@ function toggleMobileSidebar(){
 function setPanel(name){
   navItems.forEach(n=>n.classList.toggle('active',n.dataset.panel===name));
   Object.entries(panels).forEach(([k,v])=>v.classList.toggle('active',k===name));
-  const titles={overview:'Overview',blogs:'Blog Posts',jobs:'Job Listings',applications:'Applications',stories:'Success Stories',partners:'Partners',newsletter:'Newsletter',linkhub:'Link Hub'};
+  const titles={overview:'Overview',blogs:'Blog Posts',jobs:'Job Listings',applications:'Applications',stories:'Success Stories',partners:'Partners',newsletter:'Newsletter',linkhub:'Link Hub',leads:'Leads',jobsfeed:'Jobs Feed'};
   document.getElementById('panelTitle').textContent=titles[name]||name;
   if(name==='applications') loadApplications();
   if(name==='stories') loadStories();
   if(name==='partners') loadPartners();
   if(name==='linkhub') loadLinkHub();
+  // Both business-development panels load on first open rather than at init:
+  // they hit a Netlify function that queries several tables, and most sessions
+  // never open them.
+  if(name==='leads'){loadBdOverview();loadLeads(leadsPage);}
+  if(name==='jobsfeed'){loadBdOverview();loadFeedJobs(feedJobsPage);loadFeedLists(feedListsPage);}
 }
 
 navItems.forEach(n=>n.addEventListener('click',()=>setPanel(n.dataset.panel)));
@@ -3363,6 +3680,1028 @@ document.getElementById('lhSaveProfileBtn').addEventListener('click',async()=>{
     btn.disabled=false;btn.textContent='Save Heading';
   }
 });
+
+// ── LEADS & JOBS FEED ─────────────────────────────────────────────────────────
+// Both panels talk to netlify/functions/leads-admin.js. Nothing here uses the
+// Supabase client directly: the leads tables have RLS on with no policies, so
+// the anon key cannot read them and every call goes through the function with
+// the admin password.
+
+const BD_ENDPOINT='/.netlify/functions/leads-admin';
+const BD_PER_PAGE=30;
+
+let bdSettings=null;
+let bdSignalDocs={};
+let bdDefaultWeights={};
+let bdMeta={geminiConfigured:false,apifyConfigured:false,webhookConfigured:false,actorId:''};
+let leadsPage=1,leadsTotal=0,leadsRows=[];
+let leadsExpandedId=null;
+let feedJobsPage=1,feedJobsTotal=0;
+let feedListsPage=1,feedListsTotal=0;
+let bdOverviewLoaded=false;
+
+/* Every call carries the admin password, which is how leads-admin.js authorises.
+   A 401 means the session is stale, so it is surfaced rather than swallowed. */
+async function bdCall(action,payload={}){
+  const res=await fetch(BD_ENDPOINT,{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({action,password:adminPassword,...payload})
+  });
+  let data=null;
+  try{data=await res.json();}catch(_e){throw new Error('The server returned an unreadable response.');}
+  if(!res.ok||!data.ok){
+    const err=new Error(data?.error||`Request failed (${res.status})`);
+    err.setupRequired=Boolean(data?.setupRequired);
+    throw err;
+  }
+  return data;
+}
+
+function bdShowSetup(message){
+  for(const id of ['leadsSetupNote','feedSetupNote']){
+    const el=document.getElementById(id);
+    if(!el)continue;
+    el.innerHTML=message;
+    el.style.display=message?'block':'none';
+  }
+}
+
+// Relative age, which is what actually matters when judging a lead.
+function bdAge(iso){
+  if(!iso)return{text:'Unknown',days:null};
+  const days=Math.floor((Date.now()-new Date(iso).getTime())/86400000);
+  if(!Number.isFinite(days))return{text:'Unknown',days:null};
+  if(days<=0)return{text:'Today',days:0};
+  if(days===1)return{text:'Yesterday',days:1};
+  if(days<7)return{text:`${days} days ago`,days};
+  if(days<14)return{text:'1 week ago',days};
+  if(days<31)return{text:`${Math.floor(days/7)} weeks ago`,days};
+  return{text:`${Math.floor(days/30)} mo ago`,days};
+}
+
+function bdScoreClass(score){
+  const n=Number(score)||0;
+  if(n>=65)return'hot';
+  if(n>=45)return'warm';
+  if(n>=25)return'mild';
+  return'cold';
+}
+
+// "unknown" is a real answer from the AI, not a missing value, so it renders as
+// an explicit italic marker rather than as blank space.
+function bdUnknown(value){
+  const v=String(value||'').trim();
+  if(!v||v.toLowerCase()==='unknown')return'<span class="bd-unknown">unknown</span>';
+  return esc(v);
+}
+
+function bdPagerText(page,perPage,total){
+  if(!total)return'Showing 0–0';
+  const from=(page-1)*perPage+1;
+  const to=Math.min(page*perPage,total);
+  return `Showing ${from}–${to} of ${total}`;
+}
+
+// ── Overview / settings ───────────────────────────────────────────────────────
+
+async function loadBdOverview(force=false){
+  if(bdOverviewLoaded&&!force)return;
+  try{
+    const data=await bdCall('overview');
+    bdSettings=data.settings;
+    bdSignalDocs=data.signalDocs||{};
+    bdDefaultWeights=data.defaultWeights||{};
+    bdMeta={
+      geminiConfigured:data.geminiConfigured,
+      apifyConfigured:data.apifyConfigured,
+      webhookConfigured:data.webhookConfigured,
+      actorId:data.actorId||''
+    };
+    bdOverviewLoaded=true;
+    bdShowSetup('');
+    renderBdStats(data.stats);
+    renderBdWeights(bdSettings.urgency_weights);
+    renderBdSettingsForm();
+    renderFeedRunInfo(data.runs||[]);
+    renderBdConfigWarnings(data.stats);
+  }catch(err){
+    if(err.setupRequired){
+      bdShowSetup(
+        '<strong>Setup needed.</strong> The leads tables do not exist yet. Run '+
+        '<code>supabase/migrations/20260929120000_leads_and_jobs.sql</code> in the Supabase SQL editor, then refresh this page.'
+      );
+    }else{
+      bdShowSetup('<strong>Could not load.</strong> '+esc(err.message));
+    }
+  }
+}
+
+function renderBdStats(stats){
+  const s=stats||{};
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=Number(v||0).toLocaleString();};
+  set('statLeadsTotal',s.totalCompanies);
+  set('statLeadsNew',s.newCompanies);
+  set('statLeadsContacted',s.contactedCompanies);
+  set('statLeadsAiPending',s.aiPending);
+  set('statFeedTotal',s.totalJobs);
+  set('statFeedEligible',s.eligibleJobs);
+  set('statFeedFlagged',s.flaggedJobs);
+  set('statFeedDead',s.deadLinks);
+
+  // The resume button only exists when there is something to resume.
+  const resume=document.getElementById('leadsResumeAiBtn');
+  if(resume)resume.style.display=Number(s.aiPending||0)>0&&bdMeta.geminiConfigured?'inline-flex':'none';
+}
+
+/* Warn about missing configuration where it would otherwise look like the system
+   is simply quiet: no Apify token means no data at all, no webhook secret means
+   nothing arrives automatically, no Gemini key means no AI columns. */
+function renderBdConfigWarnings(stats){
+  const banner=document.getElementById('leadsAiBanner');
+  if(!banner)return;
+  const notes=[];
+  if(!bdMeta.apifyConfigured)notes.push('<strong>APIFY_API_Key is not set in Netlify</strong> — no jobs can be pulled.');
+  if(!bdMeta.webhookConfigured)notes.push('<strong>APIFY_WEBHOOK_SECRET is not set</strong> — weekly runs will not ingest automatically. Use "Sync Latest Apify Run" until it is.');
+  if(!bdMeta.geminiConfigured)notes.push('<strong>Gemini_API_Key is not set</strong> — fit scores, pitch angles and reworded-repost matching are unavailable. Everything else still works.');
+  else if(Number(stats?.aiPending||0)>0)notes.push(`<strong>${Number(stats.aiPending).toLocaleString()} companies are waiting for AI review</strong> — the free-tier quota ran out mid-run. Click "Resume AI Review" to finish.`);
+
+  banner.innerHTML=notes.map(n=>`<div>${n}</div>`).join('');
+  banner.style.display=notes.length?'block':'none';
+}
+
+/* The weight editors, each next to what its signal actually measures.
+
+   The explanation text comes from the server (urgency.js SIGNAL_DOCS) so the
+   formula and its description can never drift apart. */
+function renderBdWeights(weights){
+  const grid=document.getElementById('leadsWeightsGrid');
+  if(!grid)return;
+  const w=weights||bdDefaultWeights;
+  grid.innerHTML=Object.keys(bdDefaultWeights).map(key=>{
+    const doc=bdSignalDocs[key]||{};
+    return `<div class="bd-weight">
+      <div class="bd-weight-head">
+        <label for="bdw-${key}">${esc(doc.label||key)}</label>
+        <input type="number" id="bdw-${key}" data-weight="${key}" min="0" max="100" step="1" value="${Number(w[key]??0)}">
+      </div>
+      <div class="why">${esc(doc.why||'')}</div>
+      <div class="measure">${esc(doc.measure||'')}</div>
+    </div>`;
+  }).join('');
+}
+
+function readBdWeights(){
+  const weights={};
+  document.querySelectorAll('[data-weight]').forEach(input=>{
+    weights[input.dataset.weight]=Number(input.value)||0;
+  });
+  return weights;
+}
+
+function renderBdSettingsForm(){
+  if(!bdSettings)return;
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v;};
+  set('leadsAgencyList',(bdSettings.agency_blocklist||[]).join('\n'));
+  set('leadsCompetitorList',(bdSettings.competitor_blocklist||[]).join('\n'));
+  set('leadsServices',bdSettings.services_description||'');
+  set('leadsMaxAge',bdSettings.max_job_age_days||20);
+  set('leadsRecheck',bdSettings.link_recheck_days||7);
+}
+
+// ── Leads table ───────────────────────────────────────────────────────────────
+
+async function loadLeads(page=leadsPage){
+  const tbody=document.getElementById('leadsTable');
+  if(!tbody)return;
+  leadsPage=Math.max(1,page);
+  tbody.innerHTML='<tr class="empty-row"><td colspan="9">Loading…</td></tr>';
+
+  const showExcluded=document.getElementById('leadsShowExcluded')?.checked;
+  try{
+    const data=await bdCall('companies',{
+      page:leadsPage,
+      perPage:BD_PER_PAGE,
+      search:document.getElementById('leadsSearch')?.value||'',
+      status:document.getElementById('leadsStatus')?.value||'all',
+      sort:document.getElementById('leadsSort')?.value||'urgency',
+      minFit:Number(document.getElementById('leadsMinFit')?.value||0),
+      includeExcluded:Boolean(showExcluded),
+      view:showExcluded?'excluded':'live'
+    });
+    leadsRows=data.companies||[];
+    leadsTotal=data.total||0;
+    renderLeadsTable();
+  }catch(err){
+    tbody.innerHTML=`<tr class="empty-row"><td colspan="9">${esc(err.message)}</td></tr>`;
+    if(err.setupRequired)loadBdOverview(true);
+  }
+}
+
+function renderLeadsTable(){
+  const tbody=document.getElementById('leadsTable');
+  if(!tbody)return;
+
+  if(!leadsRows.length){
+    tbody.innerHTML='<tr class="empty-row"><td colspan="9">No leads yet. Sync an Apify run from the Jobs Feed panel to populate this.</td></tr>';
+  }else{
+    tbody.innerHTML=leadsRows.map(row=>{
+      const age=bdAge(row.newest_posted_at);
+      const roles=(row.roles||[]).slice(0,4).map(r=>
+        `<span class="bd-role">${esc(r.title)}${r.count>1?` <b>${r.count}</b>`:''}</span>`
+      ).join('');
+      const more=(row.roles||[]).length>4?`<span class="bd-role">+${(row.roles||[]).length-4} more</span>`:'';
+      const fit=row.ai_fit_score===null||row.ai_fit_score===undefined
+        ? '<span class="bd-unknown">not reviewed</span>'
+        : `<span class="bd-fit"><span class="num">${row.ai_fit_score}</span><span style="color:var(--muted);font-weight:400;">/10</span></span>`;
+      const excluded=row.excluded_reason
+        ? `<span class="badge inactive" title="Excluded by rules or AI review">${esc(row.excluded_reason)}</span>`
+        : '';
+
+      const detail=leadsExpandedId===row.id?renderLeadDetail(row):'';
+
+      return `<tr data-lead-row="${esc(row.id)}">
+        <td data-label="Company">
+          <strong>${esc(row.company)}</strong> ${excluded}
+          ${row.website?`<br><a class="btn-view" href="${esc(row.website)}" target="_blank" rel="noopener">Website ↗</a>`:''}
+          ${row.last_reviewed_at?`<br><span class="bd-approx">reviewed ${esc(fmt(row.last_reviewed_at))}</span>`:''}
+        </td>
+        <td data-label="Roles Hiring">
+          <div class="bd-roles">${roles}${more}</div>
+          <span class="bd-approx">${row.total_job_count} posting${row.total_job_count===1?'':'s'}, ${row.distinct_role_count} distinct</span>
+        </td>
+        <td data-label="Location">${bdUnknown(row.location)}</td>
+        <td data-label="Recency">${esc(age.text)}</td>
+        <td data-label="Industry">${bdUnknown(row.industry)}${row.company_size&&row.company_size!=='unknown'?`<br><span class="bd-approx">${esc(row.company_size)}</span>`:''}</td>
+        <td data-label="Urgency"><span class="bd-score ${bdScoreClass(row.urgency_score)}">${Number(row.urgency_score).toFixed(0)}</span></td>
+        <td data-label="AI Fit">${fit}</td>
+        <td data-label="Status">
+          <select class="bd-status" data-status-for="${esc(row.id)}" data-value="${esc(row.status)}">
+            ${['new','contacted','replied','won','rejected'].map(s=>
+              `<option value="${s}"${row.status===s?' selected':''}>${s.charAt(0).toUpperCase()+s.slice(1)}</option>`
+            ).join('')}
+          </select>
+        </td>
+        <td data-label="Actions">
+          <button class="btn-view" data-lead-expand="${esc(row.id)}">${leadsExpandedId===row.id?'Hide':'Details'}</button>
+          <button class="btn-delete" data-lead-delete="${esc(row.id)}" data-lead-name="${esc(row.company)}">Delete</button>
+        </td>
+      </tr>${detail}`;
+    }).join('');
+  }
+
+  const range=document.getElementById('leadsRange');
+  if(range)range.textContent=bdPagerText(leadsPage,BD_PER_PAGE,leadsTotal);
+  const prev=document.getElementById('leadsPrevBtn');
+  const next=document.getElementById('leadsNextBtn');
+  if(prev)prev.disabled=leadsPage<=1;
+  if(next)next.disabled=leadsPage*BD_PER_PAGE>=leadsTotal;
+}
+
+/* The expanded row: why this company ranks where it does, the AI's read, and the
+   workflow fields. The score breakdown is shown so the rank is auditable. */
+function renderLeadDetail(row){
+  const signals=row.urgency_breakdown?.signals||{};
+  const parts=Object.keys(signals).map(key=>{
+    const doc=bdSignalDocs[key]||{};
+    const s=signals[key];
+    return `<span class="part" title="${esc(doc.why||'')}">${esc(doc.label||key)}: <b>${s.points}</b> <span>(w${s.weight} × ${s.measure})</span></span>`;
+  }).join('');
+
+  const allRoles=(row.roles||[]).map(r=>
+    `<tr><td>${esc(r.title)}</td><td style="text-align:right;">${r.count}</td><td>${r.newest_posted_at?esc(fmt(r.newest_posted_at)):'<span class="bd-unknown">unknown</span>'}</td></tr>`
+  ).join('');
+
+  return `<tr class="bd-detail-row" data-lead-detail="${esc(row.id)}"><td colspan="9"><div class="bd-detail">
+    <h5>AI review</h5>
+    ${row.ai_reviewed_at
+      ? `<div style="font-size:13px;line-height:1.7;">
+           <div><strong>Fit ${row.ai_fit_score}/10.</strong> ${esc(row.ai_reason||'')}</div>
+           ${row.ai_pitch_angle?`<div style="margin-top:4px;"><strong>Pitch angle:</strong> ${esc(row.ai_pitch_angle)}</div>`:''}
+           <div class="bd-approx" style="margin-top:4px;">Reviewed ${esc(fmt(row.ai_reviewed_at))} — advisory only; the urgency rank is computed by script.</div>
+         </div>`
+      : `<div class="bd-unknown">${row.ai_status==='quota'?'Waiting — the Gemini free-tier quota ran out. Click "Resume AI Review".':'Not reviewed yet.'}</div>`}
+    ${row.ai_error?`<div class="bd-approx" style="color:#C53030;margin-top:6px;">${esc(row.ai_error)}</div>`:''}
+
+    <h5 style="margin-top:18px;">Urgency ${Number(row.urgency_score).toFixed(1)} / 100</h5>
+    <div class="bd-breakdown">${parts}</div>
+
+    <h5 style="margin-top:18px;">All roles (de-duplicated)</h5>
+    <table><thead><tr><th>Title</th><th style="text-align:right;">Openings</th><th>Newest</th></tr></thead><tbody>${allRoles}</tbody></table>
+    <div class="bd-approx" style="margin-top:6px;">
+      Sources: ${(row.sources||[]).length?esc((row.sources||[]).join(', ')):'unknown'} ·
+      Seen in ${row.run_appearance_count} scrape${row.run_appearance_count===1?'':'s'} ·
+      ${row.repost_count} reposted role${row.repost_count===1?'':'s'}
+    </div>
+
+    <div class="bd-notes">
+      <label for="bdnote-${esc(row.id)}">Notes</label>
+      <textarea id="bdnote-${esc(row.id)}" rows="3" placeholder="What was discussed, who to follow up with, next step…">${esc(row.notes||'')}</textarea>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
+        <div style="flex:1 1 200px;">
+          <label for="bdsite-${esc(row.id)}">Website</label>
+          <input type="url" id="bdsite-${esc(row.id)}" value="${esc(row.website||'')}" placeholder="https://…"
+                 style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;">
+        </div>
+        <div style="flex:1 1 160px;">
+          <label for="bdind-${esc(row.id)}">Industry</label>
+          <input type="text" id="bdind-${esc(row.id)}" value="${row.industry&&row.industry!=='unknown'?esc(row.industry):''}" placeholder="e.g. Hospitality"
+                 style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;">
+        </div>
+        <button class="btn-save" data-lead-save="${esc(row.id)}" style="width:max-content;">Save &amp; Mark Reviewed</button>
+      </div>
+    </div>
+  </div></td></tr>`;
+}
+
+// ── Jobs feed ─────────────────────────────────────────────────────────────────
+
+function renderFeedRunInfo(runs){
+  const el=document.getElementById('feedRunInfo');
+  if(!el)return;
+  const last=runs?.[0];
+  if(!last){
+    el.innerHTML=`No scrape has been ingested yet. ${bdMeta.apifyConfigured
+      ? 'Click "Sync Latest Apify Run" to pull the most recent run of <code>'+esc(bdMeta.actorId)+'</code>.'
+      : 'Set APIFY_API_Key in Netlify first.'}`;
+    return;
+  }
+
+  const statusBadge=last.status==='ok'
+    ? '<span class="badge published">OK</span>'
+    : last.status==='ai_quota'
+    ? '<span class="badge draft">AI quota reached</span>'
+    : `<span class="badge inactive">${esc(last.status)}</span>`;
+
+  el.innerHTML=`
+    <div style="margin-bottom:10px;">Last scrape ingested ${esc(fmt(last.created_at))} ${statusBadge}</div>
+    <div class="bd-kv"><span>Jobs reported:</span> <b>${Number(last.reported_total_jobs||0).toLocaleString()}</b></div>
+    <div class="bd-kv"><span>Companies reported:</span> <b>${Number(last.reported_total_companies||0).toLocaleString()}</b></div>
+    <div class="bd-kv"><span>New:</span> <b>${Number(last.jobs_inserted||0).toLocaleString()}</b></div>
+    <div class="bd-kv"><span>Updated:</span> <b>${Number(last.jobs_updated||0).toLocaleString()}</b></div>
+    <div class="bd-kv"><span>Links checked:</span> <b>${Number(last.links_checked||0).toLocaleString()}</b></div>
+    <div class="bd-kv"><span>Dead:</span> <b>${Number(last.links_dead||0).toLocaleString()}</b></div>
+    ${last.error?`<div class="bd-warn" style="margin-top:12px;">${esc(last.error)}</div>`:''}`;
+
+  // A field the scraper started sending that we do not map is a silent data loss,
+  // so it is surfaced rather than logged.
+  const unmapped=document.getElementById('feedUnmapped');
+  if(unmapped){
+    const fields=last.unmapped_fields||[];
+    unmapped.innerHTML=fields.length
+      ? `<strong>The scraper sent fields we do not store:</strong> <code>${fields.map(esc).join('</code>, <code>')}</code>. Nothing is broken, but if one of these is useful it needs adding to the ingest mapping.`
+      : '';
+    unmapped.style.display=fields.length?'block':'none';
+  }
+}
+
+async function loadFeedJobs(page=feedJobsPage){
+  const tbody=document.getElementById('feedJobsTable');
+  if(!tbody)return;
+  feedJobsPage=Math.max(1,page);
+  tbody.innerHTML='<tr class="empty-row"><td colspan="8">Loading…</td></tr>';
+
+  try{
+    const data=await bdCall('jobs',{
+      page:feedJobsPage,
+      perPage:BD_PER_PAGE,
+      view:document.getElementById('feedView')?.value||'eligible',
+      search:document.getElementById('feedSearch')?.value||''
+    });
+    feedJobsTotal=data.total||0;
+    renderFeedJobs(data.jobs||[]);
+  }catch(err){
+    tbody.innerHTML=`<tr class="empty-row"><td colspan="8">${esc(err.message)}</td></tr>`;
+    if(err.setupRequired)loadBdOverview(true);
+  }
+}
+
+function renderFeedJobs(jobs){
+  const tbody=document.getElementById('feedJobsTable');
+  if(!tbody)return;
+
+  if(!jobs.length){
+    tbody.innerHTML='<tr class="empty-row"><td colspan="8">No jobs match this view.</td></tr>';
+  }else{
+    tbody.innerHTML=jobs.map(j=>{
+      const link=j.link_status==='live'
+        ? '<span class="bd-link-ok">Live</span>'
+        : j.link_status==='dead'
+        ? `<span class="bd-link-dead">Dead${j.link_status_code?` (${j.link_status_code})`:''}</span>`
+        : '<span class="bd-link-unknown">Unchecked</span>';
+
+      const state=j.featured_in_list_id
+        ? '<span class="badge published">Featured</span>'
+        : j.excluded_reason
+        ? `<span class="badge inactive">${esc(j.excluded_reason)}</span>`
+        : j.ai_flagged
+        ? `<span class="badge draft" title="${esc(j.ai_flag_reason||'')}">Flagged</span>`
+        : '<span class="badge active">Eligible</span>';
+
+      return `<tr>
+        <td data-label="Title"><strong>${esc(j.title)}</strong>${j.summary?`<br><span class="bd-approx">${esc(j.summary)}</span>`:''}</td>
+        <td data-label="Company">${esc(j.company)}</td>
+        <td data-label="Location">${bdUnknown(j.location)}</td>
+        <td data-label="Posted">${j.posted_at?esc(fmt(j.posted_at)):'<span class="bd-unknown">unknown</span>'}${j.posted_at&&!j.posted_is_exact?'<br><span class="bd-approx">approx.</span>':''}</td>
+        <td data-label="Source">${(j.source_list||[]).length?esc((j.source_list||[]).join(', ')):'—'}</td>
+        <td data-label="Link">${link}</td>
+        <td data-label="Status">${state}</td>
+        <td data-label="Actions">
+          <a class="btn-view" href="${esc(j.raw_url||j.canonical_url)}" target="_blank" rel="noopener">Open ↗</a>
+          <button class="btn-edit" data-job-recheck="${esc(j.id)}">Re-check</button>
+          ${j.ai_flagged?`<button class="btn-edit" data-job-unflag="${esc(j.id)}">Unflag</button>`:''}
+          <button class="btn-delete" data-job-delete="${esc(j.id)}" data-job-name="${esc(j.title)}">Delete</button>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  const range=document.getElementById('feedJobsRange');
+  if(range)range.textContent=bdPagerText(feedJobsPage,BD_PER_PAGE,feedJobsTotal);
+  const prev=document.getElementById('feedJobsPrevBtn');
+  const next=document.getElementById('feedJobsNextBtn');
+  if(prev)prev.disabled=feedJobsPage<=1;
+  if(next)next.disabled=feedJobsPage*BD_PER_PAGE>=feedJobsTotal;
+}
+
+async function loadFeedLists(page=feedListsPage){
+  const tbody=document.getElementById('feedListsTable');
+  if(!tbody)return;
+  feedListsPage=Math.max(1,page);
+  tbody.innerHTML='<tr class="empty-row"><td colspan="6">Loading…</td></tr>';
+
+  try{
+    const data=await bdCall('lists',{page:feedListsPage,perPage:BD_PER_PAGE});
+    feedListsTotal=data.total||0;
+    const lists=data.lists||[];
+    tbody.innerHTML=lists.length
+      ? lists.map(l=>`<tr>
+          <td data-label="Week Of"><strong>${esc(fmt(l.week_of))}</strong></td>
+          <td data-label="Title">${esc(l.title)}</td>
+          <td data-label="Jobs">${l.item_count}</td>
+          <td data-label="Held Back">${l.excluded_count}${l.dead_link_count?` <span class="bd-approx">(${l.dead_link_count} dead links)</span>`:''}</td>
+          <td data-label="Published">${esc(fmt(l.published_at))}</td>
+          <td data-label="Actions">
+            <button class="btn-view" data-list-pdf="${esc(l.id)}">Download PDF</button>
+            <button class="btn-delete" data-list-delete="${esc(l.id)}" data-list-week="${esc(fmt(l.week_of))}">Delete</button>
+          </td>
+        </tr>`).join('')
+      : '<tr class="empty-row"><td colspan="6">No lists published yet.</td></tr>';
+
+    const range=document.getElementById('feedListsRange');
+    if(range)range.textContent=bdPagerText(feedListsPage,BD_PER_PAGE,feedListsTotal);
+    const prev=document.getElementById('feedListsPrevBtn');
+    const next=document.getElementById('feedListsNextBtn');
+    if(prev)prev.disabled=feedListsPage<=1;
+    if(next)next.disabled=feedListsPage*BD_PER_PAGE>=feedListsTotal;
+  }catch(err){
+    tbody.innerHTML=`<tr class="empty-row"><td colspan="6">${esc(err.message)}</td></tr>`;
+    if(err.setupRequired)loadBdOverview(true);
+  }
+}
+
+// ── PDF ───────────────────────────────────────────────────────────────────────
+
+let jsPdfPromise=null;
+
+/* Load jsPDF on demand from a CDN.
+
+   Deliberately lazy: the admin already loads a lot, and the PDF library is only
+   needed when someone actually clicks Download. */
+function loadJsPdf(){
+  if(window.jspdf?.jsPDF)return Promise.resolve(window.jspdf.jsPDF);
+  if(jsPdfPromise)return jsPdfPromise;
+  jsPdfPromise=new Promise((resolve,reject)=>{
+    const script=document.createElement('script');
+    script.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+    script.onload=()=>{
+      if(window.jspdf?.jsPDF)resolve(window.jspdf.jsPDF);
+      else reject(new Error('jsPDF loaded but did not register.'));
+    };
+    script.onerror=()=>{jsPdfPromise=null;reject(new Error('Could not load the PDF library. Check your connection.'));};
+    document.head.appendChild(script);
+  });
+  return jsPdfPromise;
+}
+
+const PDF_BRAND={sky:[74,179,212],dark:[26,26,46],muted:[136,150,164],text:[45,55,72],line:[232,236,240]};
+
+/* Build the branded job-seeker PDF.
+
+   The apply links are real PDF link annotations created with textWithLink, not
+   blue-coloured text, so they are clickable in Acrobat, Preview, Chrome and
+   phone viewers. Each row's link is drawn last at a known x/y for that reason. */
+async function downloadListPdf(listId){
+  const jsPDF=await loadJsPdf();
+  const {list}=await bdCall('list',{id:listId});
+  const items=list.items||[];
+  if(!items.length)throw new Error('This list has no jobs in it.');
+
+  const doc=new jsPDF({unit:'pt',format:'a4',compress:true});
+  const pageW=doc.internal.pageSize.getWidth();
+  const pageH=doc.internal.pageSize.getHeight();
+  const margin=40;
+  const contentW=pageW-margin*2;
+
+  const weekOf=new Date(list.week_of).toLocaleDateString('en-KE',{year:'numeric',month:'long',day:'numeric'});
+
+  let y=margin;
+  let pageNum=1;
+
+  function header(){
+    doc.setFillColor(...PDF_BRAND.dark);
+    doc.rect(0,0,pageW,72,'F');
+    doc.setFillColor(...PDF_BRAND.sky);
+    doc.rect(0,72,pageW,3,'F');
+
+    doc.setTextColor(255,255,255);
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(18);
+    doc.text('HOCAN HOLDINGS',margin,32);
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(10);
+    doc.setTextColor(200,215,225);
+    doc.text(list.title||'Latest Job Openings',margin,50);
+    doc.text(`Week of ${weekOf}`,pageW-margin,50,{align:'right'});
+    doc.setFontSize(9);
+    doc.text(`${items.length} opening${items.length===1?'':'s'}`,pageW-margin,32,{align:'right'});
+    y=100;
+  }
+
+  function footer(){
+    const fy=pageH-28;
+    doc.setDrawColor(...PDF_BRAND.line);
+    doc.setLineWidth(0.5);
+    doc.line(margin,fy-14,pageW-margin,fy-14);
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(8);
+    doc.setTextColor(...PDF_BRAND.muted);
+    doc.text('hocanholdings.co.ke  ·  info@hocanholdings.co.ke  ·  +254 791 235 830',margin,fy);
+    doc.text(`Page ${pageNum}`,pageW-margin,fy,{align:'right'});
+  }
+
+  function newPage(){
+    footer();
+    doc.addPage();
+    pageNum+=1;
+    header();
+  }
+
+  header();
+
+  doc.setFontSize(9);
+  doc.setTextColor(...PDF_BRAND.muted);
+  const intro='Tap or click any "Apply" link to open the original job posting. Every link was checked before this list was produced.';
+  for(const line of doc.splitTextToSize(intro,contentW)){
+    doc.text(line,margin,y);
+    y+=12;
+  }
+  y+=10;
+
+  items.forEach((item,index)=>{
+    // Measure the row before drawing it, so a card is never split across pages.
+    doc.setFontSize(11);
+    const titleLines=doc.splitTextToSize(`${index+1}. ${item.title}`,contentW-70);
+    doc.setFontSize(9);
+    const summaryLines=item.summary?doc.splitTextToSize(item.summary,contentW-12):[];
+    const rowH=18+titleLines.length*14+14+(summaryLines.length?summaryLines.length*11+4:0)+16;
+
+    if(y+rowH>pageH-56)newPage();
+
+    const top=y;
+
+    doc.setFillColor(250,251,252);
+    doc.roundedRect(margin,top,contentW,rowH-8,5,5,'F');
+
+    // Title
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(11);
+    doc.setTextColor(...PDF_BRAND.dark);
+    let ty=top+18;
+    for(const line of titleLines){doc.text(line,margin+12,ty);ty+=14;}
+
+    // Company · location · type
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(9);
+    doc.setTextColor(...PDF_BRAND.text);
+    const meta=[item.company,item.location,item.employment_type].filter(Boolean).join('  ·  ');
+    doc.text(doc.splitTextToSize(meta,contentW-90)[0]||'',margin+12,ty);
+    ty+=13;
+
+    // Optional one-line summary — written fresh, never copied from the posting.
+    if(summaryLines.length){
+      doc.setTextColor(...PDF_BRAND.muted);
+      doc.setFontSize(8.5);
+      for(const line of summaryLines){doc.text(line,margin+12,ty);ty+=11;}
+      ty+=3;
+    }
+
+    // Posted date + source, right-aligned on the title line.
+    doc.setFontSize(8);
+    doc.setTextColor(...PDF_BRAND.muted);
+    const posted=item.posted_at
+      ? new Date(item.posted_at).toLocaleDateString('en-KE',{month:'short',day:'numeric'})+(item.posted_is_exact?'':' (approx.)')
+      : 'date unknown';
+    doc.text(posted,pageW-margin-12,top+18,{align:'right'});
+    if(item.source&&item.source!=='—'){
+      doc.text(doc.splitTextToSize(item.source,150)[0],pageW-margin-12,top+29,{align:'right'});
+    }
+
+    // The apply link, as a real PDF annotation. textWithLink draws the text and
+    // registers the clickable rect over it in one call.
+    if(item.apply_url){
+      doc.setFont('helvetica','bold');
+      doc.setFontSize(9);
+      doc.setTextColor(...PDF_BRAND.sky);
+      const label='Apply for this job →';
+      doc.textWithLink(label,margin+12,ty,{url:item.apply_url});
+      // Underline it so it reads as a link on paper and in viewers that do not
+      // highlight annotations.
+      const w=doc.getTextWidth(label);
+      doc.setDrawColor(...PDF_BRAND.sky);
+      doc.setLineWidth(0.6);
+      doc.line(margin+12,ty+2,margin+12+w,ty+2);
+      // A second, larger hit area: thin text is easy to miss on a phone.
+      doc.link(margin+12,ty-9,w,13,{url:item.apply_url});
+    }
+
+    y=top+rowH;
+  });
+
+  // Closing note, on its own page if the last card left no room.
+  if(y+50>pageH-56)newPage();
+  y+=8;
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(8);
+  doc.setTextColor(...PDF_BRAND.muted);
+  const note='Hocan Holdings shares these openings as a free service. We are not the employer and do not charge for applications. Never pay anyone to apply for a job.';
+  for(const line of doc.splitTextToSize(note,contentW)){doc.text(line,margin,y);y+=11;}
+
+  footer();
+
+  const name=`hocan-jobs-${list.week_of}.pdf`;
+  doc.save(name);
+  return name;
+}
+
+// ── Actions ───────────────────────────────────────────────────────────────────
+
+// Wraps a button click: disables the button, swaps its label, always restores it.
+async function bdRun(btn,busyLabel,fn){
+  if(!btn)return fn();
+  const original=btn.textContent;
+  btn.disabled=true;
+  btn.textContent=busyLabel;
+  try{
+    return await fn();
+  }finally{
+    btn.disabled=false;
+    btn.textContent=original;
+  }
+}
+
+function renderWeightsPreview(data){
+  const el=document.getElementById('leadsWeightsPreview');
+  if(!el)return;
+  const rows=(data.preview||[]).map(p=>{
+    const delta=p.proposed-p.current;
+    const cls=delta>0.05?'up':delta<-0.05?'down':'same';
+    const arrow=delta>0.05?'▲':delta<-0.05?'▼':'–';
+    return `<tr>
+      <td>${esc(p.company)}</td>
+      <td style="text-align:right;">${p.current.toFixed(1)}</td>
+      <td style="text-align:right;">${p.proposed.toFixed(1)}</td>
+      <td style="text-align:right;" class="${cls}">${arrow} ${Math.abs(delta).toFixed(1)}</td>
+    </tr>`;
+  }).join('');
+
+  el.innerHTML=`<h4>Top leads re-ranked with these weights</h4>
+    <table><thead><tr><th>Company</th><th style="text-align:right;">Now</th><th style="text-align:right;">Proposed</th><th style="text-align:right;">Change</th></tr></thead>
+    <tbody>${rows||'<tr><td colspan="4">No leads to preview yet.</td></tr>'}</tbody></table>
+    <div class="bd-approx" style="margin-top:8px;">Nothing is saved until you click "Save Weights &amp; Rescore".</div>`;
+  el.style.display='block';
+}
+
+function renderListPreview(data){
+  const el=document.getElementById('feedListPreview');
+  if(!el)return;
+  const s=data.stats||{};
+  const rows=(data.items||[]).map((it,i)=>`<tr>
+    <td>${i+1}</td>
+    <td>${esc(it.title)}</td>
+    <td>${esc(it.company)}</td>
+    <td>${it.posted_at?esc(fmt(it.posted_at)):'unknown'}</td>
+    <td>${esc(it.source||'—')}</td>
+  </tr>`).join('');
+
+  el.innerHTML=`<h4>${data.count} job${data.count===1?'':'s'} would be published</h4>
+    <div class="bd-approx" style="margin-bottom:10px;">
+      ${s.candidates||0} eligible before de-duplication ·
+      ${s.dropped_featured||0} already featured (matched on company, title and location) ·
+      ${s.dropped_ai_repost||0} reworded reposts caught by the AI ·
+      ${s.flagged||0} held back pending your review
+      ${data.quota?' · <strong>AI repost check incomplete (quota reached)</strong>':''}
+    </div>
+    <table><thead><tr><th>#</th><th>Title</th><th>Company</th><th>Posted</th><th>Source</th></tr></thead>
+    <tbody>${rows||'<tr><td colspan="5">Nothing eligible right now.</td></tr>'}</tbody></table>
+    ${data.count>30?`<div class="bd-approx" style="margin-top:8px;">Showing the first 30 of ${data.count}.</div>`:''}
+    <div class="bd-approx" style="margin-top:8px;">This is a preview — no job has been marked as featured.</div>`;
+  el.style.display='block';
+}
+
+// ── Wiring ────────────────────────────────────────────────────────────────────
+
+function wireBdPanels(){
+  // -- Leads filters
+  let leadsSearchTimer=null;
+  document.getElementById('leadsSearch')?.addEventListener('input',()=>{
+    clearTimeout(leadsSearchTimer);
+    leadsSearchTimer=setTimeout(()=>loadLeads(1),350);
+  });
+  for(const id of ['leadsStatus','leadsSort','leadsMinFit','leadsShowExcluded']){
+    document.getElementById(id)?.addEventListener('change',()=>loadLeads(1));
+  }
+  document.getElementById('leadsPrevBtn')?.addEventListener('click',()=>{if(leadsPage>1)loadLeads(leadsPage-1);});
+  document.getElementById('leadsNextBtn')?.addEventListener('click',()=>{if(leadsPage*BD_PER_PAGE<leadsTotal)loadLeads(leadsPage+1);});
+  document.getElementById('leadsRefreshBtn')?.addEventListener('click',async e=>{
+    await bdRun(e.target,'Refreshing…',async()=>{await loadBdOverview(true);await loadLeads(leadsPage);});
+  });
+
+  document.getElementById('leadsRescoreBtn')?.addEventListener('click',async e=>{
+    await bdRun(e.target,'Recomputing…',async()=>{
+      try{
+        const data=await bdCall('rescoreAll');
+        showToast(data.message||'Ranks recomputed.');
+        await loadLeads(leadsPage);
+      }catch(err){showToast(err.message,'error');}
+    });
+  });
+
+  document.getElementById('leadsResumeAiBtn')?.addEventListener('click',async e=>{
+    await bdRun(e.target,'Reviewing…',async()=>{
+      try{
+        const data=await bdCall('resumeAiReview');
+        showToast(data.message||'AI review resumed.',data.quotaHit?'error':'success');
+        await loadBdOverview(true);
+        await loadLeads(leadsPage);
+      }catch(err){showToast(err.message,'error');}
+    });
+  });
+
+  // -- Leads table: expand, status, notes, delete
+  document.getElementById('panel-leads')?.addEventListener('click',async e=>{
+    const expand=e.target.closest('[data-lead-expand]');
+    if(expand){
+      const id=expand.dataset.leadExpand;
+      leadsExpandedId=leadsExpandedId===id?null:id;
+      renderLeadsTable();
+      return;
+    }
+
+    const del=e.target.closest('[data-lead-delete]');
+    if(del){
+      const id=del.dataset.leadDelete;
+      const name=del.dataset.leadName||'this lead';
+      if(!confirm(`Delete the lead for "${name}"?\n\nThis removes the company from your pipeline along with its notes and status. The scraped jobs behind it are kept. This cannot be undone.`))return;
+      await bdRun(del,'Deleting…',async()=>{
+        try{
+          await bdCall('deleteCompany',{id,confirm:true});
+          showToast('Lead deleted.');
+          if(leadsExpandedId===id)leadsExpandedId=null;
+          await loadLeads(leadsPage);
+          await loadBdOverview(true);
+        }catch(err){showToast(err.message,'error');}
+      });
+      return;
+    }
+
+    const save=e.target.closest('[data-lead-save]');
+    if(save){
+      const id=save.dataset.leadSave;
+      await bdRun(save,'Saving…',async()=>{
+        try{
+          await bdCall('updateCompany',{
+            id,
+            notes:document.getElementById(`bdnote-${id}`)?.value||'',
+            website:document.getElementById(`bdsite-${id}`)?.value||'',
+            industry:document.getElementById(`bdind-${id}`)?.value||'',
+            markReviewed:true
+          });
+          showToast('Saved.');
+          await loadLeads(leadsPage);
+        }catch(err){showToast(err.message,'error');}
+      });
+    }
+  });
+
+  // Status is a select, so it needs change rather than click.
+  document.getElementById('panel-leads')?.addEventListener('change',async e=>{
+    const select=e.target.closest('[data-status-for]');
+    if(!select)return;
+    const id=select.dataset.statusFor;
+    const previous=select.dataset.value;
+    const status=select.value;
+    select.disabled=true;
+    try{
+      await bdCall('updateCompany',{id,status});
+      select.dataset.value=status;
+      // Keep the row's data in sync so a re-render does not show the old value.
+      const row=leadsRows.find(r=>r.id===id);
+      if(row)row.status=status;
+      showToast(`Marked as ${status}.`);
+      // A status filter is active and this row no longer matches it: reload so
+      // the table stays truthful.
+      const filter=document.getElementById('leadsStatus')?.value;
+      if(filter&&filter!=='all'&&filter!==status)await loadLeads(leadsPage);
+    }catch(err){
+      select.value=previous;
+      showToast(err.message,'error');
+    }finally{
+      select.disabled=false;
+    }
+  });
+
+  // -- Weights
+  document.getElementById('leadsPreviewWeightsBtn')?.addEventListener('click',async e=>{
+    await bdRun(e.target,'Calculating…',async()=>{
+      try{
+        const data=await bdCall('previewWeights',{urgency_weights:readBdWeights()});
+        renderWeightsPreview(data);
+      }catch(err){showToast(err.message,'error');}
+    });
+  });
+
+  document.getElementById('leadsSaveWeightsBtn')?.addEventListener('click',async e=>{
+    await bdRun(e.target,'Saving…',async()=>{
+      try{
+        const data=await bdCall('saveSettings',{urgency_weights:readBdWeights()});
+        showToast(data.message||'Weights saved.');
+        await loadBdOverview(true);
+        await loadLeads(leadsPage);
+      }catch(err){showToast(err.message,'error');}
+    });
+  });
+
+  document.getElementById('leadsResetWeightsBtn')?.addEventListener('click',()=>{
+    renderBdWeights(bdDefaultWeights);
+    showToast('Reset to defaults — not saved yet.');
+  });
+
+  document.getElementById('leadsSaveSettingsBtn')?.addEventListener('click',async e=>{
+    await bdRun(e.target,'Saving…',async()=>{
+      try{
+        await bdCall('saveSettings',{
+          agency_blocklist:document.getElementById('leadsAgencyList')?.value||'',
+          competitor_blocklist:document.getElementById('leadsCompetitorList')?.value||'',
+          services_description:document.getElementById('leadsServices')?.value||'',
+          max_job_age_days:Number(document.getElementById('leadsMaxAge')?.value||20),
+          link_recheck_days:Number(document.getElementById('leadsRecheck')?.value||7)
+        });
+        showToast('Settings saved. They apply from the next scrape.');
+        await loadBdOverview(true);
+      }catch(err){showToast(err.message,'error');}
+    });
+  });
+
+  // -- Jobs feed
+  let feedSearchTimer=null;
+  document.getElementById('feedSearch')?.addEventListener('input',()=>{
+    clearTimeout(feedSearchTimer);
+    feedSearchTimer=setTimeout(()=>loadFeedJobs(1),350);
+  });
+  document.getElementById('feedView')?.addEventListener('change',()=>loadFeedJobs(1));
+  document.getElementById('feedJobsPrevBtn')?.addEventListener('click',()=>{if(feedJobsPage>1)loadFeedJobs(feedJobsPage-1);});
+  document.getElementById('feedJobsNextBtn')?.addEventListener('click',()=>{if(feedJobsPage*BD_PER_PAGE<feedJobsTotal)loadFeedJobs(feedJobsPage+1);});
+  document.getElementById('feedListsPrevBtn')?.addEventListener('click',()=>{if(feedListsPage>1)loadFeedLists(feedListsPage-1);});
+  document.getElementById('feedListsNextBtn')?.addEventListener('click',()=>{if(feedListsPage*BD_PER_PAGE<feedListsTotal)loadFeedLists(feedListsPage+1);});
+  document.getElementById('feedRefreshBtn')?.addEventListener('click',async e=>{
+    await bdRun(e.target,'Refreshing…',()=>loadFeedJobs(feedJobsPage));
+  });
+
+  document.getElementById('feedSyncBtn')?.addEventListener('click',async e=>{
+    await bdRun(e.target,'Syncing…',async()=>{
+      try{
+        const data=await bdCall('syncNow',{publish:false});
+        const bits=[
+          `${data.itemsReceived} scraped`,
+          `${data.inserted} new`,
+          `${data.updated} updated`,
+          `${data.linksChecked} links checked`
+        ];
+        if(data.linksDead)bits.push(`${data.linksDead} dead`);
+        if(data.aiQuotaHit)bits.push('AI quota reached');
+        showToast(bits.join(', '),data.aiQuotaHit?'error':'success');
+        await loadBdOverview(true);
+        await loadFeedJobs(1);
+      }catch(err){showToast(err.message,'error');}
+    });
+  });
+
+  document.getElementById('feedRecheckBtn')?.addEventListener('click',async e=>{
+    await bdRun(e.target,'Checking…',async()=>{
+      try{
+        const data=await bdCall('recheckLinks',{limit:60});
+        showToast(`Checked ${data.checked} links${data.dead?`, ${data.dead} dead`:''}.`);
+        await loadBdOverview(true);
+        await loadFeedJobs(feedJobsPage);
+      }catch(err){showToast(err.message,'error');}
+    });
+  });
+
+  document.getElementById('feedPreviewListBtn')?.addEventListener('click',async e=>{
+    await bdRun(e.target,'Building preview…',async()=>{
+      try{
+        const data=await bdCall('previewList',{withAi:true});
+        renderListPreview(data);
+      }catch(err){showToast(err.message,'error');}
+    });
+  });
+
+  document.getElementById('feedPublishBtn')?.addEventListener('click',async e=>{
+    if(!confirm('Publish a job-seeker list now?\n\nEvery job in it is permanently marked as featured and will never appear in a future list, including if it is reposted at a new address. A list is normally published automatically after each weekly scrape.'))return;
+    await bdRun(e.target,'Publishing…',async()=>{
+      try{
+        const data=await bdCall('publishNow',{confirm:true});
+        if(!data.published){
+          showToast(data.message||'Nothing eligible to publish.','error');
+          return;
+        }
+        showToast(`Published ${data.list.item_count} jobs.`);
+        await loadFeedLists(1);
+        await loadFeedJobs(feedJobsPage);
+        await loadBdOverview(true);
+      }catch(err){showToast(err.message,'error');}
+    });
+  });
+
+  document.getElementById('panel-jobsfeed')?.addEventListener('click',async e=>{
+    const pdf=e.target.closest('[data-list-pdf]');
+    if(pdf){
+      await bdRun(pdf,'Building…',async()=>{
+        try{
+          const name=await downloadListPdf(pdf.dataset.listPdf);
+          showToast(`Downloaded ${name}`);
+        }catch(err){showToast(err.message,'error');}
+      });
+      return;
+    }
+
+    const delList=e.target.closest('[data-list-delete]');
+    if(delList){
+      const week=delList.dataset.listWeek||'this list';
+      if(!confirm(`Delete the list for ${week}?\n\nThe PDF will no longer be downloadable. The jobs in it stay marked as already featured, so they will not reappear in a future list. This cannot be undone.`))return;
+      await bdRun(delList,'Deleting…',async()=>{
+        try{
+          await bdCall('deleteList',{id:delList.dataset.listDelete,confirm:true});
+          showToast('List deleted.');
+          await loadFeedLists(feedListsPage);
+        }catch(err){showToast(err.message,'error');}
+      });
+      return;
+    }
+
+    const recheck=e.target.closest('[data-job-recheck]');
+    if(recheck){
+      await bdRun(recheck,'…',async()=>{
+        try{
+          const data=await bdCall('recheckLinks',{id:recheck.dataset.jobRecheck});
+          showToast(`Link is ${data.status}${data.code?` (${data.code})`:''}.`,data.status==='dead'?'error':'success');
+          await loadFeedJobs(feedJobsPage);
+        }catch(err){showToast(err.message,'error');}
+      });
+      return;
+    }
+
+    const unflag=e.target.closest('[data-job-unflag]');
+    if(unflag){
+      await bdRun(unflag,'…',async()=>{
+        try{
+          const data=await bdCall('clearJobFlag',{id:unflag.dataset.jobUnflag});
+          showToast(data.message||'Flag cleared.');
+          await loadFeedJobs(feedJobsPage);
+          await loadBdOverview(true);
+        }catch(err){showToast(err.message,'error');}
+      });
+      return;
+    }
+
+    const delJob=e.target.closest('[data-job-delete]');
+    if(delJob){
+      const name=delJob.dataset.jobName||'this job';
+      if(!confirm(`Delete "${name}"?\n\nIt will be removed from the scraped data. If it is still live it will come back on the next scrape. This cannot be undone.`))return;
+      await bdRun(delJob,'Deleting…',async()=>{
+        try{
+          await bdCall('deleteJob',{id:delJob.dataset.jobDelete,confirm:true});
+          showToast('Job deleted.');
+          await loadFeedJobs(feedJobsPage);
+          await loadBdOverview(true);
+        }catch(err){showToast(err.message,'error');}
+      });
+    }
+  });
+}
+
+wireBdPanels();
 
 // ── SESSION RESTORE ───────────────────────────────────────────────────────────
 // Last thing in the module, so every declaration and handler above already
