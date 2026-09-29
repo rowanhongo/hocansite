@@ -157,7 +157,7 @@ async function getJobs(body) {
   const query =
     "scraped_jobs?select=id,title,company,location,employment_type,salary_text,posted_at,posted_is_exact," +
     "first_seen,last_seen,sources,canonical_url,raw_url,summary,link_status,link_checked_at,link_status_code," +
-    "excluded_reason,ai_flagged,ai_flag_reason,featured_in_list_id,featured_at" +
+    "excluded_reason,ai_flagged,ai_flag_reason,featured_in_list_id,featured_at,fallback_key" +
     (filters.length ? `&${filters.join("&")}` : "") +
     "&order=posted_at.desc.nullslast,first_seen.desc" +
     `&limit=${perPage}&offset=${offset}`;
