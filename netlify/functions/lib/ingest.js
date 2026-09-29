@@ -394,6 +394,51 @@ async function checkJobLinks(settings, limit = 400) {
 
    Only companies touched by this run are recomputed — recomputing every company
    every week would grow linearly with the table for no benefit. */
+/* Recompute stored fallback keys that the current rules would produce
+   differently.
+
+   upsertJobs looks existing rows up *by* fallback_key, so a row written under
+   older rules is invisible to the very lookup that would have refreshed it — the
+   key it is stored under is not the key we now search for. That left "Careers at
+   Marriott" and "Marriott" as two eligible copies of one vacancy even after
+   companyKey learned to strip job-board prefixes, because neither row was ever
+   found to be updated.
+
+   So the keys are refreshed directly, by id, before anything reads them. Cheap
+   and idempotent: it pages the table, recomputes, and writes back only the rows
+   that actually changed, so a steady state costs one read per page and no
+   writes at all. */
+async function backfillFallbackKeys() {
+  const pageSize = 500;
+  let updated = 0;
+
+  for (let offset = 0; ; offset += pageSize) {
+    const rows = await db.select(
+      `scraped_jobs?select=id,company,title,location,fallback_key&order=first_seen.asc&limit=${pageSize}&offset=${offset}`
+    );
+    if (!Array.isArray(rows) || !rows.length) break;
+
+    const stale = rows
+      .map((row) => ({ row, key: rules.fallbackKey(row.company, row.title, row.location) }))
+      .filter(({ row, key }) => key && key !== row.fallback_key);
+
+    for (let i = 0; i < stale.length; i += 10) {
+      await Promise.all(
+        stale.slice(i, i + 10).map(({ row, key }) =>
+          db
+            .update(`scraped_jobs?id=eq.${encodeURIComponent(row.id)}`, { fallback_key: key })
+            .then(() => { updated += 1; })
+            .catch(() => null)
+        )
+      );
+    }
+
+    if (rows.length < pageSize) break;
+  }
+
+  return { updated };
+}
+
 async function rebuildCompanies(companyKeys, settings) {
   const keys = [...new Set((companyKeys || []).filter(Boolean))];
   if (!keys.length) return { touched: 0, pendingIds: [] };
@@ -956,6 +1001,11 @@ async function ingestDataset({ datasetId, runId, scrapedAt, publish = true, repo
 
   const items = await fetchDatasetItems(datasetId, token);
 
+  /* Before anything looks a job up by its fallback key, make sure the stored
+     keys are the ones the current rules produce. Otherwise a row written under
+     older rules stays invisible to the lookup that would fix it. */
+  const backfill = await backfillFallbackKeys().catch(() => ({ updated: 0 }));
+
   const { records, unmapped, skipped } = normalizeItems(items, scrapeTime, runId, settings);
   const { inserted, updated, rows } = await upsertJobs(records, runId, scrapeTime);
 
@@ -1074,6 +1124,7 @@ async function ingestDataset({ datasetId, runId, scrapedAt, publish = true, repo
     skipped,
     inserted,
     updated,
+    keysBackfilled: backfill.updated,
     unmapped,
     links: linkResult,
     companies: companyResult,
@@ -1093,6 +1144,7 @@ async function ingestDataset({ datasetId, runId, scrapedAt, publish = true, repo
 
 module.exports = {
   loadSettings,
+  backfillFallbackKeys,
   fetchDatasetItems,
   fetchRunMeta,
   fetchLastSuccessfulRun,
