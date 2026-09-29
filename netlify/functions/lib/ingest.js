@@ -278,7 +278,14 @@ async function upsertJobs(records, runId, scrapedAt) {
         // Keep the row's identity and its canonical_url: changing the latter
         // would break the unique index match and orphan the featured history.
         canonical_url: existing.canonical_url,
-        fallback_key: existing.fallback_key,
+        /* Recomputed, never carried over. The fallback key is derived from the
+           company/title/location rules, so pinning it to whatever those rules
+           produced on the day the row was first seen means a later improvement
+           to them can never reach existing rows. That is what kept "Careers at
+           Marriott" and "Marriott" as two separate jobs after companyKey learned
+           to strip job-board prefixes: both new keys agreed, but the stored ones
+           still did not. */
+        fallback_key: record.fallback_key,
         title: existing.title || record.title,
         company: existing.company || record.company,
         location: existing.location || record.location,
@@ -721,7 +728,7 @@ async function selectListCandidates(settings, state) {
 
   // Ordering is the one rule every list obeys: posted date desc, first_seen as
   // the tiebreak.
-  const candidates = await db.select(
+  let candidates = await db.select(
     "scraped_jobs?select=id,title,company,location,posted_at,posted_is_exact,first_seen,sources," +
       "canonical_url,raw_url,summary,employment_type,fallback_key,link_status,ai_flagged" +
       "&excluded_reason=is.null" +
@@ -735,6 +742,22 @@ async function selectListCandidates(settings, state) {
   if (!Array.isArray(candidates) || !candidates.length) {
     return { items: [], stats: { candidates: 0, dropped_featured: 0, dropped_ai_repost: 0, flagged: 0 }, quota: false };
   }
+
+  /* Collapse duplicates *within* this batch first.
+
+     Two rows can share a fallback key and still both be unfeatured — the same
+     vacancy listed by "Marriott" and by "Careers at Marriott" at different URLs,
+     for instance. The featured-history check below only compares against past
+     lists, so without this the same job went out twice in one PDF. Candidates
+     arrive already sorted newest-first, so the first sighting of a key is the
+     one worth keeping. */
+  const seenKeys = new Set();
+  let collapsedDuplicates = 0;
+  candidates = candidates.filter((c) => {
+    if (seenKeys.has(c.fallback_key)) { collapsedDuplicates += 1; return false; }
+    seenKeys.add(c.fallback_key);
+    return true;
+  });
 
   // Deterministic repost check: has any job with this fallback key already been
   // featured? This is the "reposted at a new URL" case.
@@ -796,7 +819,8 @@ async function selectListCandidates(settings, state) {
   return {
     items: eligible,
     stats: {
-      candidates: candidates.length,
+      candidates: candidates.length + collapsedDuplicates,
+      collapsed_duplicates: collapsedDuplicates,
       dropped_featured: droppedFeatured,
       dropped_ai_repost: droppedAiRepost,
       flagged
