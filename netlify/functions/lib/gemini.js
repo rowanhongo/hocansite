@@ -2,12 +2,13 @@
 // differently-worded posting is the same job we already featured, and judging
 // how well a company fits what we sell.
 //
-// Everything here assumes the FREE tier, which is roughly 10 requests/minute
-// and 250 requests/day for gemini-2.5-flash. So: batched requests (many
-// companies per call), a hard call budget per invocation, and a distinct
-// `quota` outcome that the caller records as resumable work rather than
-// swallowing as "no result". Nothing is ever scored by guessing when the quota
-// runs out.
+// Everything here assumes the FREE tier. Google no longer publishes a fixed
+// number — the allowance is per-project and per-model, and some models have a
+// free-tier allowance of zero — so the code does not hardcode a limit. Instead:
+// batched requests (many companies per call), a hard call budget per
+// invocation, conservative spacing, and a distinct `quota` outcome that the
+// caller records as resumable work rather than swallowing as "no result".
+// Nothing is ever scored by guessing when the quota runs out.
 
 /* Model id, overridable without a deploy via GEMINI_MODEL.
 
@@ -54,6 +55,43 @@ function isConfigured() {
 }
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/* Pull the useful facts out of a 429 body.
+
+   Google's quota errors lead with two paragraphs of boilerplate URLs and only
+   then name the quota that was actually hit, so simply truncating the text cuts
+   off the one part worth reading. This picks out the quota id, its limit and the
+   model, and says plainly whether the cap is per-minute or per-day — the
+   difference between "wait a moment" and "wait until tomorrow". */
+function summarizeQuotaError(text) {
+  const raw = String(text || "");
+  const bits = [];
+
+  const quotaId = (raw.match(/"quotaId"\s*:\s*"([^"]+)"/) || [])[1];
+  const quotaValue = (raw.match(/"quotaValue"\s*:\s*"?(\d+)"?/) || [])[1];
+  const model = (raw.match(/"quotaDimensions"[\s\S]{0,200}?"model"\s*:\s*"([^"]+)"/) || [])[1];
+  const retry = (raw.match(/"retryDelay"\s*:\s*"(\d+)s"/) || [])[1];
+
+  if (quotaId) {
+    const perMinute = /PerMinute/i.test(quotaId);
+    const freeTier = /FreeTier/i.test(quotaId);
+    bits.push(
+      `Limit hit: ${quotaId}${quotaValue ? ` (allowance ${quotaValue})` : ""}` +
+        `${perMinute ? " — this is a per-minute cap, so it clears within a minute" : " — this is a daily cap and resets at midnight Pacific time"}` +
+        `${freeTier && quotaValue === "0" ? ". An allowance of 0 means this model is not available on the free tier; pick a different GEMINI_MODEL or enable billing" : ""}`
+    );
+  }
+  if (model) bits.push(`Model: ${model}`);
+  if (retry) bits.push(`Google suggests retrying in ${retry}s`);
+
+  if (!bits.length) {
+    // Nothing structured to pull out: fall back to the message, skipping the
+    // boilerplate sentence that carries no information.
+    const msg = (raw.match(/"message"\s*:\s*"([^"]+)"/) || [])[1] || raw;
+    return msg.replace(/For more information.*$/s, "").replace(/\s+/g, " ").trim().slice(0, 280);
+  }
+  return bits.join(". ");
+}
 
 /* Call Gemini once and return parsed JSON.
 
@@ -137,9 +175,9 @@ async function callGemini(prompt, responseSchema, state) {
          MAX_429_RETRIES rather than by the attempt counter, so a short burst is
          waited out while a genuine cap still ends the run promptly. */
       const perDay = /per\s*day|daily|quota_limit_value|GenerateRequestsPerDay|exhausted your current quota/i.test(text);
-      if (perDay) throw new QuotaExhausted(`Gemini daily quota reached: ${text.slice(0, 300)}`);
+      if (perDay) throw new QuotaExhausted(`Gemini daily quota reached. ${summarizeQuotaError(text)}`);
       if (rateLimitRetries >= MAX_429_RETRIES) {
-        throw new QuotaExhausted(`Gemini rate limit did not clear after ${MAX_429_RETRIES} retries: ${text.slice(0, 200)}`);
+        throw new QuotaExhausted(`Gemini rate limit did not clear after ${MAX_429_RETRIES} retries. ${summarizeQuotaError(text)}`);
       }
       rateLimitRetries += 1;
       // Google's own retryDelay when it gives one, else a widening backoff.
