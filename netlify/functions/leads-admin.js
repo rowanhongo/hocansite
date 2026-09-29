@@ -361,22 +361,30 @@ async function previewList(body) {
     ? await ingest.selectListCandidates(settings, state)
     : await ingest.selectListCandidates(settings, { calls: gemini.MAX_CALLS_PER_INVOCATION, lastCallAt: 0 });
 
+  // Same field names as a published list's frozen items, so the admin can hand
+  // a preview straight to the PDF builder without a second mapping.
+  const items = selection.items.map((c) => ({
+    id: c.id,
+    title: c.title,
+    company: c.company,
+    location: c.location || "",
+    posted_at: c.posted_at,
+    posted_is_exact: Boolean(c.posted_is_exact),
+    employment_type: c.employment_type || "",
+    apply_url: c.raw_url || c.canonical_url,
+    summary: c.summary || "",
+    source: [...new Set((Array.isArray(c.sources) ? c.sources : []).map((s) => s.via || s.applySource).filter(Boolean))].join(", ") || "—"
+  }));
+
   return json(200, {
     ok: true,
-    count: selection.items.length,
+    count: items.length,
     stats: selection.stats,
     quota: selection.quota,
-    items: selection.items.slice(0, MAX_PER_PAGE).map((c) => ({
-      id: c.id,
-      title: c.title,
-      company: c.company,
-      location: c.location,
-      posted_at: c.posted_at,
-      posted_is_exact: c.posted_is_exact,
-      apply_url: c.raw_url || c.canonical_url,
-      summary: c.summary || "",
-      source: [...new Set((Array.isArray(c.sources) ? c.sources : []).map((s) => s.via || s.applySource).filter(Boolean))].join(", ")
-    }))
+    // The table shows a page; `items` carries the full set so a draft PDF is
+    // the whole list rather than the first 30.
+    items: items.slice(0, MAX_PER_PAGE),
+    allItems: items
   });
 }
 

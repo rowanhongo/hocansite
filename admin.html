@@ -4191,9 +4191,17 @@ const PDF_BRAND={sky:[74,179,212],dark:[26,26,46],muted:[136,150,164],text:[45,5
    The apply links are real PDF link annotations created with textWithLink, not
    blue-coloured text, so they are clickable in Acrobat, Preview, Chrome and
    phone viewers. Each row's link is drawn last at a known x/y for that reason. */
-async function downloadListPdf(listId){
+/* Download a PDF for either a published list or an unpublished preview.
+
+   Given a list id it fetches the frozen snapshot. Given a list object directly
+   (the preview path) it renders that instead, so the draft you can download is
+   built by exactly the same tested code as the real thing — no second renderer
+   to drift out of step. */
+async function downloadListPdf(listOrId){
   const jsPDF=await loadJsPdf();
-  const {list}=await bdCall('list',{id:listId});
+  const list=typeof listOrId==='string'
+    ? (await bdCall('list',{id:listOrId})).list
+    : listOrId;
   const items=list.items||[];
   if(!items.length)throw new Error('This list has no jobs in it.');
 
@@ -4382,9 +4390,14 @@ function renderWeightsPreview(data){
   el.style.display='block';
 }
 
+// Holds the last preview so the draft PDF button has the full item set to
+// render, rather than the 30 rows the table shows.
+let lastListPreview=null;
+
 function renderListPreview(data){
   const el=document.getElementById('feedListPreview');
   if(!el)return;
+  lastListPreview=data;
   const s=data.stats||{};
   const rows=(data.items||[]).map((it,i)=>`<tr>
     <td>${i+1}</td>
@@ -4405,7 +4418,10 @@ function renderListPreview(data){
     <table><thead><tr><th>#</th><th>Title</th><th>Company</th><th>Posted</th><th>Source</th></tr></thead>
     <tbody>${rows||'<tr><td colspan="5">Nothing eligible right now.</td></tr>'}</tbody></table>
     ${data.count>30?`<div class="bd-approx" style="margin-top:8px;">Showing the first 30 of ${data.count}.</div>`:''}
-    <div class="bd-approx" style="margin-top:8px;">This is a preview — no job has been marked as featured.</div>`;
+    <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+      ${data.count?'<button class="btn-secondary" id="feedDraftPdfBtn">Download Draft PDF</button>':''}
+      <span class="bd-approx">This is a preview — no job has been marked as featured. A draft PDF is the full list and changes nothing.</span>
+    </div>`;
   el.style.display='block';
 }
 
@@ -4635,6 +4651,25 @@ function wireBdPanels(){
   });
 
   document.getElementById('panel-jobsfeed')?.addEventListener('click',async e=>{
+    // Draft PDF of the current preview. Renders through the same builder as a
+    // published list, so what you check here is what goes out.
+    const draft=e.target.closest('#feedDraftPdfBtn');
+    if(draft){
+      await bdRun(draft,'Building…',async()=>{
+        try{
+          const items=lastListPreview?.allItems||lastListPreview?.items||[];
+          if(!items.length)throw new Error('Nothing to download. Press Preview Next List first.');
+          const name=await downloadListPdf({
+            week_of:new Date().toISOString().slice(0,10),
+            title:'Latest Job Openings (draft)',
+            items
+          });
+          showToast(`Downloaded ${name} — ${items.length} jobs, nothing marked featured.`);
+        }catch(err){showToast(err.message,'error');}
+      });
+      return;
+    }
+
     const pdf=e.target.closest('[data-list-pdf]');
     if(pdf){
       await bdRun(pdf,'Building…',async()=>{

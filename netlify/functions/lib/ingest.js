@@ -548,8 +548,11 @@ async function runBorderlineFlagging(settings, state) {
   const maxAge = Number(settings.max_job_age_days || 20);
   const cutoff = new Date(Date.now() - maxAge * rules.MS_PER_DAY).toISOString();
 
+  // `via` is not a column — each sighting's board name lives inside the
+  // `sources` jsonb array, because one job can be seen through several boards.
+  // Selecting it directly failed the whole ingest with 42703.
   const jobs = await db.select(
-    "scraped_jobs?select=id,title,company,location,via,employment_type" +
+    "scraped_jobs?select=id,title,company,location,sources,employment_type" +
       "&excluded_reason=is.null&featured_in_list_id=is.null&ai_flagged=is.false" +
       `&or=(posted_at.gte.${cutoff},posted_at.is.null)` +
       "&order=first_seen.desc&limit=200"
@@ -566,7 +569,10 @@ async function runBorderlineFlagging(settings, state) {
       title: j.title,
       company: j.company,
       location: j.location,
-      via: j.via || null
+      // Distinct board names across every sighting of this job.
+      via: [...new Set((Array.isArray(j.sources) ? j.sources : [])
+        .map((s) => s.via || s.applySource)
+        .filter(Boolean))].join(", ") || null
     }));
 
     const result = await gemini.flagBorderlineJobs(batch, state);

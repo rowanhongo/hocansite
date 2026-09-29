@@ -9,14 +9,22 @@
 // swallowing as "no result". Nothing is ever scored by guessing when the quota
 // runs out.
 
-const MODEL = "gemini-2.5-flash";
+/* Model id, overridable without a deploy via GEMINI_MODEL.
+
+   Was gemini-2.5-flash, which now 404s: Google has closed the 2.5 models to any
+   project that was not already using them ("no longer available to new users").
+   The override exists because that is the second time a model id has moved
+   underneath this code, and a one-line env var beats a redeploy. */
+const MODEL = (process.env.GEMINI_MODEL || "gemini-3.8-flash").trim();
 const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`;
 
 // Netlify background functions get 15 minutes, but we stay well inside it: the
 // ingest path also has link checks and database writes to do.
 const MAX_CALLS_PER_INVOCATION = 40;
 const REQUEST_TIMEOUT_MS = 30000;
-// ~6s between calls keeps us under 10 req/min with room for a retry.
+// ~6s between calls. Free-tier limits are not published as a fixed number any
+// more (they are per-project, visible in AI Studio), so this stays deliberately
+// conservative and the 429 handling below is what actually enforces the ceiling.
 const MIN_GAP_MS = 6500;
 
 class QuotaExhausted extends Error {
@@ -124,6 +132,15 @@ async function callGemini(prompt, responseSchema, state) {
 
     if (!res.ok) {
       const text = await res.text().catch(() => "");
+      // A retired or misspelled model id is a 404, and the raw body buries the
+      // one thing worth acting on. Say what to do instead.
+      if (res.status === 404) {
+        throw new Error(
+          `Gemini model "${MODEL}" is unavailable (404). Set the GEMINI_MODEL environment ` +
+            `variable in Netlify to a current model id, then redeploy. Google said: ` +
+            text.replace(/\s+/g, " ").slice(0, 200)
+        );
+      }
       throw new Error(`Gemini error ${res.status}: ${text.slice(0, 300)}`);
     }
 
