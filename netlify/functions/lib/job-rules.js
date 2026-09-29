@@ -90,7 +90,10 @@ function normalizeText(value) {
   return String(value || "")
     .normalize("NFKD")
     .toLowerCase()
-    .replace(/[‘’“”]/g, "")
+    // Apostrophes are removed rather than turned into a space, so "Peponi's"
+    // keys as "peponis" and not "peponi s".
+    .replace(/[‘’ʼ'`]/g, "")
+    .replace(/[“”"]/g, "")
     .replace(/[^a-z0-9\s]/g, " ")
     .replace(/\s+/g, " ")
     .trim();
@@ -105,16 +108,39 @@ const COMPANY_SUFFIXES = [
   "international", "intl", "africa", "sa", "pty", "gmbh", "bv", "nv", "srl"
 ];
 
+/* Prefixes and trailing city/descriptor words that a job board bolts onto an
+   employer's name. Real scraped data had one hotel group arriving as "Marriott",
+   "Careers at Marriott" and "Marriott Hotels Resorts", which split its hiring
+   demand across three leads and understated all three. Stripped from the key
+   only; the display name keeps whatever was scraped. */
+const COMPANY_PREFIXES = [/^careers?\s+at\s+/, /^jobs?\s+at\s+/, /^work\s+at\s+/, /^the\s+/];
+const COMPANY_TRAILING = [
+  "nairobi", "westlands", "kilimani", "mombasa", "kisumu", "nakuru",
+  "hotels resorts", "hotels and resorts", "hotels", "resorts", "hotel",
+  "collection", "group of companies"
+];
+
 function companyKey(company) {
   let key = normalizeText(company);
   if (!key) return "";
-  // Strip trailing suffixes repeatedly: "Acme Kenya Ltd" -> "acme".
+
+  for (const prefix of COMPANY_PREFIXES) {
+    const stripped = key.replace(prefix, "").trim();
+    // Never strip down to nothing: "The Luke Hotel" must not become "".
+    if (stripped) key = stripped;
+  }
+  // Strip trailing suffixes and descriptors repeatedly: "Acme Kenya Ltd" ->
+  // "acme", "Marriott Hotels Resorts" -> "marriott".
   let changed = true;
   while (changed) {
     changed = false;
-    for (const suffix of COMPANY_SUFFIXES) {
+    for (const suffix of [...COMPANY_SUFFIXES, ...COMPANY_TRAILING]) {
       if (key.endsWith(` ${suffix}`)) {
-        key = key.slice(0, -(suffix.length + 1)).trim();
+        const stripped = key.slice(0, -(suffix.length + 1)).trim();
+        // Keep at least one word, so "The Luke Hotel" keeps "luke" rather than
+        // collapsing to empty and colliding with every other stripped name.
+        if (!stripped) continue;
+        key = stripped;
         changed = true;
       }
     }
@@ -209,7 +235,26 @@ const AGENCY_PATTERNS = [
   /\bhuman\s+(resource|capital)\s+(solutions|consult\w*|services|partners)\b/,
   /\bpeople\s+(solutions|consult\w*)\b/, /\bworkforce\s+(solutions|services)\b/,
   /\bjob\s+(board|portal|search)\b/, /\bcareer(s)?\s+(agency|solutions)\b/,
-  /\btemp(orary)?\s+agency\b/, /\blabour\s+(hire|broker|outsourcing)\b/
+  /\btemp(orary)?\s+agency\b/, /\blabour\s+(hire|broker|outsourcing)\b/,
+  // Added after a real scrape: the patterns above were written from assumptions
+  // about how agencies name themselves, and five well-known Kenyan recruiters
+  // walked straight through them as sales leads. These match what actually
+  // appears in the data.
+  //
+  // "<something> management services" is the common shape for a Kenyan labour
+  // broker (Brites Management Services, Volt Management Services). Anchored to
+  // the end so a genuine facilities or property manager is less likely to match.
+  /\bmanagement\s+services?\b\s*(limited|ltd|plc|kenya)?\s*$/,
+  /\b(recruitment|hiring|staffing)\s+(partner|partners|firm|company)\b/,
+  /\bconsulting\b\s*(limited|ltd|kenya)?\s*$/,
+  /\bconsultancy\b/, /\bconsultants\b/,
+  /\bhospitality\s+solutions\b/, /\bbusiness\s+support\s+services\b/,
+  // Named Kenyan job boards and agencies that carry no generic giveaway word.
+  /\bbrighter\s*monday\b/, /\bfuzu\b/, /\bmyjobmag\b/, /\bjobwebkenya\b/,
+  /\bcorporate\s+staffing\b/, /\bsummit\s+recruitment\b/, /\bflexi[-\s]?personnel\b/,
+  /\bgap\s+recruit\w*\b/, /\bcrystal\s+recruit\w*\b/, /\bgeneva\s+hr\b/,
+  /\bgeneral\s+hr\b/, /\bgenesis\s+consult\w*\b/, /\bmorsan\w*\b/,
+  /\bsheer\s+logic\b/, /\bexecafrica\b/, /\bjanta\s+kenya\b/, /\bstellar\s+human\b/
 ];
 
 const CONFIDENTIAL_PATTERNS = [

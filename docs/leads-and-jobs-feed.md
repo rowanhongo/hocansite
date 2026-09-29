@@ -19,14 +19,20 @@ red notice telling you what is missing.
 
 ### 1. Create the database tables
 
-In Supabase → **SQL Editor**, paste and run the whole contents of:
+In Supabase → **SQL Editor**, run the migrations in `supabase/migrations/` in
+filename order, newest last:
 
 ```
-supabase/migrations/20260929120000_leads_and_jobs.sql
+20260929120000_leads_and_jobs.sql               (tables)
+20260929170000_fix_ingest_run_conflict_index.sql (index fix)
 ```
 
-It is safe to run more than once — it creates nothing that already exists and
-deletes nothing.
+Both are safe to run more than once — they create nothing that already exists
+and delete no data.
+
+If the tables were created before 29 Sep 2026, you still need the second file:
+without it every ingest writes its data correctly but then reports a failure, and
+the "Last scrape ingested" line never updates.
 
 ### 2. Add the environment variables
 
