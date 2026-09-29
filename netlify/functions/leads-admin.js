@@ -549,6 +549,7 @@ async function syncNow(body) {
     skipped: result.skipped,
     inserted: result.inserted,
     updated: result.updated,
+    keysBackfilled: result.keysBackfilled || 0,
     companiesTouched: result.companies.touched,
     linksChecked: result.links.checked,
     linksDead: result.links.dead,
