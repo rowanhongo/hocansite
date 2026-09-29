@@ -574,8 +574,11 @@ async function resumeAiReview() {
     reviewed: result.reviewed,
     stillPending: result.pending,
     quotaHit: result.quota,
+    // Carry Gemini's own words through: "quota reached" with nothing else to go
+    // on is exactly the message that sent a real 404 undiagnosed.
+    detail: result.quotaMessage || null,
     message: result.quota
-      ? `Reviewed ${result.reviewed}. Quota reached again — ${result.pending} still waiting.`
+      ? `Reviewed ${result.reviewed}. Stopped with ${result.pending} still waiting — ${result.quotaMessage || "quota reached"}`
       : `Reviewed ${result.reviewed} companies.`
   });
 }

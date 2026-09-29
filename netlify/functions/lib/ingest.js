@@ -28,7 +28,16 @@ const KNOWN_FIELDS = new Set([
   "employmentType", "applySource", "applyUrl",
   // Commonly present and deliberately ignored.
   "id", "position", "thumbnail", "companyLogo", "scrapedAt", "searchQuery",
-  "description", "descriptionHtml", "jobHighlights", "shareLink", "url", "link"
+  "description", "descriptionHtml", "jobHighlights", "shareLink", "url", "link",
+  // Seen in a real run of inovaflow/google-jobs-scraper. Listed so the admin's
+  // "fields we do not store" notice stays meaningful: it should name genuinely
+  // new fields, not the same known ones every week. Several are worth mapping
+  // later (salaryMin/Max, ageDays, isRemote, atsUrl); none is needed for
+  // de-duplication, ranking or the job-seeker list as they stand.
+  "isRemote", "postedText", "ageDays", "salaryMin", "salaryMax", "salaryCurrency",
+  "salaryPeriod", "benefits", "qualificationChip", "applyOptions",
+  "directApplyAvailable", "atsUrl", "highlights", "googleUrl", "thumbnailUrl",
+  "searchLocation", "searchVariant"
 ]);
 
 function getApifyToken() {
@@ -605,6 +614,7 @@ async function runCompanyReview(settings, state, limit = 120) {
   const servicesDescription = settings.services_description || "";
   let reviewed = 0;
   let quota = false;
+  let quotaMessage = "Gemini quota reached. Resume the review to finish.";
   const batchSize = 20;
   const reviewedIds = new Set();
 
@@ -625,7 +635,9 @@ async function runCompanyReview(settings, state, limit = 120) {
     }));
 
     const result = await gemini.reviewCompanies(payload, servicesDescription, state);
-    if (result.quota) { quota = true; break; }
+    // Keep Gemini's own words. Overwriting them with a generic "quota reached"
+    // hid a real cause once and cost a long debugging detour.
+    if (result.quota) { quota = true; quotaMessage = result.error || quotaMessage; break; }
 
     const now = new Date().toISOString();
     for (const review of result.reviews) {
@@ -671,12 +683,12 @@ async function runCompanyReview(settings, state, limit = 120) {
     for (const c of remaining) {
       await db.update(`company_leads?id=eq.${encodeURIComponent(c.id)}`, {
         ai_status: "quota",
-        ai_error: "Gemini free-tier quota reached. Resume the review to finish."
+        ai_error: String(quotaMessage).slice(0, 400)
       }).catch(() => null);
     }
   }
 
-  return { reviewed, pending, quota };
+  return { reviewed, pending, quota, quotaMessage };
 }
 
 // ── Step 6: publish the weekly job-seeker list ──────────────────────────────
