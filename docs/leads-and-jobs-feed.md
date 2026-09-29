@@ -44,6 +44,7 @@ Netlify → **Site settings → Environment variables**:
 | `Gemini_API_Key` | Your Gemini API key | Fit scores, pitch angles, summaries and reworded-repost matching. Everything else still works |
 | `APIFY_WEBHOOK_SECRET` | A long random string you invent | Weekly runs will not ingest by themselves; you would have to press Sync each week |
 | `APIFY_ACTOR_ID` | *(optional)* defaults to `inovaflow/google-jobs-scraper` | Only needed if you change scraper |
+| `GEMINI_MODEL` | *(optional)* defaults to `gemini-3.8-flash` | Only needed when Google retires a model — set it here rather than waiting for a code change |
 
 For `APIFY_WEBHOOK_SECRET`, any long random string works. This one is fine:
 
@@ -245,6 +246,8 @@ why.
 | "APIFY_WEBHOOK_SECRET is not set" | Weekly runs will not auto-ingest. Use Sync until you add it |
 | "Gemini_API_Key is not set" | AI columns unavailable; urgency ranking and lists still work |
 | Lots of companies "Awaiting AI Review" | Free-tier quota ran out. Press Resume AI Review |
+| Badge reads "Jobs OK, AI unavailable" | The scrape landed and the urgency ranks are correct; only the AI columns are missing. Usually a passing Google outage — press Sync again later, or Resume AI Review |
+| `Gemini model "..." is unavailable (404)` | Google retired that model. Set `GEMINI_MODEL` in Netlify to a current one and redeploy |
 | A thin weekly list | Normal after a few weeks — most jobs have already been featured. Press Preview Next List to see the breakdown |
 | Apply link marked dead but works in your browser | Some job sites refuse automated checks. 401/403/429 are already treated as live; a genuine 404 is not. Press Re-check on the row |
 | Apify says the webhook succeeded but nothing arrived | Almost always a mismatched `APIFY_WEBHOOK_SECRET`. Apify sees a success either way (see the note in step 3) — trust the "Last scrape ingested" date instead. Re-copy the secret, redeploy, and press Sync in the meantime |
