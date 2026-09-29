@@ -26,6 +26,10 @@ const REQUEST_TIMEOUT_MS = 30000;
 // more (they are per-project, visible in AI Studio), so this stays deliberately
 // conservative and the 429 handling below is what actually enforces the ceiling.
 const MIN_GAP_MS = 6500;
+// Per-call retry ceilings, kept small so one stuck batch cannot eat the
+// invocation's time budget while still surviving an ordinary blip.
+const MAX_429_RETRIES = 3;
+const MAX_5XX_RETRIES = 3;
 
 class QuotaExhausted extends Error {
   constructor(message) {
@@ -88,9 +92,13 @@ async function callGemini(prompt, responseSchema, state) {
   };
 
   let lastError = null;
-  // Two attempts only. A 429 on the free tier usually means the daily cap, not
-  // a momentary burst, and retrying hard would burn the remaining budget.
-  for (let attempt = 0; attempt < 2; attempt += 1) {
+  let rateLimitRetries = 0;
+  let serverErrorRetries = 0;
+  /* Bounded retries, counted per failure kind rather than by one shared attempt
+     number. A transient 503 and a per-minute 429 both deserve another go, and
+     the previous two-attempt ceiling meant a single blip from Google ended the
+     whole enrichment pass. The daily-quota case still exits immediately. */
+  for (let attempt = 0; attempt < 8; attempt += 1) {
     if (state) {
       state.calls += 1;
       state.lastCallAt = Date.now();
@@ -109,25 +117,45 @@ async function callGemini(prompt, responseSchema, state) {
     } catch (error) {
       clearTimeout(timer);
       lastError = new Error(`Gemini request failed: ${error.message}`);
-      if (attempt === 0) { await sleep(2000); continue; }
-      throw lastError;
+      // A dropped connection or timeout is the same class of problem as a 5xx,
+      // so it shares that budget rather than ending the run on the first blip.
+      if (serverErrorRetries >= MAX_5XX_RETRIES) throw lastError;
+      serverErrorRetries += 1;
+      await sleep(2000 * serverErrorRetries);
+      continue;
     }
     clearTimeout(timer);
 
     if (res.status === 429) {
       const text = await res.text().catch(() => "");
-      // Distinguish "slow down" from "you are done for today": only the former
-      // is worth waiting out inside this invocation.
-      const perDay = /per\s*day|daily|quota_limit_value|GenerateRequestsPerDay/i.test(text);
-      if (perDay || attempt === 1) throw new QuotaExhausted(`Gemini quota reached: ${text.slice(0, 300)}`);
-      await sleep(20000);
+      /* Distinguish "slow down" from "you are done for today".
+
+         Only a per-day signal is terminal. A per-minute burst is not: treating
+         it as exhaustion parks every remaining company behind a Resume button
+         for no reason, which is what happened during a Google outage when
+         repeated 503s and 429s arrived together. Retries are bounded by
+         MAX_429_RETRIES rather than by the attempt counter, so a short burst is
+         waited out while a genuine cap still ends the run promptly. */
+      const perDay = /per\s*day|daily|quota_limit_value|GenerateRequestsPerDay|exhausted your current quota/i.test(text);
+      if (perDay) throw new QuotaExhausted(`Gemini daily quota reached: ${text.slice(0, 300)}`);
+      if (rateLimitRetries >= MAX_429_RETRIES) {
+        throw new QuotaExhausted(`Gemini rate limit did not clear after ${MAX_429_RETRIES} retries: ${text.slice(0, 200)}`);
+      }
+      rateLimitRetries += 1;
+      // Google's own retryDelay when it gives one, else a widening backoff.
+      const suggested = Number((text.match(/"retryDelay"\s*:\s*"(\d+)s"/) || [])[1]);
+      await sleep(Number.isFinite(suggested) && suggested > 0 ? Math.min(suggested * 1000, 30000) : 8000 * rateLimitRetries);
       continue;
     }
 
+    // 503 means Google is briefly unavailable, which it genuinely is from time
+    // to time. Back off and retry rather than abandoning the run.
     if (res.status >= 500) {
       lastError = new Error(`Gemini server error ${res.status}`);
-      if (attempt === 0) { await sleep(3000); continue; }
-      throw lastError;
+      if (serverErrorRetries >= MAX_5XX_RETRIES) throw lastError;
+      serverErrorRetries += 1;
+      await sleep(3000 * serverErrorRetries);
+      continue;
     }
 
     if (!res.ok) {

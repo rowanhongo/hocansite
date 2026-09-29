@@ -555,6 +555,7 @@ async function syncNow(body) {
     aiReviewed: result.reviewed,
     aiPending: result.aiPending,
     aiQuotaHit: result.aiQuotaHit,
+    aiErrors: result.aiErrors || [],
     unmapped: result.unmapped,
     list: result.list
   });

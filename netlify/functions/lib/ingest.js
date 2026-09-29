@@ -921,18 +921,40 @@ async function ingestDataset({ datasetId, runId, scrapedAt, publish = true, repo
   const companyKeys = records.map((r) => rules.companyKey(r.company));
   const companyResult = await rebuildCompanies(companyKeys, settings);
 
-  const flagResult = await runBorderlineFlagging(settings, state);
-  const reviewResult = await runCompanyReview(settings, state);
+  /* Everything from here on is AI enrichment, and none of it may fail the
+     ingest. The jobs, companies and urgency ranks are already committed and are
+     useful on their own; Gemini being down, rate-limited or pointed at a retired
+     model is a reason to ship a list without fit scores, not a reason to throw
+     away a completed scrape. A 503 from Google was doing exactly that. */
+  const aiErrors = [];
+  const tryAi = async (label, fn, fallback) => {
+    try {
+      return await fn();
+    } catch (error) {
+      aiErrors.push(`${label}: ${String(error.message || error).slice(0, 160)}`);
+      return fallback;
+    }
+  };
+
+  const flagResult = await tryAi("flagging", () => runBorderlineFlagging(settings, state), { flagged: 0, quota: false });
+  const reviewResult = await tryAi("review", () => runCompanyReview(settings, state), { reviewed: 0, pending: 0, quota: false });
 
   let list = null;
   let listStats = { candidates: 0, dropped_featured: 0, dropped_ai_repost: 0, flagged: 0 };
   let summaryResult = { summarized: 0, quota: false };
 
   if (publish) {
-    const selection = await selectListCandidates(settings, state);
+    // The repost check inside this is AI-assisted, but the deterministic
+    // fallback-key match still runs, so a failure here costs fuzzy matching, not
+    // the whole list.
+    const selection = await tryAi(
+      "list selection",
+      () => selectListCandidates(settings, state),
+      { items: [], stats: listStats, quota: false }
+    );
     listStats = { ...selection.stats, dead_links: linkResult.dead };
     if (selection.items.length) {
-      summaryResult = await summarizeForList(selection.items, state);
+      summaryResult = await tryAi("summaries", () => summarizeForList(selection.items, state), { summarized: 0, quota: false });
       list = await publishList(selection.items, listStats, settings, null);
     }
   }
@@ -956,8 +978,15 @@ async function ingestDataset({ datasetId, runId, scrapedAt, publish = true, repo
     ai_reviewed: reviewResult.reviewed,
     ai_pending: reviewResult.pending,
     list_id: list?.id || null,
-    status: aiQuotaHit ? "ai_quota" : "ok",
-    error: aiQuotaHit ? "Gemini free-tier quota reached; AI review is incomplete and can be resumed." : null,
+    // A run that ingested cleanly but could not reach Gemini is 'ai_failed', not
+    // 'ok' and not 'error': the data is trustworthy, the enrichment is missing,
+    // and the admin should say so rather than show a silently score-less table.
+    status: aiQuotaHit ? "ai_quota" : aiErrors.length ? "ai_failed" : "ok",
+    error: aiQuotaHit
+      ? "Gemini free-tier quota reached; AI review is incomplete and can be resumed."
+      : aiErrors.length
+      ? `Jobs and rankings ingested normally, but AI enrichment failed — ${aiErrors.join("; ")}`
+      : null,
     unmapped_fields: unmapped
   };
 
@@ -999,6 +1028,9 @@ async function ingestDataset({ datasetId, runId, scrapedAt, publish = true, repo
     reviewed: reviewResult.reviewed,
     aiPending: reviewResult.pending,
     aiQuotaHit,
+    // Non-empty when the ingest succeeded but AI enrichment did not, so the
+    // caller can report a degraded run instead of an apparently perfect one.
+    aiErrors,
     list,
     listStats,
     summarized: summaryResult.summarized,

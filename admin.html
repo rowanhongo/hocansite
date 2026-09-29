@@ -4031,6 +4031,8 @@ function renderFeedRunInfo(runs){
     ? '<span class="badge published">OK</span>'
     : last.status==='ai_quota'
     ? '<span class="badge draft">AI quota reached</span>'
+    : last.status==='ai_failed'
+    ? '<span class="badge draft">Jobs OK, AI unavailable</span>'
     : `<span class="badge inactive">${esc(last.status)}</span>`;
 
   el.innerHTML=`
@@ -4606,7 +4608,12 @@ function wireBdPanels(){
         ];
         if(data.linksDead)bits.push(`${data.linksDead} dead`);
         if(data.aiQuotaHit)bits.push('AI quota reached');
-        showToast(bits.join(', '),data.aiQuotaHit?'error':'success');
+        // The jobs are in either way; say plainly that only the AI part failed,
+        // rather than reporting a clean sync with mysteriously empty scores.
+        const aiFailed=(data.aiErrors||[]).length>0;
+        if(aiFailed)bits.push('AI enrichment failed (jobs still ingested)');
+        showToast(bits.join(', '),(data.aiQuotaHit||aiFailed)?'error':'success');
+        if(aiFailed)console.warn('AI enrichment errors:',data.aiErrors);
         await loadBdOverview(true);
         await loadFeedJobs(1);
       }catch(err){showToast(err.message,'error');}
