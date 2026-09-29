@@ -947,11 +947,30 @@ async function ingestDataset({ datasetId, runId, scrapedAt, publish = true, repo
     unmapped_fields: unmapped
   };
 
-  // Upsert on run id so a webhook retry updates the record instead of adding a
-  // duplicate "last sync" row.
-  const savedRun = runId
-    ? await db.upsert("job_ingest_runs", [runRow], "apify_run_id")
-    : await db.insert("job_ingest_runs", [runRow]);
+  /* Record the run.
+
+     Upsert on run id so a webhook retry updates the record rather than adding a
+     duplicate "last sync" row.
+
+     This is history, not data: by the time we get here the jobs, companies and
+     list are already committed. So a failure to write it must never fail the
+     ingest — it did once, when the unique index this infers was still partial
+     (Postgres cannot infer ON CONFLICT from a partial index), and the result was
+     a completed ingest reported to the operator as a hard error. Falling back to
+     a plain insert keeps the history usable even if the index is wrong, and a
+     total failure is swallowed with the run left unrecorded. */
+  let savedRun = null;
+  try {
+    savedRun = runId
+      ? await db.upsert("job_ingest_runs", [runRow], "apify_run_id")
+      : await db.insert("job_ingest_runs", [runRow]);
+  } catch (error) {
+    try {
+      savedRun = await db.insert("job_ingest_runs", [runRow]);
+    } catch (_e) {
+      savedRun = null;
+    }
+  }
 
   return {
     run: Array.isArray(savedRun) ? savedRun[0] : savedRun,

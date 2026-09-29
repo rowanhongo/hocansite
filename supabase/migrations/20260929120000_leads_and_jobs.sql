@@ -238,8 +238,18 @@ create table if not exists public.job_ingest_runs (
 
 create index if not exists job_ingest_runs_created_idx
   on public.job_ingest_runs (created_at desc);
+
+-- Unique on apify_run_id so a webhook retry updates its run row instead of
+-- adding a second "last sync".
+--
+-- NOT a partial index (`where apify_run_id is not null`), even though that would
+-- describe the intent more tightly: Postgres cannot use a partial index to infer
+-- an ON CONFLICT target, so the upsert in lib/ingest.js failed with 42P10 and
+-- every ingest threw after the data had already been written. A plain unique
+-- index infers correctly, and NULLs are distinct in Postgres anyway, so manual
+-- ingests with no run id can still insert freely.
 create unique index if not exists job_ingest_runs_apify_run_key
-  on public.job_ingest_runs (apify_run_id) where apify_run_id is not null;
+  on public.job_ingest_runs (apify_run_id);
 
 -- ── Settings (single row) ────────────────────────────────────────────────────
 -- Urgency weights live in the database, not in code, because the whole point is

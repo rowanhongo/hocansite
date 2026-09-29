@@ -24,14 +24,22 @@ function restUrl(pathAndQuery) {
   return `${getEnv("SUPABASE_URL")}/rest/v1/${pathAndQuery}`;
 }
 
-// Recognises the "you have not run the migration" case, so the admin can say so
-// plainly instead of showing a raw Postgres error.
+/* Recognises the "you have not run the migration" case, so the admin can say so
+   plainly instead of showing a raw Postgres error.
+
+   Deliberately narrow. A previous version also matched a bare "does not exist",
+   which is a substring of plenty of unrelated Postgres errors — a failed
+   ON CONFLICT inference among them. That sent the operator off to re-run a
+   migration that was already applied while the real fault went unreported.
+   PostgREST's own codes are the reliable signal: PGRST205 (table not in the
+   schema cache) and 42P01 (undefined_table). */
 function tableMissing(text) {
   const msg = String(text || "").toLowerCase();
+  if (msg.includes("pgrst205") || msg.includes("42p01")) return true;
   return (
     msg.includes("could not find the table") ||
-    msg.includes("does not exist") ||
-    msg.includes("schema cache")
+    msg.includes("could not find the schema") ||
+    (msg.includes("relation") && msg.includes("does not exist"))
   );
 }
 
