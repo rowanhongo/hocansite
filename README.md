@@ -12,6 +12,14 @@ Set these in **Netlify → Site settings → Environment variables** (or in `net
 | `SUPABASE_ANON_KEY` | Public anon key (safe for browser) | Injected into frontend at build |
 | `SUPABASE_SERVICE_ROLE_KEY` | Secret service key (bypasses RLS) | **Never** in frontend. Supabase Edge Function secrets (Paystack webhook) and Netlify Functions (`bio-links-admin`). |
 | `ADMIN_PASSWORD` | Password for the admin dashboard, also re-checked server-side by `bio-links-admin` | Netlify env vars |
+| `APIFY_API_Key` | Apify API token, used to pull the Nairobi jobs dataset | Netlify env vars. Server-side only (`apify-jobs-webhook-background`, `leads-admin`) |
+| `APIFY_WEBHOOK_SECRET` | Shared secret in the Apify webhook URL. Without it the weekly scrape will not ingest automatically | Netlify env vars |
+| `APIFY_ACTOR_ID` | Optional. Defaults to `inovaflow/google-jobs-scraper` | Netlify env vars |
+| `Gemini_API_Key` | Gemini API key for repost matching, company fit scoring and one-line job summaries | Netlify env vars. Server-side only |
+
+See **[docs/leads-and-jobs-feed.md](docs/leads-and-jobs-feed.md)** for the Leads and
+Jobs Feed admin panels: one-time setup (migration, env vars, Apify webhook), how the
+weekly job-seeker PDF lists work, and how the company urgency ranking is calculated.
 
 **Build command:** `npm run build`  
 **Publish directory:** `.` (or your static output folder)
