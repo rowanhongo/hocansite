@@ -42,6 +42,7 @@ Netlify → **Site settings → Environment variables**:
 |---|---|---|
 | `APIFY_API_Key` | Your Apify API token | Nothing can be pulled at all |
 | `Gemini_API_Key` | Your Gemini API key | Fit scores, pitch angles, summaries and reworded-repost matching. Everything else still works |
+| `GEMINI_MAX_CALLS` | *(optional)* defaults to `12` | Raise it only if your key is on a paid tier — see the note on quotas below |
 | `APIFY_WEBHOOK_SECRET` | A long random string you invent | Weekly runs will not ingest by themselves; you would have to press Sync each week |
 | `APIFY_ACTOR_ID` | *(optional)* defaults to `inovaflow/google-jobs-scraper` | Only needed if you change scraper |
 | `GEMINI_MODEL` | *(optional)* defaults to `gemini-3.8-flash` | Only needed when Google retires a model — set it here rather than waiting for a code change |
@@ -187,6 +188,31 @@ means old and new scores remain comparable.
 
 Press **Details** on any row to see the score broken down signal by signal,
 alongside the actual postings it was computed from. The rank is always auditable.
+
+### A note on the AI, and why the vetting does not depend on it
+
+The free Gemini tier is small — a real key allowed **20 requests per day**. That
+is enough to keep the weekly list and the fit scores ticking over, but not
+enough to re-review everything on demand, and you will see "Awaiting AI Review"
+whenever it runs out. That resets at midnight Pacific time.
+
+**This does not weaken the vetting.** Everything that decides whether a job or a
+company is worth your attention is deterministic and runs without the AI:
+
+- agencies, competitors, confidential and non-Kenya postings are excluded by
+  keyword rules plus your own blocklists
+- duplicates and reposts are matched on the canonical apply URL and on
+  company + title + location
+- apply links are verified by an actual HTTP request
+- the urgency ranking is arithmetic over de-duplicated jobs
+
+The AI adds a fit score, a pitch angle and a catch for reworded reposts. Useful,
+not load-bearing. A list published with no AI at all is still correctly filtered,
+correctly de-duplicated, correctly ordered and free of dead links.
+
+If you want the AI columns filled reliably, enabling billing on the Gemini key is
+the only real fix, and it is cheap at this volume. Otherwise press **Resume AI
+Review** the next day and it will catch up.
 
 ### AI review
 
