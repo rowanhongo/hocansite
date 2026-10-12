@@ -4223,6 +4223,20 @@ function loadJsPdf(){
   return jsPdfPromise;
 }
 
+// Standard PDF fonts cover Latin-1 only. A single emoji or unsupported symbol in
+// a job title would garble that whole line, so text is reduced to what prints.
+function pdfSafe(s){
+  return String(s??'')
+    .replace(/[‘’ʼ]/g,"'")
+    .replace(/[“”]/g,'"')
+    .replace(/[–—−]/g,'-')
+    .replace(/…/g,'...')
+    .replace(/ /g,' ')
+    .replace(/[^ -~À-ÿ]/g,'')
+    .replace(/\s+/g,' ')
+    .trim();
+}
+
 const PDF_BRAND={sky:[74,179,212],dark:[26,26,46],muted:[136,150,164],text:[45,55,72],line:[232,236,240]};
 
 /* Build the branded job-seeker PDF.
@@ -4308,9 +4322,9 @@ async function downloadListPdf(listOrId){
   items.forEach((item,index)=>{
     // Measure the row before drawing it, so a card is never split across pages.
     doc.setFontSize(11);
-    const titleLines=doc.splitTextToSize(`${index+1}. ${item.title}`,contentW-70);
+    const titleLines=doc.splitTextToSize(pdfSafe(`${index+1}. ${item.title}`),contentW-70);
     doc.setFontSize(9);
-    const summaryLines=item.summary?doc.splitTextToSize(item.summary,contentW-12):[];
+    const summaryLines=item.summary?doc.splitTextToSize(pdfSafe(item.summary),contentW-12):[];
     const rowH=18+titleLines.length*14+14+(summaryLines.length?summaryLines.length*11+4:0)+16;
 
     if(y+rowH>pageH-56)newPage();
@@ -4331,7 +4345,7 @@ async function downloadListPdf(listOrId){
     doc.setFont('helvetica','normal');
     doc.setFontSize(9);
     doc.setTextColor(...PDF_BRAND.text);
-    const meta=[item.company,item.location,item.employment_type].filter(Boolean).join('  ·  ');
+    const meta=[item.company,item.location,item.employment_type].map(pdfSafe).filter(Boolean).join('  ·  ');
     doc.text(doc.splitTextToSize(meta,contentW-90)[0]||'',margin+12,ty);
     ty+=13;
 
@@ -4351,7 +4365,7 @@ async function downloadListPdf(listOrId){
       : 'date unknown';
     doc.text(posted,pageW-margin-12,top+18,{align:'right'});
     if(item.source&&item.source!=='—'){
-      doc.text(doc.splitTextToSize(item.source,150)[0],pageW-margin-12,top+29,{align:'right'});
+      doc.text(doc.splitTextToSize(pdfSafe(item.source),150)[0],pageW-margin-12,top+29,{align:'right'});
     }
 
     // The apply link, as a real PDF annotation. textWithLink draws the text and
@@ -4360,7 +4374,9 @@ async function downloadListPdf(listOrId){
       doc.setFont('helvetica','bold');
       doc.setFontSize(9);
       doc.setTextColor(...PDF_BRAND.sky);
-      const label='Apply for this job →';
+      // No arrow: it is outside the standard PDF font's character set, and one
+      // unsupported glyph garbles the entire string it sits in.
+      const label='Apply for this job';
       doc.textWithLink(label,margin+12,ty,{url:item.apply_url});
       // Underline it so it reads as a link on paper and in viewers that do not
       // highlight annotations.
