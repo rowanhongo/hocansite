@@ -4828,7 +4828,7 @@ function rsMonth(iso){
 // Themes across the staff-related reviews. A review can sit in several.
 const RS_THEMES=[
   {key:'rude',label:'Rude, disrespectful or bad attitude',re:/rude|attitude|disrespect|arrogan|insult|harass|shout|unfriendly|hostile|argumentative|condescend|judgy|aggressive|abusive/i},
-  {key:'slow',label:'Slow service or long waits',re:/slow|wait(ed|ing)?\b|took (forever|long|an hour|ages)|forever|delay|long time|\bhours?\b|ages/i},
+  {key:'slow',label:'Slow service or long waits',re:/slow|wait(ed|ing)?\b|took (forever|long|an hour|ages)|forever|delay|long time|\bhours?\b|\bages\b/i},
   {key:'ignored',label:'Ignored, inattentive or absent',re:/ignor|inattentive|not attentive|unattentive|nobody|no one|neglect|never came|didn'?t (come|bother|attend)|absent|disappear|clueless/i},
   {key:'untrained',label:'Unprofessional or untrained',re:/unprofession|untrained|not (well |properly )?trained|incompetent|lack of training|poorly trained|no training|unskilled|careless/i},
   {key:'manager',label:'Manager or management named',re:/manager|management/i}
@@ -4929,7 +4929,9 @@ async function rsBuildPdf(){
     y+=gap;
   };
   const heading=(text,size=13)=>{
-    ensure(size+22);y+=8;
+    // Needs room for the heading and a few lines under it, so a heading is
+    // never left stranded at the foot of a page.
+    ensure(size+64);y+=8;
     doc.setFont('helvetica','bold');doc.setFontSize(size);doc.setTextColor(...RS_C.dark);
     doc.text(rsSafe(text),M,y+size);y+=size+9;
   };
@@ -5065,7 +5067,7 @@ async function rsBuildPdf(){
 
   heading('1. Ratings in this market are compressed, so the middle is high');
   const ge43=Object.entries(m.buckets).filter(([k])=>Number(k)>=4.3).reduce((n,[,v])=>n+v,0);
-  para(`Across the ${m.placesScanned} open, rated places we scanned, the median rating is ${m.median} and the mean ${m.mean}. ${Math.round(ge43/m.placesScanned*100)}% score 4.3 or higher and only ${m.belowBand} fall below 2.0. A 4.2 sounds respectable, but here it sits in the lower half of the market.`);
+  para(`Across the ${m.placesScanned} open, rated places we scanned, the median rating is ${m.median} and the mean ${m.mean}. ${Math.round(ge43/m.placesScanned*100)}% score 4.3 or higher and only ${m.belowBand} ${m.belowBand===1?'falls':'fall'} below 2.0. A 4.2 sounds respectable, but here it sits in the lower half of the market.`);
 
   // Distribution chart
   const keys=Object.keys(m.buckets).map(Number).sort((a,b)=>a-b);
@@ -5142,7 +5144,24 @@ async function rsBuildPdf(){
     newPage();
     doc.setFont('helvetica','bold');doc.setFontSize(17);doc.setTextColor(...RS_C.dark);
     doc.text('Chain directory',M,y+16);y+=24;
-    para('One entry per brand, so the same operator is not repeated on every outlet. A person is only named where they appear on an official company page; none are named here.',{color:RS_C.muted,gap:8});
+    para('One entry per brand, so the same operator is not repeated on every outlet. A person is only named where they appear on an official company page; none are named here.',{color:RS_C.muted,gap:6});
+
+    // Operators running more than one of the brands above: one conversation
+    // reaches several leads.
+    const byOperator=new Map();
+    brands.forEach(({chain,venues},brand)=>{
+      if(!chain.operator)return;
+      const key=chain.operator.toLowerCase().slice(0,22);
+      const g=byOperator.get(key)||{name:chain.operator.split(/[,(]/)[0].trim(),brands:[],count:0};
+      g.brands.push(brand);g.count+=venues.length;
+      byOperator.set(key,g);
+    });
+    const multi=[...byOperator.values()].filter(g=>g.brands.length>1);
+    if(multi.length){
+      heading('Operators behind more than one brand here',11);
+      multi.forEach(g=>para(`${g.name}: ${g.count} venues across ${g.brands.join(' and ')}.`,{indent:10,gap:2,size:9}));
+      y+=6;
+    }
     [...brands.entries()].sort((a,b)=>b[1].venues.length-a[1].venues.length).forEach(([brand,{chain,venues}])=>{
       doc.setFont('helvetica','normal');doc.setFontSize(8.6);
       const rows=[
