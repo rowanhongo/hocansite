@@ -229,6 +229,10 @@ function resolvePostedAt(postedRaw, scrapedAt) {
 
 const AGENCY_PATTERNS = [
   /\brecruit(ing|ment|er|ers)?\b/, /\bstaffing\b/, /\btalent\s+(solutions|acquisition|partners|group)\b/,
+  // "Stratostaff", "Teamstaff": agencies that fuse the word into one token, which
+  // \bstaffing\b never sees. Needs 3+ letters before it so "Staff Canteen" and
+  // similar are left alone.
+  /\b[a-z]{3,}staff\b/,
   /\bmanpower\b/, /\bemployment\s+agency\b/, /\bplacement(s)?\s+(agency|services|ltd)\b/,
   /\bexecutive\s+search\b/, /\bheadhunt(er|ers|ing)\b/, /\boutsourc(ing|e|ed)\b/,
   /\bhr\s+(solutions|consult\w*|services|outsourcing|advisory)\b/,
