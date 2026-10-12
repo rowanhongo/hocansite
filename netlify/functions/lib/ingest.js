@@ -316,8 +316,21 @@ async function upsertJobs(records, runId, scrapedAt) {
       updated += 1;
     }
 
-    const written = await db.upsert("scraped_jobs", toUpsert, "canonical_url");
-    if (Array.isArray(written)) rows.push(...written);
+    /* Written as two uniform batches, never one mixed one.
+
+       A new row and an existing row carry different columns (an existing row
+       brings its link status, featured history and summary along; a new one has
+       none of those yet), and PostgREST rejects a bulk write whose objects do not
+       all share the same keys — PGRST102, "All object keys must match". It never
+       showed up while every row in a run was new, or every row was a re-sighting,
+       and then the first week with a mix failed the whole ingest and the weekly
+       refresh silently produced nothing. */
+    const isNew = (r) => !("link_status" in r);
+    for (const group of [toUpsert.filter(isNew), toUpsert.filter((r) => !isNew(r))]) {
+      if (!group.length) continue;
+      const written = await db.upsert("scraped_jobs", group, "canonical_url");
+      if (Array.isArray(written)) rows.push(...written);
+    }
   }
 
   return { inserted, updated, rows };
