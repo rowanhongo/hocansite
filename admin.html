@@ -4835,10 +4835,15 @@ function rsSafe(s){
     .trim();
 }
 
-function rsMonth(iso){
+function rsDay(iso){
   if(!iso)return'';
   const d=new Date(iso);
-  return Number.isFinite(d.getTime())?d.toLocaleDateString('en-KE',{month:'short',year:'numeric'}):'';
+  return Number.isFinite(d.getTime())?d.toLocaleDateString('en-KE',{day:'numeric',month:'short',year:'numeric'}):'';
+}
+// Whole years since a review, so a 2018 complaint is not read as current.
+function rsYearsAgo(iso){
+  const t=new Date(iso).getTime();
+  return Number.isFinite(t)?(Date.now()-t)/(365.25*86400000):null;
 }
 
 // Themes across the staff-related reviews. A review can sit in several.
@@ -4853,8 +4858,11 @@ const RS_THEMES=[
 function rsThemeCounts(leads){
   const reviews=leads.flatMap(l=>l.staffReviews);
   const total=reviews.length;
+  const dated=reviews.filter(r=>r.date);
+  const recent=dated.filter(r=>{const y=rsYearsAgo(r.date);return y!==null&&y<=1;}).length;
+  const old=dated.filter(r=>{const y=rsYearsAgo(r.date);return y!==null&&y>3;}).length;
   return {
-    total,
+    total,recent,old,
     themes:RS_THEMES.map(t=>{
       const n=reviews.filter(r=>t.re.test(r.text)).length;
       return {label:t.label,n,pct:total?Math.round(n/total*100):0};
@@ -4884,7 +4892,7 @@ function rsRender(){
       <td data-label="Rating"><span class="bd-score ${l.rating<3.5?'hot':l.rating<4?'warm':'mild'}">${l.rating.toFixed(1)}</span><br><span class="bd-approx">${l.reviewsCount.toLocaleString()} reviews</span></td>
       <td data-label="Staff reviews">${l.staffReviews.length?l.staffReviews.length:'<span class="bd-approx">none found</span>'}</td>
       <td data-label="Chain / operator">${chain}</td>
-      <td data-label="Lowest staff review">${top?`<span class="bd-approx">${top.stars} star</span> ${esc(top.text.slice(0,130))}${top.text.length>130?'…':''}`:'<span class="bd-approx">still worth approaching</span>'}</td>
+      <td data-label="Lowest staff review">${top?`<span class="bd-approx">${top.stars} star · ${esc(rsDay(top.date))}</span> ${esc(top.text.slice(0,130))}${top.text.length>130?'…':''}`:'<span class="bd-approx">still worth approaching</span>'}</td>
     </tr>`;
   }).join(''):'<tr class="empty-row"><td colspan="6">No venues.</td></tr>';
 
@@ -5041,7 +5049,8 @@ async function rsBuildPdf(){
 
     revBlocks.forEach(({rv,ls})=>{
       doc.setFont('helvetica','bold');doc.setFontSize(7.6);doc.setTextColor(...RS_C.rose);
-      doc.text(`${rv.stars} star${rv.stars===1?'':'s'}${rv.date?'  |  '+rsMonth(rv.date):''}`,M+14,cy+7);
+      const yrs=rv.date?rsYearsAgo(rv.date):null;
+      doc.text(`${rv.stars} star${rv.stars===1?'':'s'}${rv.date?'  |  '+rsDay(rv.date):''}${yrs!==null&&yrs>2?'  |  over '+Math.floor(yrs)+' years ago':''}`,M+14,cy+7);
       cy+=11;
       doc.setFont('helvetica','italic');doc.setFontSize(8.6);doc.setTextColor(...RS_C.text);
       ls.forEach(t=>{doc.text(t,M+22,cy+8);cy+=11.2;});
@@ -5135,6 +5144,7 @@ async function rsBuildPdf(){
   });
   y+=4;
   para(`${r.withStaffComplaint} of the ${r.leads.length} venues had at least one such review. These problems come from hiring, training, supervision and staffing levels, which is where an outside HR partner can help.`);
+  para(`Recency matters: ${tc.recent} of the ${tc.total} reviews (${tc.total?Math.round(tc.recent/tc.total*100):0}%) are from the last 12 months, and ${tc.old} are more than three years old. Each quote in the list carries its date, and anything over two years is tagged. A recent run of complaints is a live problem; an old one may already have been fixed, or the staff may have changed.`);
   para('Read this as a signal, not proof. A review can fall in more than one theme, the themes are matched by keywords, and the sample is the lowest-rated reviews that mention staff, capped at two per venue. It shows what unhappy customers say about people, not how common the problem is across all customers.',{style:'italic',color:RS_C.muted});
 
   heading('4. How to use this with a lead');
