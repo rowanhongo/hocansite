@@ -180,7 +180,21 @@ async function results(body) {
   const datasetId = String(body.datasetId || "");
   if (!datasetId) return json(400, { ok: false, error: "datasetId is required." });
   const items = await apify(`/datasets/${encodeURIComponent(datasetId)}/items?clean=true&format=json&limit=2000`);
-  return json(200, { ok: true, ...shape(Array.isArray(items) ? items : []) });
+  const list = Array.isArray(items) ? items : [];
+  return json(200, {
+    ok: true,
+    ...shape(list),
+    // Diagnostics: the spread of overall ratings seen, and the order reviews
+    // arrive in for the first few places, so the scan depth and the sort value
+    // can be judged from real data instead of assumed.
+    ratingsSeen: list.map((p) => Number(p.totalScore)).filter(Number.isFinite).sort((a, b) => a - b),
+    reviewOrderSample: list.slice(0, 4).map((p) => ({
+      title: p.title,
+      rating: p.totalScore,
+      reviewCount: p.reviewsCount,
+      starsInOrder: (Array.isArray(p.reviews) ? p.reviews : []).map((r) => r.stars)
+    }))
+  });
 }
 
 exports.handler = async function handler(event) {
