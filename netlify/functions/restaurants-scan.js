@@ -35,13 +35,126 @@ const STAFF_RE = /\b(staff|waiters?|waitress(es)?|managers?|management)\b/i;
    safe to keep in source. `reviewsDataset` is filled in once the pull has run. */
 const REPORT = {
   placesDatasets: ["fSSpoOpjbZl8alJQI", "8ASJW338M2wRyHkNB"],
-  reviewsDataset: ""
+  reviewsDataset: "SWQELAeAGs1rM8lb1"
 };
 
 /* Brand research, applied to venues by name. Filled in from public sources only;
    a blank field means it was looked for and not found. `source` is where each
    claim came from so a team member can check it. */
-const CHAINS = [];
+const CHAINS = [
+  {
+    re: /galito/i, brand: "Galito's",
+    operator: "Simbisa Brands Kenya Limited (formerly Innscor Kenya), ICD Road, Nairobi",
+    hiring: "Simbisa Kenya posts roles on MyJobMag and JobWebKenya; no HR email published",
+    source: "simbisabrands.com (Galito's listed as a Simbisa brand, Kenya a market); Mwango Capital post citing 252 Kenyan outlets incl. Galito's",
+    note: "Medium confidence: individual outlets may be franchised rather than company-run."
+  },
+  {
+    re: /pizza inn|chicken inn/i, brand: "Pizza Inn / Chicken Inn",
+    operator: "Simbisa Brands Kenya Limited (formerly Innscor Kenya), ICD Road, Nairobi",
+    hiring: "Simbisa Kenya posts roles on MyJobMag and JobWebKenya; no HR email published",
+    source: "Business Daily (63 Chicken Inn, 74 Pizza Inn, 402 jobs added); LinkedIn: Simbisa Brands Kenya Limited",
+    note: "High confidence. Simbisa runs c.250 Kenyan outlets across seven brands, so one conversation covers several of these leads."
+  },
+  {
+    re: /domino/i, brand: "Domino's Pizza",
+    operator: "Eat 'N' Go Limited, master franchisee (took over the Kenyan franchise April 2021; earlier Om Nom Nom Ltd)",
+    hiring: "Posts on MyJobMag, Fuzu and JobWebKenya; recruiting actively in Nairobi (Apr-May 2026 listings)",
+    source: "ir.dominos.com Kenya launch release; dominos.co.ke; MyJobMag and Fuzu listings for Eat 'N' Go Limited",
+    note: "High confidence on operator."
+  },
+  {
+    re: /java house/i, brand: "Java House",
+    operator: "Java House Africa Ltd (also owns 360 Degrees Pizza)",
+    hiring: "Careers portal jobs.javahouseafrica.com; applications email jointheteam@javahouseafrica.com (seen on a May 2025 listing, unverified)",
+    source: "MyJobMag and Fuzu listings; jobs.javahouseafrica.com; Wikipedia: Java House",
+    note: "Hiring branch supervisors and managers (Apr 2026 listing)."
+  },
+  {
+    re: /\bkfc\b/i, brand: "KFC",
+    operator: "Kuku Foods Kenya Ltd (Kuku Foods East Africa), the KFC franchisee",
+    hiring: "KFC Kenya says vacancies are received only via admin@kfeah.com; also posts crew roles on BrighterMonday",
+    source: "KFC Kenya official account on X (Aug 2023); howwemadeitinafrica.com; BrighterMonday listings",
+    note: "High confidence. The email is from a 2023 post, so confirm it is still current."
+  },
+  {
+    re: /pizza hut/i, brand: "Pizza Hut",
+    operator: "",
+    hiring: "",
+    source: "Searched. Two dated sources conflict: Feast Limited (c.2015) and Liberty Eagle (older Business Daily piece)",
+    note: "Operator not confirmed; left blank rather than guess."
+  },
+  {
+    re: /papa john/i, brand: "Papa John's",
+    operator: "Kitchen Express Ltd, master franchisee for Kenya and Uganda; subsidiary of AAH Limited, sister to Hass Petroleum",
+    hiring: "",
+    source: "BusinessWire (Nov 2021); Benzinga; global-franchise.com",
+    note: "High confidence on operator. No careers page or HR contact found."
+  },
+  {
+    re: /chicken cottage/i, brand: "Chicken Cottage",
+    operator: "Kitchen Express Ltd (reported as Express Kitchen), subsidiary of AAH Limited, sister to Hass Petroleum",
+    hiring: "",
+    source: "Business Daily: UK food chain Chicken Cottage enters Kenya; The Standard",
+    note: "Same group as Papa John's. No careers page or HR contact found."
+  },
+  {
+    re: /pizza mojo/i, brand: "Pizza Mojo",
+    operator: "",
+    hiring: "",
+    source: "Searched. One Tripadvisor reviewer says Big Square; no authoritative source",
+    note: "Owner not confirmed. A business line (+254 729 918 435) appears on BusinessList.co.ke."
+  },
+  {
+    re: /spur/i, brand: "Spur Steak Ranches",
+    operator: "",
+    hiring: "",
+    source: "Searched. Listings show a South African franchise brand; no Kenyan franchisee named",
+    note: "Franchisee not found. Soaring Eagle Spur showed as closed on Uber Eats in Nov 2024, so check it is trading."
+  },
+  {
+    re: /artcaff/i, brand: "Artcaffe",
+    operator: "Artcaffe Coffee & Bakery Limited (trademark holder per site footer)",
+    hiring: "HR inbox hr@artcaffe.co.ke with a coded subject line (from 2025-26 job listings); hiring waitstaff and baristas",
+    source: "artcaffe.co.ke footer; MyJobMag, CorporateStaffing and Opportunities for Young Kenyans listings",
+    note: "Medium confidence on the email: not shown on the company's own site."
+  },
+  {
+    re: /^mezza\b/i, brand: "Mezza",
+    operator: "",
+    hiring: "",
+    source: "Searched. mezza.co.ke lists only MEZZA as the parent organisation",
+    note: "Legal owner not found."
+  },
+  {
+    re: /chicking/i, brand: "ChicKing",
+    operator: "UAE halal fast-food brand. Kenyan franchise partner reported as Crispy Ltd (Mombasa launch); Nairobi operator not confirmed",
+    hiring: "",
+    source: "Business Daily (2022); nation.africa; chicking.ke",
+    note: "Low confidence on the Nairobi operator."
+  },
+  {
+    re: /k'?osewe/i, brand: "K'Osewe Ranalo Foods",
+    operator: "Family-run local group, flagship on Kimathi Street (founded 1970s by William Guda Osewe)",
+    hiring: "",
+    source: "Tripadvisor; nairobirestaurants.co.ke; kosewe.com",
+    note: "Single local operator rather than a franchise. No careers page found."
+  },
+  {
+    re: /chowpaty/i, brand: "Chowpaty",
+    operator: "Chowpaty Restaurants Ltd / Chowpaty Fast Foods Ltd, Diamond Plaza, Parklands (incorporated 1996; also runs Cafe Tajiri)",
+    hiring: "",
+    source: "BusinessList.co.ke; Facebook page; chowpatyrestaurants.com",
+    note: "Local operator. No careers page found."
+  },
+  {
+    re: /tomoca/i, brand: "Tomoca Coffee",
+    operator: "Tomoca Coffee Kenya Ltd, a joint venture with an unnamed local investor (not a franchise)",
+    hiring: "",
+    source: "Addis Fortune; allAfrica (Two Rivers Mall opening, Sept 2020)",
+    note: "No careers page found."
+  }
+];
 
 function json(statusCode, body) {
   return {
@@ -142,6 +255,22 @@ async function status(body) {
     datasetId: d.defaultDatasetId,
     usageUsd: d.usageTotalUsd ?? null
   });
+}
+
+// Unnamed run datasets expire; naming one keeps it. Used once, on the finished pulls.
+async function keep(body) {
+  const pairs = Array.isArray(body.pairs) ? body.pairs : [];
+  const done = [];
+  for (const { id, name } of pairs) {
+    if (!id || !/^[a-z0-9-]{3,60}$/.test(String(name))) continue;
+    await apify(`/datasets/${encodeURIComponent(id)}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name })
+    });
+    done.push(name);
+  }
+  return json(200, { ok: true, named: done });
 }
 
 // What the account has used this month against its cap.
@@ -301,6 +430,7 @@ exports.handler = async function handler(event) {
       case "places": return await places(body);
       case "report": return await report(body);
       case "limits": return await limits();
+      case "keep": return await keep(body);
       default: return json(400, { ok: false, error: `Unknown action: ${body.action}` });
     }
   } catch (error) {

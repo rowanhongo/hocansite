@@ -1134,27 +1134,23 @@ tr:hover td{background:#FAFBFD;}
     <div class="panel" id="panel-restaurants">
       <div class="section-card">
         <div class="section-header">
-          <h3>Low-rated restaurants — Westlands, Parklands, Kilimani</h3>
+          <h3>Restaurant prospects — Westlands, Parklands, Kilimani</h3>
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
-            <button class="btn-secondary" id="rsLoadBtn">Load latest scan</button>
-            <button class="btn-secondary" id="rsTestBtn">Quick test (5 per area)</button>
-            <button class="btn-new" id="rsRunBtn">Run full scan</button>
+            <button class="btn-secondary" id="rsLoadBtn">Load report data</button>
+            <button class="btn-new" id="rsPdfBtn">Download report PDF</button>
           </div>
         </div>
         <p class="bd-help">
-          One-off. Finds restaurants whose overall Google rating is between 2.0 and 3.7, and keeps
-          those with at least one review of 3 stars or lower, showing the five lowest. Results come
-          back as a table and a PDF you can download. This tab will be removed afterwards.
+          One-off lead report. Venues rated 2.0 to 4.4 on Google Maps (the median and below), ranked by
+          staff-related complaints, with who runs each chain and how they hire. The PDF puts a quick
+          report on why this matters underneath the list. This tab will be removed afterwards.
         </p>
-        <div id="rsStatus" class="bd-run-info">Not run yet.</div>
+        <div id="rsStatus" class="bd-run-info">Press “Load report data” first, then download the PDF.</div>
         <div id="rsResults" style="display:none;">
-          <div class="bd-filters" style="margin-top:16px;">
-            <button class="btn-new" id="rsPdfBtn">Download PDF</button>
-            <span id="rsSummary" class="bd-approx"></span>
-          </div>
+          <div class="bd-filters" style="margin-top:16px;"><span id="rsSummary" class="bd-approx"></span></div>
           <div class="table-scroll">
             <table>
-              <thead><tr><th>Restaurant</th><th>Area</th><th>Rating</th><th>Low reviews</th><th>Worst review</th><th>Map</th></tr></thead>
+              <thead><tr><th>#</th><th>Venue</th><th>Rating</th><th>Staff reviews</th><th>Chain / operator</th><th>Lowest staff review</th></tr></thead>
               <tbody id="rsTable"></tbody>
             </table>
           </div>
@@ -4787,15 +4783,13 @@ function wireBdPanels(){
 wireBdPanels();
 
 /* TEMP:RESTAURANTS client START
-   One-off restaurant scan. Talks to netlify/functions/restaurants-scan.js.
+   One-off restaurant lead report. Talks to netlify/functions/restaurants-scan.js.
    Remove this whole block, the nav item, the panel and that function to delete it. */
 
 const RS_ENDPOINT='/.netlify/functions/restaurants-scan';
 const RS_PER_PAGE=30;
-let rsVenues=[];
+let rsReport=null;
 let rsPage=1;
-let rsPoll=null;
-let rsLast={dropped:null,scanned:0};
 
 async function rsCall(action,payload={}){
   const res=await fetch(RS_ENDPOINT,{
@@ -4809,161 +4803,372 @@ async function rsCall(action,payload={}){
   return data;
 }
 
-function rsSetStatus(html){const el=document.getElementById('rsStatus');if(el)el.innerHTML=html;}
+function rsStatus(html){const el=document.getElementById('rsStatus');if(el)el.innerHTML=html;}
+
+// Standard PDF fonts only cover Latin-1, so curly quotes are straightened and
+// emoji and other scripts dropped. Left as-is they print as garbage.
+function rsSafe(s){
+  return String(s??'')
+    .replace(/[‘’ʼ]/g,"'")
+    .replace(/[“”]/g,'"')
+    .replace(/[–—−]/g,'-')
+    .replace(/…/g,'...')
+    .replace(/ /g,' ')
+    .replace(/[^\x20-\x7EÀ-ÿ]/g,'')
+    .replace(/\s+/g,' ')
+    .trim();
+}
+
+function rsMonth(iso){
+  if(!iso)return'';
+  const d=new Date(iso);
+  return Number.isFinite(d.getTime())?d.toLocaleDateString('en-KE',{month:'short',year:'numeric'}):'';
+}
+
+// Themes across the staff-related reviews. A review can sit in several.
+const RS_THEMES=[
+  {key:'rude',label:'Rude, disrespectful or bad attitude',re:/rude|attitude|disrespect|arrogan|insult|harass|shout|unfriendly|hostile|argumentative|condescend|judgy|aggressive|abusive/i},
+  {key:'slow',label:'Slow service or long waits',re:/slow|wait(ed|ing)?\b|took (forever|long|an hour|ages)|forever|delay|long time|\bhours?\b|ages/i},
+  {key:'ignored',label:'Ignored, inattentive or absent',re:/ignor|inattentive|not attentive|unattentive|nobody|no one|neglect|never came|didn'?t (come|bother|attend)|absent|disappear|clueless/i},
+  {key:'untrained',label:'Unprofessional or untrained',re:/unprofession|untrained|not (well |properly )?trained|incompetent|lack of training|poorly trained|no training|unskilled|careless/i},
+  {key:'manager',label:'Manager or management named',re:/manager|management/i}
+];
+
+function rsThemeCounts(leads){
+  const reviews=leads.flatMap(l=>l.staffReviews);
+  const total=reviews.length;
+  return {
+    total,
+    themes:RS_THEMES.map(t=>{
+      const n=reviews.filter(r=>t.re.test(r.text)).length;
+      return {label:t.label,n,pct:total?Math.round(n/total*100):0};
+    })
+  };
+}
+
+// ── Panel ─────────────────────────────────────────────────────────────────────
 
 function rsRender(){
   const wrap=document.getElementById('rsResults');
   const tbody=document.getElementById('rsTable');
-  if(!wrap||!tbody)return;
+  if(!wrap||!tbody||!rsReport)return;
   wrap.style.display='block';
+  const leads=rsReport.leads;
   const from=(rsPage-1)*RS_PER_PAGE;
-  const rows=rsVenues.slice(from,from+RS_PER_PAGE);
-  tbody.innerHTML=rows.length?rows.map(v=>{
-    const worst=v.negativeReviews[0];
+  const rows=leads.slice(from,from+RS_PER_PAGE);
+
+  tbody.innerHTML=rows.length?rows.map((l,i)=>{
+    const top=l.staffReviews[0];
+    const chain=l.chain
+      ? `<strong>${esc(l.chain.brand)}</strong><br><span class="bd-approx">${l.chain.operator?esc(l.chain.operator.slice(0,90)):'operator not found'}</span>`
+      : '<span class="bd-approx">independent</span>';
     return `<tr>
-      <td data-label="Restaurant"><strong>${esc(v.name)}</strong><br><span class="bd-approx">${esc(v.category||'')}</span></td>
-      <td data-label="Area">${esc(v.area)}</td>
-      <td data-label="Rating"><span class="bd-score ${v.rating<3?'hot':'warm'}">${v.rating.toFixed(1)}</span><br><span class="bd-approx">${v.reviewsCount} reviews</span></td>
-      <td data-label="Low reviews">${v.negativeReviews.length}</td>
-      <td data-label="Worst review"><span class="bd-approx">${worst.stars}★</span> ${esc(worst.text.slice(0,140))}${worst.text.length>140?'…':''}</td>
-      <td data-label="Map">${v.mapsUrl?`<a class="btn-view" href="${esc(v.mapsUrl)}" target="_blank" rel="noopener">Open ↗</a>`:'—'}</td>
+      <td data-label="#">${from+i+1}</td>
+      <td data-label="Venue"><strong>${esc(l.name)}</strong><br><span class="bd-approx">${esc(l.area)}${l.category?' · '+esc(l.category):''}</span></td>
+      <td data-label="Rating"><span class="bd-score ${l.rating<3.5?'hot':l.rating<4?'warm':'mild'}">${l.rating.toFixed(1)}</span><br><span class="bd-approx">${l.reviewsCount.toLocaleString()} reviews</span></td>
+      <td data-label="Staff reviews">${l.staffReviews.length?l.staffReviews.length:'<span class="bd-approx">none found</span>'}</td>
+      <td data-label="Chain / operator">${chain}</td>
+      <td data-label="Lowest staff review">${top?`<span class="bd-approx">${top.stars} star</span> ${esc(top.text.slice(0,130))}${top.text.length>130?'…':''}`:'<span class="bd-approx">still worth approaching</span>'}</td>
     </tr>`;
-  }).join(''):'<tr class="empty-row"><td colspan="6">No restaurants matched.</td></tr>';
+  }).join(''):'<tr class="empty-row"><td colspan="6">No venues.</td></tr>';
 
-  const total=rsVenues.length;
-  document.getElementById('rsRange').textContent=total?`Showing ${from+1}–${Math.min(from+RS_PER_PAGE,total)} of ${total}`:'Showing 0–0';
+  document.getElementById('rsRange').textContent=leads.length?`Showing ${from+1}–${Math.min(from+RS_PER_PAGE,leads.length)} of ${leads.length}`:'Showing 0–0';
   document.getElementById('rsPrevBtn').disabled=rsPage<=1;
-  document.getElementById('rsNextBtn').disabled=rsPage*RS_PER_PAGE>=total;
+  document.getElementById('rsNextBtn').disabled=rsPage*RS_PER_PAGE>=leads.length;
 
-  const d=rsLast.dropped||{};
+  const m=rsReport.market;
   document.getElementById('rsSummary').textContent=
-    `${total} kept of ${rsLast.scanned} scanned — dropped: ${d.outOfBand||0} outside 2.0–3.7, ${d.noNegativeReviews||0} with no review ≤3★, ${d.closed||0} closed, ${d.duplicate||0} duplicates, ${d.noRating||0} unrated`;
+    `${leads.length} venues rated ${rsReport.band.min.toFixed(1)}–${rsReport.band.max.toFixed(1)} out of ${m.placesScanned} places scanned · ${rsReport.withStaffComplaint} with a staff complaint, ${leads.length-rsReport.withStaffComplaint} none found · market median ${m.median}, mean ${m.mean}`;
 }
 
-async function rsFinish(datasetId,usage,placesScanned){
-  const data=await rsCall('results',{datasetId});
-  rsVenues=data.venues||[];
-  rsLast={dropped:data.dropped,scanned:placesScanned||data.scanned};
+async function rsLoad(){
+  rsStatus('Loading from Apify…');
+  rsReport=await rsCall('report');
   rsPage=1;
-  rsSetStatus(`Done. ${data.scanned} places scanned${usage!=null?`, Apify cost about $${Number(usage).toFixed(2)}`:''}.`);
+  rsStatus(`Loaded ${rsReport.leads.length} venues, generated ${new Date(rsReport.generatedAt).toLocaleString('en-KE')}.`);
   rsRender();
-  try{sessionStorage.setItem('rs_dataset',datasetId);}catch(_e){}
 }
 
-// Resolves with the finished run's status, or rejects if it failed.
-function rsWait(runId,label){
-  return new Promise((resolve,reject)=>{
-    clearInterval(rsPoll);
-    rsPoll=setInterval(async()=>{
-      try{
-        const s=await rsCall('status',{runId});
-        rsSetStatus(`${label}: ${esc(String(s.status||'').toLowerCase())}…`);
-        if(s.status==='SUCCEEDED'){clearInterval(rsPoll);resolve(s);}
-        else if(['FAILED','ABORTED','TIMED-OUT'].includes(s.status)){clearInterval(rsPoll);reject(new Error(`${label} ended with status ${s.status}.`));}
-      }catch(err){clearInterval(rsPoll);reject(err);}
-    },8000);
-  });
-}
+// ── PDF report ────────────────────────────────────────────────────────────────
 
-/* Two passes: find every place and its overall rating, then pull reviews only
-   for the ones that landed inside the 2.0-3.7 band. */
-async function rsRun(limit,btn){
-  clearInterval(rsPoll);
-  await bdRun(btn,'Running…',async()=>{
-    try{
-      rsSetStatus('Step 1 of 2: finding restaurants and their overall ratings. This takes a few minutes…');
-      const first=await rsCall('start',{limit});
-      const done1=await rsWait(first.runId,'Step 1 of 2');
-      const placeData=await rsCall('results',{datasetId:done1.datasetId||first.datasetId});
-      const ids=(placeData.bandPlaces||[]).map(p=>p.placeId);
+const RS_C={sky:[74,179,212],dark:[26,26,46],muted:[110,124,138],text:[45,55,72],line:[226,231,236],card:[248,249,251],rose:[196,80,60],amber:[214,150,30],band:[214,96,77],other:[176,196,208]};
 
-      if(!ids.length){
-        rsLast={dropped:placeData.dropped,scanned:placeData.scanned};
-        rsVenues=[];rsRender();
-        rsSetStatus(`Scanned ${placeData.scanned} places across ${first.searches} searches; none had an overall rating between 2.0 and 3.7.`);
-        return;
-      }
-
-      rsSetStatus(`Step 2 of 2: found ${ids.length} in the 2.0–3.7 band out of ${placeData.scanned}. Pulling their lowest reviews…`);
-      const second=await rsCall('start',{placeIds:ids});
-      const done2=await rsWait(second.runId,'Step 2 of 2');
-      await rsFinish(done2.datasetId||second.datasetId,(Number(done1.usageUsd)||0)+(Number(done2.usageUsd)||0),placeData.scanned);
-    }catch(err){rsSetStatus(esc(err.message));showToast(err.message,'error');}
-  });
-}
-
-const RS_PDF={sky:[74,179,212],dark:[26,26,46],muted:[136,150,164],text:[45,55,72],line:[232,236,240]};
-
-async function rsDownloadPdf(){
-  if(!rsVenues.length)throw new Error('Nothing to download — run a scan first.');
+async function rsBuildPdf(){
+  const r=rsReport;
+  if(!r?.leads?.length)throw new Error('Load the report data first.');
   const jsPDF=await loadJsPdf();
   const doc=new jsPDF({unit:'pt',format:'a4',compress:true});
   const W=doc.internal.pageSize.getWidth(),H=doc.internal.pageSize.getHeight(),M=40,CW=W-M*2;
-  let y=0,page=1;
+  const today=new Date().toLocaleDateString('en-KE',{day:'numeric',month:'long',year:'numeric'});
+  let y=0,pageNo=1;
 
   const header=()=>{
-    doc.setFillColor(...RS_PDF.dark);doc.rect(0,0,W,64,'F');
-    doc.setFillColor(...RS_PDF.sky);doc.rect(0,64,W,3,'F');
-    doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(16);
-    doc.text('HOCAN HOLDINGS',M,28);
-    doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(200,215,225);
-    doc.text('Restaurant prospects — Westlands, Parklands, Kilimani',M,46);
-    doc.text(`${rsVenues.length} venues · ${new Date().toLocaleDateString('en-KE',{year:'numeric',month:'long',day:'numeric'})}`,W-M,46,{align:'right'});
-    y=88;
+    doc.setFillColor(...RS_C.dark);doc.rect(0,0,W,40,'F');
+    doc.setFillColor(...RS_C.sky);doc.rect(0,40,W,3,'F');
+    doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(12);
+    doc.text('HOCAN HOLDINGS',M,25);
+    doc.setFont('helvetica','normal');doc.setFontSize(8.5);doc.setTextColor(200,215,225);
+    doc.text('Restaurant prospects  |  Internal - lead team',W-M,25,{align:'right'});
+    y=62;
   };
   const footer=()=>{
-    doc.setDrawColor(...RS_PDF.line);doc.setLineWidth(.5);doc.line(M,H-40,W-M,H-40);
-    doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(...RS_PDF.muted);
-    doc.text('Overall rating 2.0–3.7 · up to five reviews of 3 stars or lower per venue · source: Google Maps',M,H-26);
-    doc.text(`Page ${page}`,W-M,H-26,{align:'right'});
+    doc.setDrawColor(...RS_C.line);doc.setLineWidth(.5);doc.line(M,H-38,W-M,H-38);
+    doc.setFont('helvetica','normal');doc.setFontSize(7.5);doc.setTextColor(...RS_C.muted);
+    doc.text(`Source: Google Maps, ${today}. Public review text; reviewer names not collected.`,M,H-24);
+    doc.text(`Page ${pageNo}`,W-M,H-24,{align:'right'});
   };
-  const newPage=()=>{footer();doc.addPage();page+=1;header();};
+  const newPage=()=>{footer();doc.addPage();pageNo+=1;header();};
+  const ensure=(h)=>{if(y+h>H-50)newPage();};
+
+  const para=(text,o={})=>{
+    const size=o.size||9.5,color=o.color||RS_C.text,style=o.style||'normal',indent=o.indent||0,gap=o.gap??5;
+    doc.setFont('helvetica',style);doc.setFontSize(size);doc.setTextColor(...color);
+    const lines=doc.splitTextToSize(rsSafe(text),CW-indent);
+    const lh=size*1.4;
+    lines.forEach(l=>{ensure(lh);doc.text(l,M+indent,y+size);y+=lh;});
+    y+=gap;
+  };
+  const heading=(text,size=13)=>{
+    ensure(size+22);y+=8;
+    doc.setFont('helvetica','bold');doc.setFontSize(size);doc.setTextColor(...RS_C.dark);
+    doc.text(rsSafe(text),M,y+size);y+=size+9;
+  };
 
   header();
 
-  rsVenues.forEach((v,i)=>{
-    // Measure the whole card first so one venue is never split across pages.
-    doc.setFontSize(8.5);
-    const reviewLines=v.negativeReviews.map(r=>doc.splitTextToSize(`${r.stars}★  ${r.text}`,CW-28));
-    const bodyH=reviewLines.reduce((n,l)=>n+l.length*10.5+5,0);
-    const cardH=50+bodyH+8;
-    if(y+cardH>H-56)newPage();
+  // ── Title and summary ──
+  doc.setFont('helvetica','bold');doc.setFontSize(21);doc.setTextColor(...RS_C.dark);
+  doc.text('Restaurant prospects',M,y+20);y+=28;
+  doc.setFont('helvetica','normal');doc.setFontSize(11);doc.setTextColor(...RS_C.muted);
+  doc.text(`Westlands, Parklands and Kilimani  |  rated ${r.band.min.toFixed(1)} to ${r.band.max.toFixed(1)} on Google Maps  |  ${today}`,M,y+11);y+=26;
 
-    const top=y;
-    doc.setFillColor(250,251,252);doc.roundedRect(M,top,CW,cardH-8,5,5,'F');
-
-    doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(...RS_PDF.dark);
-    doc.text(doc.splitTextToSize(`${i+1}. ${v.name}`,CW-110)[0],M+12,top+18);
-
-    doc.setFontSize(11);doc.setTextColor(197,48,48);
-    doc.text(`${v.rating.toFixed(1)} ★`,W-M-12,top+18,{align:'right'});
-    doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(...RS_PDF.muted);
-    doc.text(`${v.reviewsCount} reviews`,W-M-12,top+30,{align:'right'});
-
-    doc.setFontSize(8.5);doc.setTextColor(...RS_PDF.text);
-    const meta=[v.area,v.category,v.phone].filter(Boolean).join('  ·  ');
-    doc.text(doc.splitTextToSize(meta,CW-110)[0]||'',M+12,top+32);
-
-    // Clickable link to the Google Maps listing, as a real annotation.
-    let ly=top+44;
-    if(v.mapsUrl){
-      doc.setFont('helvetica','bold');doc.setTextColor(...RS_PDF.sky);
-      const label='View on Google Maps →';
-      doc.textWithLink(label,M+12,ly,{url:v.mapsUrl});
-      const lw=doc.getTextWidth(label);
-      doc.setDrawColor(...RS_PDF.sky);doc.setLineWidth(.5);doc.line(M+12,ly+2,M+12+lw,ly+2);
-      doc.link(M+12,ly-9,lw,13,{url:v.mapsUrl});
-      doc.setFont('helvetica','normal');
-    }
-    ly+=14;
-
-    doc.setFontSize(8.5);doc.setTextColor(...RS_PDF.text);
-    reviewLines.forEach(lines=>{
-      lines.forEach(line=>{doc.text(line,M+16,ly);ly+=10.5;});
-      ly+=5;
-    });
-    y=top+cardH;
+  const m=r.market;
+  const none=r.leads.length-r.withStaffComplaint;
+  const boxes=[
+    [String(m.placesScanned),'places scanned'],
+    [String(r.leads.length),`in the ${r.band.min.toFixed(1)}-${r.band.max.toFixed(1)} band`],
+    [String(r.withStaffComplaint),'with a staff complaint'],
+    [String(none),'none found, still approach']
+  ];
+  const bw=(CW-18)/4;
+  boxes.forEach(([v,label],i)=>{
+    const x=M+i*(bw+6);
+    doc.setFillColor(...RS_C.card);doc.roundedRect(x,y,bw,54,5,5,'F');
+    doc.setFont('helvetica','bold');doc.setFontSize(20);doc.setTextColor(...RS_C.dark);doc.text(v,x+10,y+27);
+    doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(...RS_C.muted);doc.text(label,x+10,y+43);
   });
+  y+=70;
+
+  para(`This is a lead list: ${r.leads.length} restaurants whose overall Google rating is at or below the market median (${m.median}), ranked by the number of staff-related complaints found, then by lowest rating. Each entry shows up to two of the lowest-rated reviews that mention staff, a manager or a waiter, who runs the venue where we could find out, and how they hire. A quick report on why this matters follows the list.`,{gap:6});
+  para('Venues with no complaint found are included on purpose and sit at the end of the list. A quiet review history is not evidence of a good team; the rating alone puts them in the lower half of the market.',{gap:4});
+
+  heading('Lead list');
+
+  // ── Cards ──
+  r.leads.forEach((l,idx)=>{
+    const chain=l.chain;
+    const lines=[];
+    if(chain){
+      lines.push({style:'bold',text:`Chain: ${chain.brand}`});
+      lines.push({style:'normal',text:`Operator: ${chain.operator||'not found'}`,cap:2});
+      if(chain.hiring)lines.push({style:'normal',text:`Hiring: ${chain.hiring}`,cap:2});
+    }
+
+    // Measure first so a card is never split across pages.
+    const innerW=CW-30;
+    let h=12+15+13;
+    const chainBlocks=lines.map(ln=>{
+      doc.setFont('helvetica',ln.style);doc.setFontSize(8.2);
+      let ls=doc.splitTextToSize(rsSafe(ln.text),innerW);
+      if(ln.cap&&ls.length>ln.cap){ls=ls.slice(0,ln.cap);ls[ln.cap-1]=ls[ln.cap-1].replace(/\s*\S*$/,'')+'...';}
+      h+=ls.length*10.6;
+      return {style:ln.style,ls};
+    });
+    if(chainBlocks.length)h+=3;
+
+    doc.setFont('helvetica','italic');doc.setFontSize(8.6);
+    const revBlocks=l.staffReviews.map(rv=>{
+      const txt=rsSafe(rv.text);
+      const ls=doc.splitTextToSize('"'+(txt.length>330?txt.slice(0,327)+'...':txt)+'"',innerW-8);
+      h+=11+ls.length*11.2+4;
+      return {rv,ls};
+    });
+    if(!revBlocks.length)h+=14;
+    h+=16+8;
+
+    ensure(h+8);
+    const top=y;
+    doc.setFillColor(...RS_C.card);doc.roundedRect(M,top,CW,h,5,5,'F');
+    const accent=l.rating<3.5?RS_C.rose:l.rating<4?RS_C.amber:RS_C.sky;
+    doc.setFillColor(...accent);doc.rect(M,top+4,3,h-8,'F');
+
+    let cy=top+12;
+    doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(...RS_C.dark);
+    doc.text(doc.splitTextToSize(rsSafe(`${idx+1}. ${l.name}`),CW-120)[0],M+14,cy+9);
+    doc.setFontSize(12);doc.setTextColor(...accent);
+    doc.text(l.rating.toFixed(1),W-M-12,cy+9,{align:'right'});
+    cy+=15;
+
+    doc.setFont('helvetica','normal');doc.setFontSize(8.2);doc.setTextColor(...RS_C.muted);
+    const meta=[l.area,l.category,l.phone].map(rsSafe).filter(Boolean).join('  |  ');
+    doc.text(doc.splitTextToSize(meta,CW-120)[0]||'',M+14,cy+8);
+    doc.text(`${l.reviewsCount.toLocaleString()} reviews`,W-M-12,cy+8,{align:'right'});
+    cy+=13;
+
+    chainBlocks.forEach(b=>{
+      doc.setFont('helvetica',b.style);doc.setFontSize(8.2);doc.setTextColor(...RS_C.text);
+      b.ls.forEach(t=>{doc.text(t,M+14,cy+8);cy+=10.6;});
+    });
+    if(chainBlocks.length)cy+=3;
+
+    revBlocks.forEach(({rv,ls})=>{
+      doc.setFont('helvetica','bold');doc.setFontSize(7.6);doc.setTextColor(...RS_C.rose);
+      doc.text(`${rv.stars} star${rv.stars===1?'':'s'}${rv.date?'  |  '+rsMonth(rv.date):''}`,M+14,cy+7);
+      cy+=11;
+      doc.setFont('helvetica','italic');doc.setFontSize(8.6);doc.setTextColor(...RS_C.text);
+      ls.forEach(t=>{doc.text(t,M+22,cy+8);cy+=11.2;});
+      cy+=4;
+    });
+    if(!revBlocks.length){
+      doc.setFont('helvetica','italic');doc.setFontSize(8.6);doc.setTextColor(...RS_C.muted);
+      doc.text('No staff complaint found in the reviews Google matched. Still worth approaching on the rating alone.',M+14,cy+8);
+      cy+=14;
+    }
+
+    // Links are real PDF annotations, so they work in any viewer.
+    doc.setFont('helvetica','bold');doc.setFontSize(8.2);doc.setTextColor(...RS_C.sky);
+    let lx=M+14;
+    if(l.mapsUrl){
+      const t='View on Google Maps';
+      doc.textWithLink(t,lx,cy+8,{url:l.mapsUrl});
+      const w=doc.getTextWidth(t);
+      doc.setDrawColor(...RS_C.sky);doc.setLineWidth(.5);doc.line(lx,cy+10,lx+w,cy+10);
+      doc.link(lx,cy-1,w,12,{url:l.mapsUrl});
+      lx+=w+16;
+    }
+    if(l.website&&/^https?:\/\//i.test(l.website)){
+      const t='Website';
+      doc.textWithLink(t,lx,cy+8,{url:l.website});
+      const w=doc.getTextWidth(t);
+      doc.line(lx,cy+10,lx+w,cy+10);
+      doc.link(lx,cy-1,w,12,{url:l.website});
+    }
+    y=top+h+8;
+  });
+
+  // ── Quick report ──
+  newPage();
+  doc.setFont('helvetica','bold');doc.setFontSize(19);doc.setTextColor(...RS_C.dark);
+  doc.text('Quick report',M,y+18);y+=26;
+  doc.setFont('helvetica','normal');doc.setFontSize(10.5);doc.setTextColor(...RS_C.muted);
+  doc.text('Why a below-median rating is worth a conversation about staffing',M,y+10);y+=24;
+
+  heading('1. Ratings in this market are compressed, so the middle is high');
+  const ge43=Object.entries(m.buckets).filter(([k])=>Number(k)>=4.3).reduce((n,[,v])=>n+v,0);
+  para(`Across the ${m.placesScanned} open, rated places we scanned, the median rating is ${m.median} and the mean ${m.mean}. ${Math.round(ge43/m.placesScanned*100)}% score 4.3 or higher and only ${m.belowBand} fall below 2.0. A 4.2 sounds respectable, but here it sits in the lower half of the market.`);
+
+  // Distribution chart
+  const keys=Object.keys(m.buckets).map(Number).sort((a,b)=>a-b);
+  const lo=2.0,hi=5.0,steps=Math.round((hi-lo)*10)+1;
+  const maxV=Math.max(...Object.values(m.buckets),1);
+  const chartH=120,chartW=CW,barW=chartW/steps;
+  ensure(chartH+46);
+  const baseY=y+chartH;
+  doc.setDrawColor(...RS_C.line);doc.setLineWidth(.5);doc.line(M,baseY,M+chartW,baseY);
+  for(let i=0;i<steps;i++){
+    const rating=Math.round((lo+i/10)*10)/10;
+    const v=m.buckets[rating.toFixed(1)]||0;
+    const bh=v/maxV*(chartH-14);
+    if(v){
+      doc.setFillColor(...(rating<=r.band.max?RS_C.band:RS_C.other));
+      doc.rect(M+i*barW+1,baseY-bh,barW-2,bh,'F');
+      if(bh>9){doc.setFont('helvetica','normal');doc.setFontSize(6.5);doc.setTextColor(...RS_C.muted);doc.text(String(v),M+i*barW+barW/2,baseY-bh-2,{align:'center'});}
+    }
+    if(i%5===0){doc.setFont('helvetica','normal');doc.setFontSize(7.5);doc.setTextColor(...RS_C.muted);doc.text(rating.toFixed(1),M+i*barW+barW/2,baseY+10,{align:'center'});}
+  }
+  y=baseY+16;
+  doc.setFillColor(...RS_C.band);doc.rect(M,y,8,8,'F');
+  doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(...RS_C.muted);
+  doc.text(`At or below the median (${r.band.min.toFixed(1)}-${r.band.max.toFixed(1)}): ${r.leads.length} venues`,M+13,y+7);
+  doc.setFillColor(...RS_C.other);doc.rect(M+210,y,8,8,'F');
+  doc.text(`Above the median: ${m.above} places`,M+223,y+7);
+  y+=22;
+
+  para('Why the scale piles up at the top: people who had an ordinary meal rarely leave a review, while people who loved or hated it do; owners and staff commonly ask happy customers for a rating; and the score averages years of history, so a bad patch is diluted. The number moves slowly, which makes small gaps meaningful.');
+
+  heading('2. Why a venue at or below the middle should be concerned');
+  para('Half of this market is rated above them, and a customer comparing two places on a map sees the rating before anything else.',{indent:10,gap:3});
+  para("Google's own guidance lists review count and score among the factors in local ranking, so a lower score can cost visibility as well as bookings.",{indent:10,gap:3});
+  para('Because ratings are compressed, the gap between 4.0 and 4.5 is large in practice. A high-volume venue needs a great many five-star reviews to move its average even a little.',{indent:10,gap:3});
+  para('Recent one-star reviews are what people actually read. A venue with thousands of reviews can still lose customers to the first page of complaints.',{indent:10,gap:6});
+
+  const tc=rsThemeCounts(r.leads);
+  heading('3. Why it may be a staffing issue');
+  para(`Food, price and location show up in reviews, but so does how the people serving behave, and that is not something a kitchen or a menu can fix. In the ${tc.total} staff-related reviews collected, these themes recurred:`);
+  tc.themes.forEach(t=>{
+    ensure(18);
+    doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(...RS_C.text);
+    doc.text(rsSafe(t.label),M+10,y+10);
+    const bx=M+250,bwMax=CW-250-60;
+    doc.setFillColor(...RS_C.line);doc.rect(bx,y+2,bwMax,9,'F');
+    doc.setFillColor(...RS_C.band);doc.rect(bx,y+2,Math.max(1,bwMax*t.pct/100),9,'F');
+    doc.setFont('helvetica','bold');doc.text(`${t.pct}%  (${t.n})`,bx+bwMax+8,y+10);
+    y+=17;
+  });
+  y+=4;
+  para(`${r.withStaffComplaint} of the ${r.leads.length} venues had at least one such review. These problems come from hiring, training, supervision and staffing levels, which is where an outside HR partner can help.`);
+  para('Read this as a signal, not proof. A review can fall in more than one theme, the themes are matched by keywords, and the sample is the lowest-rated reviews that mention staff, capped at two per venue. It shows what unhappy customers say about people, not how common the problem is across all customers.',{style:'italic',color:RS_C.muted});
+
+  heading('4. How to use this with a lead');
+  para('For venues with repeated staff complaints, open with the specific theme in their own reviews (slow service, inattentive staff, attitude) and offer training, supervision or staffing support. For venues with no complaint found, open from the rating and the market position instead.');
+
+  heading('5. Method and limits');
+  [
+    `Places came from Google Maps searches across ten venue types in Westlands, Parklands and Kilimani, de-duplicated, with closed places removed: ${m.placesScanned} in total. This is what Google returns for those searches, not every restaurant in Nairobi.`,
+    `Reviews: for each venue in the band, the lowest-rated reviews that Google matches on the word "staff", keeping those of 3 stars or lower that mention staff, a waiter, a waitress or a manager. Reviews that mention only a waiter or a manager, without the word staff, may not have been returned.`,
+    'Chain and operator details come from public web sources; each is listed with its source and a confidence note on the following pages. Blanks mean it was searched for and not found.',
+    'Reviewer names were not collected. Review text can still mention individual staff, so treat quotes as internal.'
+  ].forEach(t=>para(t,{indent:10,gap:3,size:9}));
+
+  // ── Chain directory ──
+  const brands=new Map();
+  r.leads.forEach(l=>{
+    if(!l.chain)return;
+    const b=brands.get(l.chain.brand)||{chain:l.chain,venues:[]};
+    b.venues.push(l.name);
+    brands.set(l.chain.brand,b);
+  });
+  if(brands.size){
+    newPage();
+    doc.setFont('helvetica','bold');doc.setFontSize(17);doc.setTextColor(...RS_C.dark);
+    doc.text('Chain directory',M,y+16);y+=24;
+    para('One entry per brand, so the same operator is not repeated on every outlet. A person is only named where they appear on an official company page; none are named here.',{color:RS_C.muted,gap:8});
+    [...brands.entries()].sort((a,b)=>b[1].venues.length-a[1].venues.length).forEach(([brand,{chain,venues}])=>{
+      doc.setFont('helvetica','normal');doc.setFontSize(8.6);
+      const rows=[
+        ['Operator',chain.operator||'Not found'],
+        ['Hiring',chain.hiring||'Not found'],
+        ['Source',chain.source],
+        ['Note',chain.note]
+      ].filter(([,v])=>v);
+      let h=20;
+      const wrapped=rows.map(([k,v])=>{const ls=doc.splitTextToSize(rsSafe(v),CW-70);h+=ls.length*11.4+2;return [k,ls];});
+      ensure(h+10);
+      doc.setFillColor(...RS_C.card);doc.roundedRect(M,y,CW,h,5,5,'F');
+      doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(...RS_C.dark);
+      doc.text(rsSafe(brand),M+10,y+14);
+      doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(...RS_C.muted);
+      doc.text(`${venues.length} venue${venues.length===1?'':'s'} in this list`,W-M-10,y+14,{align:'right'});
+      let cy=y+22;
+      wrapped.forEach(([k,ls])=>{
+        doc.setFont('helvetica','bold');doc.setFontSize(8.2);doc.setTextColor(...RS_C.muted);doc.text(k,M+10,cy+7);
+        doc.setFont('helvetica','normal');doc.setFontSize(8.6);doc.setTextColor(...RS_C.text);
+        ls.forEach(t=>{doc.text(t,M+62,cy+7);cy+=11.4;});
+        cy+=2;
+      });
+      y+=h+7;
+    });
+  }
 
   footer();
   const name=`restaurant-prospects-${new Date().toISOString().slice(0,10)}.pdf`;
@@ -4972,21 +5177,17 @@ async function rsDownloadPdf(){
 }
 
 function wireRestaurantsPanel(){
-  document.getElementById('rsRunBtn')?.addEventListener('click',e=>rsRun(60,e.currentTarget));
-  document.getElementById('rsTestBtn')?.addEventListener('click',e=>rsRun(5,e.currentTarget));
   document.getElementById('rsLoadBtn')?.addEventListener('click',async e=>{
     await bdRun(e.currentTarget,'Loading…',async()=>{
-      try{
-        const l=await rsCall('latest');
-        await rsFinish(l.datasetId,l.usageUsd);
-      }catch(err){rsSetStatus(esc(err.message));showToast(err.message,'error');}
+      try{await rsLoad();}
+      catch(err){rsStatus(esc(err.message));showToast(err.message,'error');}
     });
   });
   document.getElementById('rsPrevBtn')?.addEventListener('click',()=>{if(rsPage>1){rsPage-=1;rsRender();}});
-  document.getElementById('rsNextBtn')?.addEventListener('click',()=>{if(rsPage*RS_PER_PAGE<rsVenues.length){rsPage+=1;rsRender();}});
+  document.getElementById('rsNextBtn')?.addEventListener('click',()=>{if(rsReport&&rsPage*RS_PER_PAGE<rsReport.leads.length){rsPage+=1;rsRender();}});
   document.getElementById('rsPdfBtn')?.addEventListener('click',async e=>{
     await bdRun(e.currentTarget,'Building…',async()=>{
-      try{const name=await rsDownloadPdf();showToast(`Downloaded ${name}`);}
+      try{const name=await rsBuildPdf();showToast(`Downloaded ${name}`);}
       catch(err){showToast(err.message,'error');}
     });
   });
