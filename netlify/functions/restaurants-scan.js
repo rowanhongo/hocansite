@@ -57,19 +57,43 @@ async function apify(path, options) {
   return data;
 }
 
+// Different search terms surface different slices of Google's list, because
+// each is capped and ranked by popularity. One term per area returned only ~19
+// places, all well rated; many terms reach further down towards the 2.0-3.7
+// band, and the results are de-duplicated by place id.
+const TERMS = ["restaurant", "cafe", "bar and grill", "bistro", "pub", "eatery", "steakhouse", "pizza", "fast food", "coffee shop"];
+
+/* Two phases, so reviews are only paid for where they can matter.
+
+   Phase "places": every term x area, no reviews. Cheap, and enough to see each
+   venue's overall rating.
+   Phase "reviews": only the place ids that landed inside the band, with the five
+   lowest reviews each. */
 async function start(body) {
-  // `limit` lets a first test run cost a few cents instead of a dollar.
-  const perSearch = Math.min(120, Math.max(1, Number(body.limit) || 120));
-  const input = {
-    searchStringsArray: AREAS.map((area) => `restaurants in ${area}, Nairobi, Kenya`),
-    maxCrawledPlacesPerSearch: perSearch,
-    language: "en",
-    // Review text only. Reviewer names, ids, urls and photos are not collected.
-    // Five is enough because the sort returns the harshest reviews first.
-    maxReviews: REVIEWS_PER_VENUE,
-    reviewsSort: String(body.sort || "lowestRanking"),
-    scrapeReviewsPersonalData: false
-  };
+  const placeIds = Array.isArray(body.placeIds) ? body.placeIds.filter(Boolean).slice(0, 150) : [];
+  let input;
+
+  if (placeIds.length) {
+    input = {
+      searchStringsArray: placeIds.map((id) => `place_id:${id}`),
+      language: "en",
+      // Five is enough because the sort returns the harshest reviews first.
+      maxReviews: REVIEWS_PER_VENUE,
+      reviewsSort: String(body.sort || "lowestRanking"),
+      // Review text only. Reviewer names, ids, urls and photos are not collected.
+      scrapeReviewsPersonalData: false
+    };
+  } else {
+    const perSearch = Math.min(120, Math.max(1, Number(body.limit) || 60));
+    const areas = Array.isArray(body.areas) && body.areas.length ? body.areas : AREAS;
+    const terms = Array.isArray(body.terms) && body.terms.length ? body.terms : TERMS;
+    input = {
+      searchStringsArray: areas.flatMap((area) => terms.map((t) => `${t} in ${area}, Nairobi, Kenya`)),
+      maxCrawledPlacesPerSearch: perSearch,
+      language: "en"
+    };
+  }
+
   const run = await apify(`/acts/${ACTOR}/runs`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -77,9 +101,10 @@ async function start(body) {
   });
   return json(200, {
     ok: true,
+    phase: placeIds.length ? "reviews" : "places",
     runId: run.data.id,
     datasetId: run.data.defaultDatasetId,
-    input
+    searches: input.searchStringsArray.length
   });
 }
 
@@ -201,6 +226,15 @@ async function results(body) {
     // arrive in for the first few places, so the scan depth and the sort value
     // can be judged from real data instead of assumed.
     ratingsSeen: list.map((p) => Number(p.totalScore)).filter(Number.isFinite).sort((a, b) => a - b),
+    // Phase 1 output: places inside the band, to fetch reviews for.
+    bandPlaces: (() => {
+      const seenIds = new Set();
+      return list
+        .filter((p) => p.placeId && !p.permanentlyClosed && !p.temporarilyClosed)
+        .filter((p) => Number(p.totalScore) >= MIN_RATING && Number(p.totalScore) <= MAX_RATING)
+        .filter((p) => (seenIds.has(p.placeId) ? false : (seenIds.add(p.placeId), true)))
+        .map((p) => ({ placeId: p.placeId, title: p.title, rating: Number(p.totalScore) }));
+    })(),
     reviewOrderSample: list.slice(0, 4).map((p) => ({
       title: p.title,
       rating: p.totalScore,

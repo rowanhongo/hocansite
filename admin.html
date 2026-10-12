@@ -4840,39 +4840,54 @@ function rsRender(){
     `${total} kept of ${rsLast.scanned} scanned — dropped: ${d.outOfBand||0} outside 2.0–3.7, ${d.noNegativeReviews||0} with no review ≤3★, ${d.closed||0} closed, ${d.duplicate||0} duplicates, ${d.noRating||0} unrated`;
 }
 
-async function rsFinish(datasetId,usage){
+async function rsFinish(datasetId,usage,placesScanned){
   const data=await rsCall('results',{datasetId});
   rsVenues=data.venues||[];
-  rsLast={dropped:data.dropped,scanned:data.scanned};
+  rsLast={dropped:data.dropped,scanned:placesScanned||data.scanned};
   rsPage=1;
   rsSetStatus(`Done. ${data.scanned} places scanned${usage!=null?`, Apify cost about $${Number(usage).toFixed(2)}`:''}.`);
   rsRender();
   try{sessionStorage.setItem('rs_dataset',datasetId);}catch(_e){}
 }
 
+// Resolves with the finished run's status, or rejects if it failed.
+function rsWait(runId,label){
+  return new Promise((resolve,reject)=>{
+    clearInterval(rsPoll);
+    rsPoll=setInterval(async()=>{
+      try{
+        const s=await rsCall('status',{runId});
+        rsSetStatus(`${label}: ${esc(String(s.status||'').toLowerCase())}…`);
+        if(s.status==='SUCCEEDED'){clearInterval(rsPoll);resolve(s);}
+        else if(['FAILED','ABORTED','TIMED-OUT'].includes(s.status)){clearInterval(rsPoll);reject(new Error(`${label} ended with status ${s.status}.`));}
+      }catch(err){clearInterval(rsPoll);reject(err);}
+    },8000);
+  });
+}
+
+/* Two passes: find every place and its overall rating, then pull reviews only
+   for the ones that landed inside the 2.0-3.7 band. */
 async function rsRun(limit,btn){
   clearInterval(rsPoll);
-  await bdRun(btn,'Starting…',async()=>{
+  await bdRun(btn,'Running…',async()=>{
     try{
-      const started=await rsCall('start',{limit});
-      rsSetStatus('Scan started. Google Maps scans take a few minutes — this page checks every 10 seconds…');
-      await new Promise((resolve)=>{
-        rsPoll=setInterval(async()=>{
-          try{
-            const s=await rsCall('status',{runId:started.runId});
-            rsSetStatus(`Scan ${esc(String(s.status||'').toLowerCase())}…`);
-            if(s.status==='SUCCEEDED'){
-              clearInterval(rsPoll);
-              await rsFinish(s.datasetId||started.datasetId,s.usageUsd);
-              resolve();
-            }else if(['FAILED','ABORTED','TIMED-OUT'].includes(s.status)){
-              clearInterval(rsPoll);
-              rsSetStatus(`Scan ended with status ${esc(s.status)}.`);
-              resolve();
-            }
-          }catch(err){clearInterval(rsPoll);rsSetStatus(esc(err.message));resolve();}
-        },10000);
-      });
+      rsSetStatus('Step 1 of 2: finding restaurants and their overall ratings. This takes a few minutes…');
+      const first=await rsCall('start',{limit});
+      const done1=await rsWait(first.runId,'Step 1 of 2');
+      const placeData=await rsCall('results',{datasetId:done1.datasetId||first.datasetId});
+      const ids=(placeData.bandPlaces||[]).map(p=>p.placeId);
+
+      if(!ids.length){
+        rsLast={dropped:placeData.dropped,scanned:placeData.scanned};
+        rsVenues=[];rsRender();
+        rsSetStatus(`Scanned ${placeData.scanned} places across ${first.searches} searches; none had an overall rating between 2.0 and 3.7.`);
+        return;
+      }
+
+      rsSetStatus(`Step 2 of 2: found ${ids.length} in the 2.0–3.7 band out of ${placeData.scanned}. Pulling their lowest reviews…`);
+      const second=await rsCall('start',{placeIds:ids});
+      const done2=await rsWait(second.runId,'Step 2 of 2');
+      await rsFinish(done2.datasetId||second.datasetId,(Number(done1.usageUsd)||0)+(Number(done2.usageUsd)||0),placeData.scanned);
     }catch(err){rsSetStatus(esc(err.message));showToast(err.message,'error');}
   });
 }
