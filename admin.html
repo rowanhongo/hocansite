@@ -618,6 +618,7 @@ tr:hover td{background:#FAFBFD;}
       <div class="nav-item" data-panel="linkhub"><span class="icon">🔗</span> Link Hub</div>
       <div class="nav-item" data-panel="leads"><span class="icon">🎯</span> Leads</div>
       <div class="nav-item" data-panel="jobsfeed"><span class="icon">📡</span> Jobs Feed</div>
+      <div class="nav-item" data-panel="restaurants"><span class="icon">🍽️</span> Restaurants (temp)</div><!-- TEMP:RESTAURANTS nav -->
     </nav>
     <div class="sidebar-footer">
       <button class="btn-logout" id="logoutBtn">Sign Out</button>
@@ -1128,6 +1129,46 @@ tr:hover td{background:#FAFBFD;}
         </div>
       </div>
     </div>
+
+    <!-- TEMP:RESTAURANTS panel START -->
+    <div class="panel" id="panel-restaurants">
+      <div class="section-card">
+        <div class="section-header">
+          <h3>Low-rated restaurants — Westlands, Parklands, Kilimani</h3>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn-secondary" id="rsLoadBtn">Load latest scan</button>
+            <button class="btn-secondary" id="rsTestBtn">Quick test (5 per area)</button>
+            <button class="btn-new" id="rsRunBtn">Run full scan</button>
+          </div>
+        </div>
+        <p class="bd-help">
+          One-off. Finds restaurants whose overall Google rating is between 2.0 and 3.7, and keeps
+          those with at least one review of 3 stars or lower, showing the five lowest. Results come
+          back as a table and a PDF you can download. This tab will be removed afterwards.
+        </p>
+        <div id="rsStatus" class="bd-run-info">Not run yet.</div>
+        <div id="rsResults" style="display:none;">
+          <div class="bd-filters" style="margin-top:16px;">
+            <button class="btn-new" id="rsPdfBtn">Download PDF</button>
+            <span id="rsSummary" class="bd-approx"></span>
+          </div>
+          <div class="table-scroll">
+            <table>
+              <thead><tr><th>Restaurant</th><th>Area</th><th>Rating</th><th>Low reviews</th><th>Worst review</th><th>Map</th></tr></thead>
+              <tbody id="rsTable"></tbody>
+            </table>
+          </div>
+          <div class="bd-pager">
+            <span id="rsRange">Showing 0–0</span>
+            <div style="display:flex;gap:8px;">
+              <button class="btn-edit" id="rsPrevBtn">Previous</button>
+              <button class="btn-edit" id="rsNextBtn">Next</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- TEMP:RESTAURANTS panel END -->
 
   </main>
 </div>
@@ -1683,7 +1724,7 @@ function toggleMobileSidebar(){
 function setPanel(name){
   navItems.forEach(n=>n.classList.toggle('active',n.dataset.panel===name));
   Object.entries(panels).forEach(([k,v])=>v.classList.toggle('active',k===name));
-  const titles={overview:'Overview',blogs:'Blog Posts',jobs:'Job Listings',applications:'Applications',stories:'Success Stories',partners:'Partners',newsletter:'Newsletter',linkhub:'Link Hub',leads:'Leads',jobsfeed:'Jobs Feed'};
+  const titles={overview:'Overview',blogs:'Blog Posts',jobs:'Job Listings',applications:'Applications',stories:'Success Stories',partners:'Partners',newsletter:'Newsletter',linkhub:'Link Hub',leads:'Leads',jobsfeed:'Jobs Feed',restaurants:'Restaurants (temp)'};
   document.getElementById('panelTitle').textContent=titles[name]||name;
   if(name==='applications') loadApplications();
   if(name==='stories') loadStories();
@@ -4744,6 +4785,199 @@ function wireBdPanels(){
 }
 
 wireBdPanels();
+
+/* TEMP:RESTAURANTS client START
+   One-off restaurant scan. Talks to netlify/functions/restaurants-scan.js.
+   Remove this whole block, the nav item, the panel and that function to delete it. */
+
+const RS_ENDPOINT='/.netlify/functions/restaurants-scan';
+const RS_PER_PAGE=30;
+let rsVenues=[];
+let rsPage=1;
+let rsPoll=null;
+let rsLast={dropped:null,scanned:0};
+
+async function rsCall(action,payload={}){
+  const res=await fetch(RS_ENDPOINT,{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({action,password:adminPassword,...payload})
+  });
+  let data=null;
+  try{data=await res.json();}catch(_e){throw new Error('The server returned an unreadable response.');}
+  if(!res.ok||!data.ok)throw new Error(data?.error||`Request failed (${res.status})`);
+  return data;
+}
+
+function rsSetStatus(html){const el=document.getElementById('rsStatus');if(el)el.innerHTML=html;}
+
+function rsRender(){
+  const wrap=document.getElementById('rsResults');
+  const tbody=document.getElementById('rsTable');
+  if(!wrap||!tbody)return;
+  wrap.style.display='block';
+  const from=(rsPage-1)*RS_PER_PAGE;
+  const rows=rsVenues.slice(from,from+RS_PER_PAGE);
+  tbody.innerHTML=rows.length?rows.map(v=>{
+    const worst=v.negativeReviews[0];
+    return `<tr>
+      <td data-label="Restaurant"><strong>${esc(v.name)}</strong><br><span class="bd-approx">${esc(v.category||'')}</span></td>
+      <td data-label="Area">${esc(v.area)}</td>
+      <td data-label="Rating"><span class="bd-score ${v.rating<3?'hot':'warm'}">${v.rating.toFixed(1)}</span><br><span class="bd-approx">${v.reviewsCount} reviews</span></td>
+      <td data-label="Low reviews">${v.negativeReviews.length}</td>
+      <td data-label="Worst review"><span class="bd-approx">${worst.stars}★</span> ${esc(worst.text.slice(0,140))}${worst.text.length>140?'…':''}</td>
+      <td data-label="Map">${v.mapsUrl?`<a class="btn-view" href="${esc(v.mapsUrl)}" target="_blank" rel="noopener">Open ↗</a>`:'—'}</td>
+    </tr>`;
+  }).join(''):'<tr class="empty-row"><td colspan="6">No restaurants matched.</td></tr>';
+
+  const total=rsVenues.length;
+  document.getElementById('rsRange').textContent=total?`Showing ${from+1}–${Math.min(from+RS_PER_PAGE,total)} of ${total}`:'Showing 0–0';
+  document.getElementById('rsPrevBtn').disabled=rsPage<=1;
+  document.getElementById('rsNextBtn').disabled=rsPage*RS_PER_PAGE>=total;
+
+  const d=rsLast.dropped||{};
+  document.getElementById('rsSummary').textContent=
+    `${total} kept of ${rsLast.scanned} scanned — dropped: ${d.outOfBand||0} outside 2.0–3.7, ${d.noNegativeReviews||0} with no review ≤3★, ${d.closed||0} closed, ${d.duplicate||0} duplicates, ${d.noRating||0} unrated`;
+}
+
+async function rsFinish(datasetId,usage){
+  const data=await rsCall('results',{datasetId});
+  rsVenues=data.venues||[];
+  rsLast={dropped:data.dropped,scanned:data.scanned};
+  rsPage=1;
+  rsSetStatus(`Done. ${data.scanned} places scanned${usage!=null?`, Apify cost about $${Number(usage).toFixed(2)}`:''}.`);
+  rsRender();
+  try{sessionStorage.setItem('rs_dataset',datasetId);}catch(_e){}
+}
+
+async function rsRun(limit,btn){
+  clearInterval(rsPoll);
+  await bdRun(btn,'Starting…',async()=>{
+    try{
+      const started=await rsCall('start',{limit});
+      rsSetStatus('Scan started. Google Maps scans take a few minutes — this page checks every 10 seconds…');
+      await new Promise((resolve)=>{
+        rsPoll=setInterval(async()=>{
+          try{
+            const s=await rsCall('status',{runId:started.runId});
+            rsSetStatus(`Scan ${esc(String(s.status||'').toLowerCase())}…`);
+            if(s.status==='SUCCEEDED'){
+              clearInterval(rsPoll);
+              await rsFinish(s.datasetId||started.datasetId,s.usageUsd);
+              resolve();
+            }else if(['FAILED','ABORTED','TIMED-OUT'].includes(s.status)){
+              clearInterval(rsPoll);
+              rsSetStatus(`Scan ended with status ${esc(s.status)}.`);
+              resolve();
+            }
+          }catch(err){clearInterval(rsPoll);rsSetStatus(esc(err.message));resolve();}
+        },10000);
+      });
+    }catch(err){rsSetStatus(esc(err.message));showToast(err.message,'error');}
+  });
+}
+
+const RS_PDF={sky:[74,179,212],dark:[26,26,46],muted:[136,150,164],text:[45,55,72],line:[232,236,240]};
+
+async function rsDownloadPdf(){
+  if(!rsVenues.length)throw new Error('Nothing to download — run a scan first.');
+  const jsPDF=await loadJsPdf();
+  const doc=new jsPDF({unit:'pt',format:'a4',compress:true});
+  const W=doc.internal.pageSize.getWidth(),H=doc.internal.pageSize.getHeight(),M=40,CW=W-M*2;
+  let y=0,page=1;
+
+  const header=()=>{
+    doc.setFillColor(...RS_PDF.dark);doc.rect(0,0,W,64,'F');
+    doc.setFillColor(...RS_PDF.sky);doc.rect(0,64,W,3,'F');
+    doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(16);
+    doc.text('HOCAN HOLDINGS',M,28);
+    doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(200,215,225);
+    doc.text('Restaurant prospects — Westlands, Parklands, Kilimani',M,46);
+    doc.text(`${rsVenues.length} venues · ${new Date().toLocaleDateString('en-KE',{year:'numeric',month:'long',day:'numeric'})}`,W-M,46,{align:'right'});
+    y=88;
+  };
+  const footer=()=>{
+    doc.setDrawColor(...RS_PDF.line);doc.setLineWidth(.5);doc.line(M,H-40,W-M,H-40);
+    doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(...RS_PDF.muted);
+    doc.text('Overall rating 2.0–3.7 · up to five reviews of 3 stars or lower per venue · source: Google Maps',M,H-26);
+    doc.text(`Page ${page}`,W-M,H-26,{align:'right'});
+  };
+  const newPage=()=>{footer();doc.addPage();page+=1;header();};
+
+  header();
+
+  rsVenues.forEach((v,i)=>{
+    // Measure the whole card first so one venue is never split across pages.
+    doc.setFontSize(8.5);
+    const reviewLines=v.negativeReviews.map(r=>doc.splitTextToSize(`${r.stars}★  ${r.text}`,CW-28));
+    const bodyH=reviewLines.reduce((n,l)=>n+l.length*10.5+5,0);
+    const cardH=50+bodyH+8;
+    if(y+cardH>H-56)newPage();
+
+    const top=y;
+    doc.setFillColor(250,251,252);doc.roundedRect(M,top,CW,cardH-8,5,5,'F');
+
+    doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(...RS_PDF.dark);
+    doc.text(doc.splitTextToSize(`${i+1}. ${v.name}`,CW-110)[0],M+12,top+18);
+
+    doc.setFontSize(11);doc.setTextColor(197,48,48);
+    doc.text(`${v.rating.toFixed(1)} ★`,W-M-12,top+18,{align:'right'});
+    doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(...RS_PDF.muted);
+    doc.text(`${v.reviewsCount} reviews`,W-M-12,top+30,{align:'right'});
+
+    doc.setFontSize(8.5);doc.setTextColor(...RS_PDF.text);
+    const meta=[v.area,v.category,v.phone].filter(Boolean).join('  ·  ');
+    doc.text(doc.splitTextToSize(meta,CW-110)[0]||'',M+12,top+32);
+
+    // Clickable link to the Google Maps listing, as a real annotation.
+    let ly=top+44;
+    if(v.mapsUrl){
+      doc.setFont('helvetica','bold');doc.setTextColor(...RS_PDF.sky);
+      const label='View on Google Maps →';
+      doc.textWithLink(label,M+12,ly,{url:v.mapsUrl});
+      const lw=doc.getTextWidth(label);
+      doc.setDrawColor(...RS_PDF.sky);doc.setLineWidth(.5);doc.line(M+12,ly+2,M+12+lw,ly+2);
+      doc.link(M+12,ly-9,lw,13,{url:v.mapsUrl});
+      doc.setFont('helvetica','normal');
+    }
+    ly+=14;
+
+    doc.setFontSize(8.5);doc.setTextColor(...RS_PDF.text);
+    reviewLines.forEach(lines=>{
+      lines.forEach(line=>{doc.text(line,M+16,ly);ly+=10.5;});
+      ly+=5;
+    });
+    y=top+cardH;
+  });
+
+  footer();
+  const name=`restaurant-prospects-${new Date().toISOString().slice(0,10)}.pdf`;
+  doc.save(name);
+  return name;
+}
+
+function wireRestaurantsPanel(){
+  document.getElementById('rsRunBtn')?.addEventListener('click',e=>rsRun(60,e.currentTarget));
+  document.getElementById('rsTestBtn')?.addEventListener('click',e=>rsRun(5,e.currentTarget));
+  document.getElementById('rsLoadBtn')?.addEventListener('click',async e=>{
+    await bdRun(e.currentTarget,'Loading…',async()=>{
+      try{
+        const l=await rsCall('latest');
+        await rsFinish(l.datasetId,l.usageUsd);
+      }catch(err){rsSetStatus(esc(err.message));showToast(err.message,'error');}
+    });
+  });
+  document.getElementById('rsPrevBtn')?.addEventListener('click',()=>{if(rsPage>1){rsPage-=1;rsRender();}});
+  document.getElementById('rsNextBtn')?.addEventListener('click',()=>{if(rsPage*RS_PER_PAGE<rsVenues.length){rsPage+=1;rsRender();}});
+  document.getElementById('rsPdfBtn')?.addEventListener('click',async e=>{
+    await bdRun(e.currentTarget,'Building…',async()=>{
+      try{const name=await rsDownloadPdf();showToast(`Downloaded ${name}`);}
+      catch(err){showToast(err.message,'error');}
+    });
+  });
+}
+wireRestaurantsPanel();
+/* TEMP:RESTAURANTS client END */
 
 // ── SESSION RESTORE ───────────────────────────────────────────────────────────
 // Last thing in the module, so every declaration and handler above already
