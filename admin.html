@@ -1142,7 +1142,7 @@ tr:hover td{background:#FAFBFD;}
         </div>
         <p class="bd-help">
           One-off lead report. Venues rated 2.0 to 4.4 on Google Maps (the median and below), ranked by
-          staff-related complaints, with who runs each chain and how they hire. The PDF puts a quick
+          staff complaints from the last 12 months first, with who runs each chain and how they hire. The PDF puts a quick
           report on why this matters underneath the list. This tab will be removed afterwards.
         </p>
         <div id="rsStatus" class="bd-run-info">Press “Load report data” first, then download the PDF.</div>
@@ -4985,8 +4985,8 @@ async function rsBuildPdf(){
   });
   y+=70;
 
-  para(`This is a lead list: ${r.leads.length} restaurants whose overall Google rating is at or below the market median (${m.median}), ranked by the number of staff-related complaints found, then by lowest rating. Each entry shows up to two of the lowest-rated reviews that mention staff, a manager or a waiter, who runs the venue where we could find out, and how they hire. A quick report on why this matters follows the list.`,{gap:6});
-  para('Venues with no complaint found are included on purpose and sit at the end of the list. A quiet review history is not evidence of a good team; the rating alone puts them in the lower half of the market.',{gap:4});
+  para(`This is a lead list: ${r.leads.length} restaurants whose overall Google rating is at or below the market median (${m.median}), ranked by how many staff-related complaints were made in the last 12 months, then by total complaints, then by lowest rating. Each entry shows up to two of the lowest-rated reviews that mention staff, a manager or a waiter, newest first, who runs the venue where we could find out, and how they hire. A quick report on why this matters follows the list.`,{gap:6});
+  para(`${r.withRecentComplaint??0} venues have a complaint from the last 12 months and lead the list. Venues with no complaint found are included on purpose and sit at the end of the list. A quiet review history is not evidence of a good team; the rating alone puts them in the lower half of the market.`,{gap:4});
 
   heading('Lead list');
 

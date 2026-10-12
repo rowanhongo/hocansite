@@ -342,6 +342,13 @@ function lead(place) {
     .slice(0, REVIEWS_PER_VENUE)
     .map((r) => ({ stars: Number(r.stars), text: reviewText(r).slice(0, 400), date: r.publishedAtDate || null }));
 
+  /* A complaint from this year is a live problem; one from 2019 may be long
+     fixed. So the lead is ranked on how many of its complaints are recent, and the
+     reviews shown are put newest first. */
+  const yearAgo = Date.now() - 365 * 86400000;
+  const recentComplaints = staffReviews.filter((r) => r.date && new Date(r.date).getTime() >= yearAgo).length;
+  staffReviews.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+
   const chain = chainFor(String(place.title || ""));
   return {
     placeId: place.placeId,
@@ -356,6 +363,7 @@ function lead(place) {
     mapsUrl: place.url || "",
     reviewsReturned: all.length,
     staffReviews,
+    recentComplaints,
     noStaffComplaint: staffReviews.length === 0,
     chain: chain ? { brand: chain.brand, operator: chain.operator, hiring: chain.hiring, source: chain.source, note: chain.note || "" } : null
   };
@@ -388,8 +396,10 @@ async function report(body) {
     leads.push(lead(p));
   }
 
-  // Most staff complaints first, then the lowest rating; venues with none go last.
+  // Recent complaints first (last 12 months), then total complaints, then the
+  // lowest rating. Venues with no complaint found go last, as agreed.
   leads.sort((a, b) =>
+    b.recentComplaints - a.recentComplaints ||
     b.staffReviews.length - a.staffReviews.length ||
     a.rating - b.rating ||
     b.reviewsCount - a.reviewsCount
@@ -410,6 +420,7 @@ async function report(body) {
     band: { min: MIN_RATING, max: MAX_RATING },
     leads,
     withStaffComplaint: leads.filter((l) => !l.noStaffComplaint).length,
+    withRecentComplaint: leads.filter((l) => l.recentComplaints > 0).length,
     totalStaffReviews: leads.reduce((n, l) => n + l.staffReviews.length, 0)
   });
 }
