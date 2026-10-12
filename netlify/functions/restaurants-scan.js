@@ -59,13 +59,14 @@ async function apify(path, options) {
 
 async function start(body) {
   // `limit` lets a first test run cost a few cents instead of a dollar.
-  const perSearch = Math.min(120, Math.max(1, Number(body.limit) || 60));
+  const perSearch = Math.min(120, Math.max(1, Number(body.limit) || 120));
   const input = {
     searchStringsArray: AREAS.map((area) => `restaurants in ${area}, Nairobi, Kenya`),
     maxCrawledPlacesPerSearch: perSearch,
     language: "en",
     // Review text only. Reviewer names, ids, urls and photos are not collected.
-    maxReviews: 20,
+    // Five is enough because the sort returns the harshest reviews first.
+    maxReviews: REVIEWS_PER_VENUE,
     reviewsSort: String(body.sort || "lowestRanking"),
     scrapeReviewsPersonalData: false
   };
@@ -79,6 +80,18 @@ async function start(body) {
     runId: run.data.id,
     datasetId: run.data.defaultDatasetId,
     input
+  });
+}
+
+// What the account has used this month against its cap, so a scan is never
+// started blind.
+async function limits() {
+  const res = await apify("/users/me/limits");
+  const d = res.data || {};
+  return json(200, {
+    ok: true,
+    usedUsd: d.current?.monthlyUsageUsd ?? null,
+    capUsd: d.limits?.maxMonthlyUsageUsd ?? null
   });
 }
 
@@ -212,6 +225,7 @@ exports.handler = async function handler(event) {
       case "status": return await status(body);
       case "results": return await results(body);
       case "latest": return await latest();
+      case "limits": return await limits();
       default: return json(400, { ok: false, error: `Unknown action: ${body.action}` });
     }
   } catch (error) {
